@@ -9,14 +9,11 @@ import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import {
   Star,
-  Shield,
   Clock,
   ArrowLeft,
-  ShoppingBag,
   Check,
   ChevronRight,
   Sparkles,
-  Award,
   Truck,
   Plus,
   Minus,

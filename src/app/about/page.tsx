@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Award, ShieldAlert, Heart, ChevronRight, TrendingUp, Users } from "lucide-react";
+import { Award, Heart, ChevronRight, TrendingUp, Users } from "lucide-react";
 
 export default function AboutPage() {
   const founders = [
@@ -104,43 +104,43 @@ export default function AboutPage() {
               Meet Our Founders
             </h2>
             <p className="text-xs text-gray-500 mt-1">
-              The co-founding team driving Freshoo's operational excellence and technology.
-            </p>
-          </div>
+              The co-founding team driving Freshoo&apos;s operational excellence and technology.
+          </p>
+        </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {founders.map((founder) => (
-              <div
-                key={founder.name}
-                className="border border-gray-100 rounded-3xl p-6 bg-white hover:shadow-premium shadow-hover transition-all text-center space-y-4"
-              >
-                <img
-                  src={founder.avatar}
-                  alt={founder.name}
-                  className="w-20 h-20 rounded-full object-cover mx-auto bg-gray-50 border border-gray-200"
-                />
-                <div>
-                  <h4 className="font-display font-black text-sm text-gray-900">{founder.name}</h4>
-                  <p className="text-[10px] text-brand-primary font-bold mt-0.5 uppercase tracking-wide">
-                    {founder.role}
-                  </p>
-                </div>
-                <p className="text-[11px] text-gray-500 font-semibold leading-relaxed">
-                  {founder.bio}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {founders.map((founder) => (
+            <div
+              key={founder.name}
+              className="border border-gray-100 rounded-3xl p-6 bg-white hover:shadow-premium shadow-hover transition-all text-center space-y-4"
+            >
+              <img
+                src={founder.avatar}
+                alt={founder.name}
+                className="w-20 h-20 rounded-full object-cover mx-auto bg-gray-50 border border-gray-200"
+              />
+              <div>
+                <h4 className="font-display font-black text-sm text-gray-900">{founder.name}</h4>
+                <p className="text-[10px] text-brand-primary font-bold mt-0.5 uppercase tracking-wide">
+                  {founder.role}
                 </p>
               </div>
-            ))}
-          </div>
-        </section>
+              <p className="text-[11px] text-gray-500 font-semibold leading-relaxed">
+                {founder.bio}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-        {/* Journey Timeline */}
-        <section className="space-y-12">
-          <div className="text-center max-w-xl mx-auto">
-            <h2 className="font-display font-black text-2xl sm:text-3xl text-gray-900">
-              Our Startup Journey
-            </h2>
-            <p className="text-xs text-gray-500 mt-1">
-              How we went from an idea on paper to building Delhi's freshest meat delivery startup.
+      {/* Journey Timeline */}
+      <section className="space-y-12">
+        <div className="text-center max-w-xl mx-auto">
+          <h2 className="font-display font-black text-2xl sm:text-3xl text-gray-900">
+            Our Startup Journey
+          </h2>
+          <p className="text-xs text-gray-500 mt-1">
+            How we went from an idea on paper to building Delhi&apos;s freshest meat delivery startup.
             </p>
           </div>
 

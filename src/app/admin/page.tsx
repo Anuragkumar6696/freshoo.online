@@ -2,9 +2,10 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useApp, Product, Order } from "@/context/AppContext";
+import { useApp, Product } from "@/context/AppContext";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Package,
   ShoppingBag,
@@ -16,8 +17,6 @@ import {
   Edit2,
   CheckCircle,
   XCircle,
-  TrendingUp,
-  Settings,
   ChevronRight,
 } from "lucide-react";
 
@@ -668,7 +667,7 @@ export default function AdminPage() {
                     <label className="block mb-1 text-gray-400 uppercase tracking-wider text-[9px]">Category</label>
                     <select
                       value={category}
-                      onChange={(e) => setCategory(e.target.value as any)}
+                      onChange={(e) => setCategory(e.target.value as "Chicken" | "Mutton" | "Fish" | "Eggs")}
                       className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none font-bold text-gray-700 cursor-pointer"
                     >
                       <option value="Chicken">Chicken</option>

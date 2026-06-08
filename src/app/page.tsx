@@ -1,15 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useApp } from "@/context/AppContext";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { Logo } from "@/components/Logo";
 import {
-  ShieldCheck,
   ChevronRight,
   TrendingUp,
   Award,
@@ -17,18 +15,14 @@ import {
   Smartphone,
   Star,
   Quote,
-  Clock,
   CheckCircle,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Home() {
-  const router = useRouter();
-  const { products, selectedLocation, isStoreOpen, getStoreStatusLabel } = useApp();
-  const [activeCategory, setActiveCategory] = useState<string>("All");
+  const { products } = useApp();
 
   const bestSellers = products.filter((p) => p.isBestSeller);
-  const storeStatus = getStoreStatusLabel();
 
   const categoriesList = [
     {
@@ -210,7 +204,7 @@ export default function Home() {
                     </div>
                   </div>
                   <p className="text-white text-sm font-bold leading-snug mt-4">
-                    "The vacuum packing is so clean, and the meat is incredibly tender. Best in Delhi!"
+                    &quot;The vacuum packing is so clean, and the meat is incredibly tender. Best in Delhi!&quot;
                   </p>
                 </div>
               </div>
@@ -369,7 +363,7 @@ export default function Home() {
                     <Quote className="text-red-100 shrink-0" size={24} />
                   </div>
                   <p className="text-xs text-gray-600 leading-relaxed font-semibold italic">
-                    "{test.review}"
+                    &quot;{test.review}&quot;
                   </p>
                 </div>
 
@@ -395,7 +389,7 @@ export default function Home() {
                 Franchise Program
               </span>
               <h3 className="font-display font-black text-xl sm:text-2xl text-gray-900">
-                Partner with Delhi's Fastest Growing Meat Brand
+                Partner with Delhi&apos;s Fastest Growing Meat Brand
               </h3>
               <p className="text-xs text-gray-500 font-semibold">
                 Interested in launching a Freshoo hub in your sector? We provide tech stack support, logistics, sourcing, and marketing.

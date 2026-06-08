@@ -27,7 +27,6 @@ export default function CheckoutPage() {
     getCartTotal,
     getCartDiscount,
     appliedCoupon,
-    isStoreOpen,
   } = useApp();
 
   // Selected Address State

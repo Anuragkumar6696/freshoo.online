@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useApp, CartItem, Address } from "@/context/AppContext";
+import { useApp, CartItem } from "@/context/AppContext";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import {
@@ -13,7 +13,6 @@ import {
   Clock,
   History,
   TrendingUp,
-  CreditCard,
   Plus,
   Trash2,
   X,
@@ -38,7 +37,7 @@ export default function AccountPage() {
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [tag, setTag] = useState<"Home" | "Work" | "Other">("Home");
   const [addressLine, setAddressLine] = useState("");
-  const [city, setCity] = useState("Delhi");
+  const [city] = useState("Delhi");
   const [pincode, setPincode] = useState("");
   const [formError, setFormError] = useState("");
 
@@ -329,7 +328,7 @@ export default function AccountPage() {
                               <button
                                 key={t}
                                 type="button"
-                                onClick={() => setTag(t as any)}
+                                onClick={() => setTag(t as "Home" | "Work" | "Other")}
                                 className={`flex-1 py-1.5 border text-center rounded-lg cursor-pointer ${
                                   tag === t
                                     ? "border-brand-primary bg-red-50 text-brand-primary"

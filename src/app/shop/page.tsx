@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useApp, Product } from "@/context/AppContext";
+import { useApp } from "@/context/AppContext";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
@@ -13,7 +13,6 @@ import {
   ChevronDown,
   X,
   MapPin,
-  HelpCircle,
   Sparkles,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,7 +20,7 @@ import { motion, AnimatePresence } from "framer-motion";
 function ShopContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { products, selectedLocation, isStoreOpen } = useApp();
+  const { products, selectedLocation } = useApp();
 
   // URL parameters
   const categoryParam = searchParams.get("category");
@@ -51,11 +50,6 @@ function ShopContent() {
       setSearchQuery("");
     }
   }, [searchParam]);
-
-  // Handle Search Input Form
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
 
   // Filter & Sort Logic
   const filteredProducts = products
@@ -291,7 +285,7 @@ function ShopContent() {
                 )}
                 {searchQuery && (
                   <span className="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded-lg">
-                    Search: "{searchQuery}"
+                    Search: &quot;{searchQuery}&quot;
                     <X size={10} className="cursor-pointer text-gray-400 hover:text-gray-600" onClick={() => setSearchQuery("")} />
                   </span>
                 )}
@@ -315,7 +309,7 @@ function ShopContent() {
                   No fresh cuts found
                 </h3>
                 <p className="text-xs text-gray-500 max-w-sm mx-auto leading-relaxed">
-                  We couldn't find any items matching your selected filters. Try broadening your criteria or resetting the settings.
+                  We couldn&apos;t find any items matching your selected filters. Try broadening your criteria or resetting the settings.
                 </p>
                 <button
                   onClick={resetFilters}

@@ -6,7 +6,6 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import {
   Award,
-  ShieldCheck,
   TrendingUp,
   MapPin,
   CheckCircle2,

@@ -17,16 +17,16 @@ export const Logo: React.FC<LogoProps> = ({
   const getDimensions = () => {
     switch (size) {
       case "sm":
-        return { width: 25, height: 25, textClass: "text-base" };
+        return { width: 25, height: 25 };
       case "lg":
-        return { width: 45, height: 45, textClass: "text-3xl" };
+        return { width: 45, height: 45 };
       case "md":
       default:
-        return { width: 32, height: 30, textClass: "text-xl" };
+        return { width: 32, height: 30 };
     }
   };
 
-  const { width, height, textClass } = getDimensions();
+  const { width, height } = getDimensions();
 
   const LogoImage = () => (
     <div className="relative flex items-center justify-center transition-transform duration-300 hover:scale-105">

@@ -3,7 +3,6 @@
 import React from "react";
 import Link from "next/link";
 import { Logo } from "./Logo";
-import { useApp } from "@/context/AppContext";
 import {
   MapPin,
   Phone,
@@ -16,8 +15,6 @@ import {
 } from "lucide-react";
 
 export const Footer: React.FC = () => {
-  const { locations } = useApp();
-
   return (
     <footer className="bg-[#0b1120] text-slate-300 mt-20 pt-20 pb-10 font-medium relative overflow-hidden">
       {/* Decorative background elements */}
@@ -83,7 +80,7 @@ export const Footer: React.FC = () => {
             </div>
           </div>
           <p className="text-sm text-slate-300 leading-relaxed font-bold">
-            Freshoo is Delhi's premium hyperlocal meat delivery startup. We promise 100% fresh, chemical-free meat cut directly post-order for unmatched tenderness.
+            Freshoo is Delhi&apos;s premium hyperlocal meat delivery startup. We promise 100% fresh, chemical-free meat cut directly post-order for unmatched tenderness.
           </p>
           <div className="flex items-center gap-4 pt-2">
             <a

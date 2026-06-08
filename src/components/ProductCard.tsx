@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useApp, Product } from "@/context/AppContext";
-import { Plus, Minus, Star, Shield, HelpCircle } from "lucide-react";
+import { Plus, Minus, Star, HelpCircle } from "lucide-react";
 
 interface ProductCardProps {
   product: Product;
@@ -152,17 +152,3 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     </div>
   );
 };
-
-// Chevron helper
-const ChevronDownIcon = ({ className }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth="2.5"
-    stroke="currentColor"
-    className={className}
-  >
-    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-  </svg>
-);

@@ -91,7 +91,12 @@ interface AppContextType {
     phone: string;
     addresses: Address[];
   } | null;
-  setUser: React.Dispatch<React.SetStateAction<any>>;
+  setUser: React.Dispatch<React.SetStateAction<{
+    name: string;
+    email: string;
+    phone: string;
+    addresses: Address[];
+  } | null>>;
   addAddress: (address: Omit<Address, "id">) => void;
   removeAddress: (id: string) => void;
   
@@ -325,7 +330,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const [closeHour, closeMin] = storeSettings.closingTime.split(":").map(Number);
 
     const totalMinutesOpen = openHour * 60 + openMin;
-    let totalMinutesClose = closeHour * 60 + closeMin;
+    const totalMinutesClose = closeHour * 60 + closeMin;
 
     if (totalMinutesClose < totalMinutesOpen) {
       // Overlap to next day (e.g. closes at 2 AM)
@@ -462,7 +467,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Order Placement Actions
-  const placeOrder = (addressId: string, paymentMethod: string, instructions?: string) => {
+  const placeOrder = (addressId: string, paymentMethod: string, _instructions?: string) => {
     if (!user || cart.length === 0) return null;
     const address = user.addresses.find((a) => a.id === addressId);
     if (!address) return null;

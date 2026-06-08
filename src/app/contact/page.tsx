@@ -12,7 +12,6 @@ import {
   ChevronDown,
   CheckCircle2,
   ChevronRight,
-  Sparkles,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
