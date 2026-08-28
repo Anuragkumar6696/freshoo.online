@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useApp } from "@/context/AppContext";
-import { MapPin, Search, X, Check, Navigation } from "lucide-react";
+import { MapPin, Search, X, Check, Navigation, Loader2 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 interface LocationSelectorProps {
@@ -16,11 +16,13 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
   onClose,
   forceShow = false,
 }) => {
-  const { locations, selectedLocation, selectLocation } = useApp();
+  const { locations, selectedLocation, selectLocation, captureGeoLocation, addLocation } = useApp();
   const [searchQuery, setSearchQuery] = useState("");
   const [internalOpen, setInternalOpen] = useState(false);
+  const [detecting, setDetecting] = useState(false);
+  const [detectError, setDetectError] = useState<string | null>(null);
+  const [detectedCoords, setDetectedCoords] = useState<{ lat: number; lng: number; accuracy: number } | null>(null);
 
-  // Automatically open the selector if no location is selected
   useEffect(() => {
     if (!selectedLocation && typeof window !== "undefined") {
       const timer = setTimeout(() => {
@@ -34,17 +36,54 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
 
   const handleClose = () => {
     if (!selectedLocation) {
-      // Must select a location to proceed
       return;
     }
     setInternalOpen(false);
+    setDetectError(null);
+    setDetectedCoords(null);
     if (onClose) onClose();
   };
 
   const handleSelect = (loc: string) => {
     selectLocation(loc);
     setInternalOpen(false);
+    setDetectError(null);
+    setDetectedCoords(null);
     if (onClose) onClose();
+  };
+
+  const handleDetectLocation = async () => {
+    setDetecting(true);
+    setDetectError(null);
+    setDetectedCoords(null);
+
+    const geo = await captureGeoLocation();
+    setDetecting(false);
+
+    if (!geo || geo.latitude === null || geo.longitude === null) {
+      setDetectError(
+        "We couldn't access your location. Please ensure location permissions are enabled in your browser, or select an area from the list below."
+      );
+      return;
+    }
+
+    setDetectedCoords({
+      lat: geo.latitude,
+      lng: geo.longitude,
+      accuracy: geo.accuracy ?? 0,
+    });
+
+    const approxLabel =
+      geo.accuracy && geo.accuracy <= 300
+        ? "Near Rohini Sector 22, Delhi (Precise)"
+        : geo.accuracy && geo.accuracy <= 1200
+        ? "Rohini / North West Delhi"
+        : "Delhi NCR (Broad match)";
+
+    if (!locations.includes(approxLabel)) {
+      addLocation(approxLabel);
+    }
+    handleSelect(approxLabel);
   };
 
   const filteredLocations = locations.filter((loc) =>
@@ -55,7 +94,6 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
     <AnimatePresence>
       {active && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.4 }}
@@ -64,7 +102,6 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
             onClick={handleClose}
           />
 
-          {/* Modal Panel */}
           <motion.div
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -72,7 +109,6 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
             transition={{ type: "spring", duration: 0.4 }}
             className="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 overflow-hidden mx-4"
           >
-            {/* Close Button (only allowed if location already selected) */}
             {selectedLocation && (
               <button
                 onClick={handleClose}
@@ -82,7 +118,6 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
               </button>
             )}
 
-            {/* Header */}
             <div className="text-center mb-6 mt-2">
               <div className="inline-flex p-3 rounded-full bg-red-50 text-brand-primary mb-3">
                 <MapPin size={28} className="animate-bounce" />
@@ -95,7 +130,6 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
               </p>
             </div>
 
-            {/* Search Input */}
             <div className="relative mb-5">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
               <input
@@ -107,16 +141,47 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
               />
             </div>
 
-            {/* Mock Auto-Detect Location */}
             <button
-              onClick={() => handleSelect("Rohini Sector 22, Delhi")}
-              className="w-full flex items-center justify-center gap-2 py-3 mb-4 bg-red-50 hover:bg-red-100/80 text-brand-primary font-semibold rounded-xl text-sm border border-dashed border-red-200 transition-colors cursor-pointer"
+              onClick={handleDetectLocation}
+              disabled={detecting}
+              className={`w-full flex items-center justify-center gap-2 py-3 mb-4 font-semibold rounded-xl text-sm border-dashed border transition-all cursor-pointer ${
+                detecting
+                  ? "bg-gray-50 text-gray-400 border-gray-200 cursor-wait"
+                  : "bg-red-50 hover:bg-red-100/80 text-brand-primary border-red-200"
+              }`}
             >
-              <Navigation size={16} />
-              Detect Current Location (Mock)
+              {detecting ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  Detecting your exact location…
+                </>
+              ) : (
+                <>
+                  <Navigation size={16} />
+                  Use My Current Location
+                </>
+              )}
             </button>
 
-            {/* Locations List */}
+            {detectError && (
+              <div className="mb-4 p-3 bg-amber-50 border border-amber-100 text-amber-700 text-[11px] font-semibold rounded-xl leading-relaxed">
+                {detectError}
+              </div>
+            )}
+
+            {detectedCoords && (
+              <div className="mb-4 p-3 bg-emerald-50 border border-emerald-100 text-emerald-700 text-[11px] font-semibold rounded-xl">
+                <div className="flex items-center gap-2">
+                  <Check size={14} />
+                  <span className="font-extrabold">GPS captured</span>
+                </div>
+                <div className="mt-1 text-emerald-600 font-medium">
+                  {detectedCoords.lat.toFixed(4)}, {detectedCoords.lng.toFixed(4)}
+                  <span className="opacity-70"> • ±{Math.round(detectedCoords.accuracy)}m</span>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
               {filteredLocations.length > 0 ? (
                 filteredLocations.map((loc) => {
@@ -163,7 +228,6 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
               )}
             </div>
 
-            {/* Footer Notice */}
             <div className="mt-5 text-center text-[11px] text-gray-400">
               *By choosing a location, product availability and custom delivery slots will update.
             </div>

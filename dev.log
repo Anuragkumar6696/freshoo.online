@@ -1,0 +1,636 @@
+
+> freshoo-backend@1.0.0 dev
+> tsx watch src/server.ts
+
+[Multer] Storage mode: Local (disk)
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:11788) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:11788) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:11788) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+[Server] Freshoo backend running on port 4000
+[Server] Environment: development
+[0mGET /api/v1/user/orders?guestEmail=anurag@freshoo.com [33m404[0m 11.616 ms - 43[0m
+[0mGET /api/v1/user/orders?guestEmail=anurag@freshoo.com [33m404[0m 2.229 ms - 43[0m
+[0mPOST /api/v1/orders [32m201[0m 137.058 ms - 869[0m
+[Brevo] admin: 201
+[0mGET /api/v1/settings [33m404[0m 17.057 ms - 43[0m
+[Auth] Cookies received: [
+  'NEXT_LOCALE',
+  'auth_token',
+  '__next_hmr_refresh_hash__',
+  'refreshToken'
+]
+[Auth] Authorization header: missing
+[Auth] No token found in request
+[0mGET /api/v1/auth/me [33m401[0m 15.938 ms - 82[0m
+[0mGET /api/v1/locations [33m404[0m 1.012 ms - 43[0m
+[0mGET /api/v1/products [36m304[0m 243.902 ms - -[0m
+[0mPOST /api/v1/auth/login [32m200[0m 479.490 ms - 256[0m
+[0mGET /api/v1/user/orders [33m404[0m 3.086 ms - 43[0m
+[0mGET /api/v1/user/orders [33m404[0m 1.436 ms - 43[0m
+[0mGET /api/v1/user/addresses [33m404[0m 2.700 ms - 43[0m
+[0mGET /uploads/product-1787929449954-875025966.jpeg [32m200[0m 29.809 ms - 137591[0m
+[0mGET /uploads/product-1787927631918-611346060.webp [36m304[0m 4.365 ms - -[0m
+[0mGET /uploads/product-1787927609832-983979817.webp [36m304[0m 3.295 ms - -[0m
+[0mGET /uploads/product-1787926994081-559312251.webp [36m304[0m 4.220 ms - -[0m
+[0mGET /uploads/product-1787924386495-873429807.jpeg [36m304[0m 2.588 ms - -[0m
+[0mGET /uploads/product-1787929449954-875025966.jpeg [32m200[0m 4.600 ms - 137591[0m
+[0mPOST /api/v1/orders [32m201[0m 121.136 ms - -[0m
+[0mPOST /api/v1/user/addresses [33m404[0m 1.563 ms - 43[0m
+[0mGET /api/v1/user/orders [33m404[0m 1.317 ms - 43[0m
+[0mGET /uploads/product-1787929449954-875025966.jpeg [32m200[0m 1.822 ms - 137591[0m
+[0mGET /uploads/product-1787927631918-611346060.webp [36m304[0m 4.480 ms - -[0m
+[0mGET /uploads/product-1787927609832-983979817.webp [36m304[0m 4.882 ms - -[0m
+[0mGET /uploads/product-1787926994081-559312251.webp [36m304[0m 5.640 ms - -[0m
+[0mGET /uploads/product-1787924386495-873429807.jpeg [36m304[0m 2.042 ms - -[0m
+[0mGET /uploads/product-1787929449954-875025966.jpeg [32m200[0m 4.995 ms - 137591[0m
+[Brevo] admin: 201
+[0mPOST /api/v1/auth/login [32m200[0m 352.642 ms - 257[0m
+[0mGET /api/v1/user/orders [33m404[0m 1.147 ms - 43[0m
+[0mGET /api/v1/user/orders [33m404[0m 1.526 ms - 43[0m
+[0mGET /api/v1/user/addresses [33m404[0m 1.232 ms - 43[0m
+[0mGET /uploads/product-1787929449954-875025966.jpeg [32m200[0m 2.994 ms - 137591[0m
+[0mGET /uploads/product-17879276012:30:09 AM [tsx] change in ./src\modules\upload\upload.controller.ts Rerunning...
+[Multer] Storage mode: Local (disk)
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:472) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:472) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:472) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+12:55:35 AM [tsx] unlink in ./src\modules\upload\upload.routes.ts Rerunning...
+node:internal/modules/cjs/loader:1225
+  const err = new Error(message);
+              ^
+
+Error: Cannot find module './modules/upload/upload.routes'
+Require stack:
+- C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts
+    at node:internal/modules/cjs/loader:1225:15
+    at nextResolveSimple (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\node_modules\tsx\dist\register-C557imBs.cjs:10:1006)
+    at C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\node_modules\tsx\dist\register-C557imBs.cjs:9:4959
+    at C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\node_modules\tsx\dist\register-C557imBs.cjs:9:4261
+    at resolveTsPaths (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\node_modules\tsx\dist\register-C557imBs.cjs:10:759)
+    at C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\node_modules\tsx\dist\register-C557imBs.cjs:10:1199
+    at j._resolveFilename (file:///C:/Users/DELL/.gemini/antigravity/scratch/freshoo-web/backend/node_modules/tsx/dist/register-C4vWVmug.mjs:2:17957)
+    at Function._load (node:internal/modules/cjs/loader:1055:27)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:220:24) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Users\\DELL\\.gemini\\antigravity\\scratch\\freshoo-web\\backend\\src\\server.ts'
+  ]
+}
+
+Node.js v22.14.0
+12:56:30 AM [tsx] change in ./src\server.ts Rerunning...
+12:56:41 AM [tsx] change in ./src\server.ts Restarting...
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:5308) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:5308) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:5308) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+[Server] Freshoo backend running on port 4000
+[Server] Environment: development
+[0mGET /api/v1/health [32m200[0m 11.295 ms - 51[0m
+12:58:21 AM [tsx] change in ./src\server.ts Restarting...
+12:58:35 AM [tsx] change in ./src\server.ts Restarting...
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:13388) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:13388) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:13388) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+1:30:09 AM [tsx] change in ./src\server.ts Rerunning...
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:5516) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:5516) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:5516) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:120:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+ied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+[Server] Freshoo backend running on port 4000
+[Server] Environment: development
+1:30:09 AM [tsx] change in ./src\server.ts Rerunning...
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:17716) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:17716) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:17716) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:120:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+OSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:15244) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+12:55:35 AM [tsx] unlink in ./src\modules\upload\upload.routes.ts Rerunning...
+node:internal/modules/cjs/loader:1225
+  const err = new Error(message);
+              ^
+
+Error: Cannot find module './modules/upload/upload.routes'
+Require stack:
+- C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts
+    at node:internal/modules/cjs/loader:1225:15
+    at nextResolveSimple (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\node_modules\tsx\dist\register-C557imBs.cjs:10:1006)
+    at C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\node_modules\tsx\dist\register-C557imBs.cjs:9:4959
+    at C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\node_modules\tsx\dist\register-C557imBs.cjs:9:4261
+    at resolveTsPaths (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\node_modules\tsx\dist\register-C557imBs.cjs:10:759)
+    at C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\node_modules\tsx\dist\register-C557imBs.cjs:10:1199
+    at j._resolveFilename (file:///C:/Users/DELL/.gemini/antigravity/scratch/freshoo-web/backend/node_modules/tsx/dist/register-C4vWVmug.mjs:2:17957)
+    at Function._load (node:internal/modules/cjs/loader:1055:27)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:220:24) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Users\\DELL\\.gemini\\antigravity\\scratch\\freshoo-web\\backend\\src\\server.ts'
+  ]
+}
+
+Node.js v22.14.0
+12:56:30 AM [tsx] change in ./src\server.ts Rerunning...
+12:56:41 AM [tsx] change in ./src\server.ts Restarting...
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:21940) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:21940) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:21940) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:98:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+12:58:21 AM [tsx] change in ./src\server.ts Rerunning...
+12:58:35 AM [tsx] change in ./src\server.ts Restarting...
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:19988) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:19988) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:19988) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+1:30:09 AM [tsx] change in ./src\server.ts Rerunning...
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:12076) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:12076) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:12076) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:120:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+ was created)
+(node:6544) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:6544) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:18332) [1:30:09 AM [tsx] change in ./src\server.ts Rerunning...
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:7396) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:7396) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:7396) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: list(node:16724) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16724) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:16724) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:120:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node[0mGET /uploads/product-1787924386495-873429807.jpeg [32m200[0m 7.832 ms - 548854[0m
+[Auth] Cookies received: [
+  'NEXT_LOCALE',
+  'auth_token',
+  '__next_hmr_refresh_hash__',
+  'refreshToken'
+]
+[Auth] Authorization header: missing
+[Auth] No token found in request
+[0mGET /api/v1/auth/me [33m401[0m 13.512 ms - 82[0m
+[0mGET /api/v1/locations [33m404[0m 2.113 ms - 43[0m
+[0mGET /api/v1/settings [33m404[0m 3.345 ms - 43[0m
+[0mGET /api/v1/products [36m304[0m 79.017 ms - -[0m
+[0mGET /uploads/product-1787945684917-219785398.webp [32m200[0m 18.639 ms - 197420[0m
+[0mGET /uploads/product-default-bm.jpeg [32m200[0m 16.172 ms - 225815[0m
+[0mGET /uploads/product-1787924386495-873429807.jpeg [32m200[0m 14.599 ms - 548854[0m
+[0mGET /uploads/product-1787927609832-983979817.webp [32m200[0m 27.293 ms - 613725[0m
+[0mGET /uploads/product-1787926994081-559312251.webp [32m200[0m 20.125 ms - 666078[0m
+[0mGET /uploads/product-1787943420567-671410025.webp [32m200[0m 5.552 ms - 137591[0m
+[0mGET /uploads/product-1787927631918-611346060.webp [32m200[0m 4.155 ms - 659234[0m
+[0mPOST /api/v1/auth/login [32m200[0m 468.353 ms - 250[0m
+[0mGET /api/v1/user/orders [33m404[0m 0.954 ms - 43[0m
+[0mGET /api/v1/user/orders [33m404[0m 2.391 ms - 43[0m
+[0mGET /api/v1/user/addresses [33m404[0m 2.591 ms - 43[0m
+[Auth] Cookies received: [
+  'NEXT_LOCALE',
+  'auth_token',
+  '__next_hmr_refresh_hash__',
+  'accessToken',
+  'refreshToken'
+]
+[Auth] Authorization header: missing
+[Auth] Token verified for user: 6a9178bb01e3d83081ff986f Role: ADMIN
+[0mDELETE /api/v1/products/6a918f84ec23bfb38d5c61c3 [32m200[0m 99.842 ms - 57[0m
+[Auth] Cookies received: [
+  'NEXT_LOCALE',
+  'auth_token',
+  '__next_hmr_refresh_hash__',
+  'refreshToken'
+]
+[Auth] Authorization header: missing
+[Auth] No token found in request
+[0mPOST /api/v1/upload [33m401[0m 3.467 ms - 82[0m
+[Auth] Cookies received: [
+  'NEXT_LOCALE',
+  'auth_token',
+  '__next_hmr_refresh_hash__',
+  'refreshToken'
+]
+[Auth] Authorization header: missing
+[Auth] No token found in request
+[0mPOST /api/v1/upload [33m401[0m 0.815 ms - 82[0m
+[Auth] Cookies received: [
+  'NEXT_LOCALE',
+  'auth_token',
+  '__next_hmr_refresh_hash__',
+  'refreshToken'
+]
+[Auth] Authorization header: missing
+[Auth] No token found in request
+[0mPOST /api/v1/upload [33m401[0m 0.930 ms - 82[0m
+[Auth] Cookies received: [
+  'NEXT_LOCALE',
+  'auth_token',
+  '__next_hmr_refresh_hash__',
+  'refreshToken'
+]
+[Auth] Authorization header: missing
+[Auth] No token found in request
+[0mPOST /api/v1/upload [33m401[0m 0.803 ms - 82[0m
+[Auth] Cookies received: [
+  'NEXT_LOCALE',
+  'auth_token',
+  '__next_hmr_refresh_hash__',
+  'refreshToken'
+]
+[Auth] Authorization header: missing
+[Auth] No token found in request
+[0mPOST /api/v1/upload [33m401[0m 7.515 ms - 82[0m
+[Auth] Cookies received: [
+  'NEXT_LOCALE',
+  'auth_token',
+  '__next_hmr_refresh_hash__',
+  'refreshToken'
+]
+[Auth] Authorization header: missing
+[Auth] No token found in request
+[0mPOST /api/v1/upload [33m401[0m 7.376 ms - 82[0m
+[Auth] Cookies received: [ 'accessToken' ]
+[Auth] Authorization header: missing
+[Auth] Token verification failed: invalid signature
+[0mPOST /api/v1/upload [33m401[0m 8.666 ms - 63[0m
+[Auth] Cookies received: [
+  'NEXT_LOCALE',
+  'auth_token',
+  '__next_hmr_refresh_hash__',
+  'refreshToken'
+]
+[Auth] Authorization header: missing
+[Auth] No token found in request
+[0mPOST /api/v1/upload [33m401[0m 1.504 ms - 82[0m
+[Auth] Cookies received: [
+  'NEXT_LOCALE',
+  'auth_token',
+  '__next_hmr_refresh_hash__',
+  'refreshToken'
+]
+[Auth] Authorization header: missing
+[Auth] No token found in request
+[0mPOST /api/v1/upload [33m401[0m 2.266 ms - 82[0m
+[Auth] Cookies received: [
+  'NEXT_LOCALE',
+  'auth_token',
+  'refreshToken',
+  '__next_hmr_refresh_hash__'
+]
+[Auth] Authorization header: missing
+[Auth] No token found in request
+[0mPOST /api/v1/upload [33m401[0m 2.747 ms - 82[0m
+[Auth] Cookies received: [
+  'NEXT_LOCALE',
+  'auth_token',
+  'refreshToken',
+  '__next_hmr_refresh_hash__'
+]
+[Auth] Authorization header: missing
+[Auth] No token found in request
+[0mPOST /api/v1/upload [33m401[0m 4.406 ms - 82[0m
+[0mPOST /api/v1/auth/login [32m200[0m 2801.489 ms - 250[0m
+[0mGET /api/v1/user/orders [33m404[0m 1.176 ms - 43[0m
+[0mGET /api/v1/user/orders [33m404[0m 0.785 ms - 43[0m
+[0mGET /api/v1/user/addresses [33m404[0m 1.346 ms - 43[0m
+[0mGET /uploads/product-1787945684917-219785398.webp [36m304[0m 12.743 ms - -[0m
+[0mGET /uploads/product-1787943420567-671410025.webp [36m304[0m 9.551 ms - -[0m
+[0mGET /uploads/product-1787927631918-611346060.webp [36m304[0m 6.671 ms - -[0m
+[0mGET /uploads/product-1787927609832-983979817.webp [36m304[0m 6.323 ms - -[0m
+[0mGET /uploads/product-1787926994081-559312251.webp [36m304[0m 2.937 ms - -[0m
+[0mGET /uploads/product-1787924386495-873429807.jpeg [36m304[0m 1.862 ms - -[0m
+[Auth] Cookies received: [
+  'NEXT_LOCALE',
+  'auth_token',
+  '__next_hmr_refresh_hash__',
+  'accessToken',
+  'refreshToken'
+]
+[Auth] Authorization header: missing
+[Auth] Token verified for user: 6a9178bb01e3d83081ff986f Role: ADMIN
+[Upload] Saved file: product-1787949567159-694835202.jpeg -> http://localhost:4000/uploads/product-1787949567159-694835202.jpeg
+[0mPOST /api/v1/upload [32m201[0m 55.024 ms - 228[0m
+[Auth] Cookies received: [
+  'NEXT_LOCALE',
+  'auth_token',
+  '__next_hmr_refresh_hash__',
+  'accessToken',
+  'refreshToken'
+]
+[Auth] Authorization header: missing
+[Auth] Token verified for user: 6a9178bb01e3d83081ff986f Role: ADMIN
+[0mPOST /api/v1/products [32m201[0m 156.523 ms - 582[0m
+[0mGET /uploads/product-1787949567159-694835202.jpeg [32m200[0m 6.337 ms - 174593[0m
+[0mGET /api/v1/products [32m200[0m 81.239 ms - -[0m
+[Auth] Cookies received: [
+  'NEXT_LOCALE',
+  'auth_token',
+  '__next_hmr_refresh_hash__',
+  'accessToken',
+  'refreshToken'
+]
+[Auth] Authorization header: missing
+[Auth] Token verified for user: 6a9178bb01e3d83081ff986f Role: ADMIN
+[Upload] Saved file: product-1787949585965-898931715.jpeg -> http://localhost:4000/uploads/product-1787949585965-898931715.jpeg
+[0mPOST /api/v1/upload [32m201[0m 17.011 ms - 228[0m
+[Auth] Cookies received: [
+  'NEXT_LOCALE',
+  'auth_token',
+  '__next_hmr_refresh_hash__',
+  'accessToken',
+  'refreshToken'
+]
+[Auth] Authorization header: missing
+[Auth] Token verified for user: 6a9178bb01e3d83081ff986f Role: ADMIN
+(node:20784) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+[0mPATCH /api/v1/products/6a91dc3f861f88b60c125421 [32m200[0m 134.800 ms - 580[0m
+[0mGET /uploads/product-1787949585965-898931715.jpeg [32m200[0m 7.570 ms - 174593[0m

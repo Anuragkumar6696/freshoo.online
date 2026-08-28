@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useApp, Product } from "@/context/AppContext";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { AdminGuard } from "@/components/AdminGuard";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Package,
@@ -18,9 +19,18 @@ import {
   CheckCircle,
   XCircle,
   ChevronRight,
+  Upload,
 } from "lucide-react";
 
 export default function AdminPage() {
+  return (
+    <AdminGuard>
+      <AdminPageContent />
+    </AdminGuard>
+  );
+}
+
+function AdminPageContent() {
   const {
     products,
     addProduct,
@@ -34,7 +44,14 @@ export default function AdminPage() {
     orders,
     updateOrderStatus,
     getStoreStatusLabel,
+    user,
   } = useApp();
+
+  // Log user state for debugging
+  useEffect(() => {
+    console.log("[Admin] Current user:", user);
+    console.log("[Admin] Is admin:", user?.isAdmin);
+  }, [user]);
 
   // Tabs state
   const [activeTab, setActiveTab] = useState<"products" | "orders" | "locations" | "timings" | "customers">("products");
@@ -46,6 +63,8 @@ export default function AdminPage() {
   const [category, setCategory] = useState<"Chicken" | "Mutton" | "Fish" | "Eggs">("Chicken");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
   const [freshnessBadge, setFreshnessBadge] = useState("Cut After Order");
   const [isBestSeller, setIsBestSeller] = useState(false);
   // Simple pricing tags
@@ -77,7 +96,9 @@ export default function AdminPage() {
     setName("");
     setCategory("Chicken");
     setDescription("");
-    setImage("https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&q=80&w=600");
+    setImage("");
+    setImageFile(null);
+    setImagePreview("");
     setFreshnessBadge("Cut After Order");
     setIsBestSeller(false);
     setPrice500g("199");
@@ -94,6 +115,8 @@ export default function AdminPage() {
     setCategory(prod.category);
     setDescription(prod.description);
     setImage(prod.image);
+    setImageFile(null);
+    setImagePreview(prod.image);
     setFreshnessBadge(prod.freshnessBadge);
     setIsBestSeller(!!prod.isBestSeller);
 
@@ -109,8 +132,47 @@ export default function AdminPage() {
     setShowProductModal(true);
   };
 
-  const handleProductSubmit = (e: React.FormEvent) => {
+  const handleProductSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    let finalImageUrl = image;
+
+    // If user selected a new file, upload it first
+    if (imageFile) {
+      try {
+        console.log("[Admin] Starting image upload...");
+        const formData = new FormData();
+        formData.append("image", imageFile);
+
+        const uploadRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000/api/v1"}/upload`, {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        });
+
+        console.log("[Admin] Upload response status:", uploadRes.status);
+        console.log("[Admin] Upload response headers:", Object.fromEntries(uploadRes.headers.entries()));
+
+        if (!uploadRes.ok) {
+          const errorData = await uploadRes.json().catch(() => ({ error: "Unknown error" }));
+          console.error("Upload failed:", errorData);
+          console.error("Full upload response:", {
+            status: uploadRes.status,
+            statusText: uploadRes.statusText,
+            headers: Object.fromEntries(uploadRes.headers.entries()),
+          });
+          throw new Error(errorData.error || `Upload failed with status ${uploadRes.status}`);
+        }
+
+        const uploadData = await uploadRes.json();
+        console.log("Upload success:", uploadData);
+        finalImageUrl = uploadData.data.url;
+      } catch (err) {
+        console.error("Image upload error:", err);
+        alert(`Failed to upload image: ${err instanceof Error ? err.message : "Please try again"}`);
+        return;
+      }
+    }
 
     // Compile weights
     const weightsArray = [];
@@ -134,11 +196,15 @@ export default function AdminPage() {
       return;
     }
 
+    if (!finalImageUrl || finalImageUrl === "") {
+      finalImageUrl = "/chicken1.png";
+    }
+
     const payload = {
       name,
       category,
       description,
-      image,
+      image: finalImageUrl,
       rating: 4.8,
       reviewsCount: 15,
       freshnessBadge,
@@ -324,7 +390,7 @@ export default function AdminPage() {
                       {products.map((prod) => (
                         <tr key={prod.id} className="hover:bg-gray-50/50">
                           <td className="p-3 flex items-center gap-3">
-                            <img src={prod.image} alt="" className="w-10 h-10 rounded-lg object-cover bg-gray-50 border border-gray-100" />
+                            <img src={prod.image || "/chicken1.png"} alt="" className="w-10 h-10 rounded-lg object-cover bg-gray-50 border border-gray-100" />
                             <div>
                               <p className="font-bold text-gray-900 text-xs">{prod.name}</p>
                               {prod.isBestSeller && <span className="text-[8px] bg-red-50 text-brand-primary px-1.5 py-0.5 rounded font-black uppercase">BEST SELLER</span>}
@@ -385,7 +451,13 @@ export default function AdminPage() {
                             </div>
                             <div>
                               <span className="text-[9px] text-gray-400 font-black uppercase">Customer Info</span>
-                              <p className="text-gray-900 font-bold">{order.address.addressLine.split(",")[0]}</p>
+                              <p className="text-gray-900 font-bold">{order.customerName || order.guestDetails?.name || (order.isGuestOrder ? "Guest" : "User")}</p>
+                              <p className="text-[10px] text-gray-500">{order.customerEmail || order.guestEmail || "—"}</p>
+                              <p className="text-[10px] text-gray-500">{order.customerPhone || order.guestPhone || "—"}</p>
+                            </div>
+                            <div>
+                              <span className="text-[9px] text-gray-400 font-black uppercase">Address</span>
+                              <p className="text-gray-900 font-bold text-[10px]">{order.address?.addressLine || "—"}</p>
                             </div>
                             <div>
                               <span className="text-[9px] text-gray-400 font-black uppercase">Total Bill</span>
@@ -692,15 +764,36 @@ export default function AdminPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block mb-1 text-gray-400 uppercase tracking-wider text-[9px]">Image URL</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="https://images.unsplash.com/..."
-                      value={image}
-                      onChange={(e) => setImage(e.target.value)}
-                      className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none font-medium"
-                    />
+                    <label className="block mb-1 text-gray-400 uppercase tracking-wider text-[9px]">Product Image</label>
+                    <div className="space-y-2">
+                      <label className="flex items-center justify-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors">
+                        <Upload size={16} className="text-brand-primary" />
+                        <span className="text-xs font-semibold text-gray-600">
+                          {imageFile ? imageFile.name : "Choose Image File"}
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              setImageFile(file);
+                              setImagePreview(URL.createObjectURL(file));
+                            }
+                          }}
+                          className="hidden"
+                        />
+                      </label>
+                      {imagePreview && (
+                        <div className="relative w-full h-24 rounded-lg overflow-hidden border border-gray-200">
+                          <img
+                            src={imagePreview}
+                            alt="Preview"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <div>
                     <label className="block mb-1 text-gray-400 uppercase tracking-wider text-[9px]">Freshness Badge</label>

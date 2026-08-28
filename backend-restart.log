@@ -1,0 +1,851 @@
+
+> freshoo-backend@1.0.0 dev
+> tsx watch src/server.ts
+
+[Multer] Storage mode: Local (disk)
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:23124) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:23124) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:23124) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+9:30:54 PM [tsx] change in ./src\modules\orders\orders.controller.ts Rerunning...
+[Multer] Storage mode: Local (disk)
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:19212) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:19212) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:19212) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+9:36:39 PM [tsx] change in ./src\modules\upload\upload.controller.ts Rerunning...
+[Multer] Storage mode: Local (disk)
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:26544) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:26544) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:26544) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+9:40:00 PM [tsx] change in ./src\modules\orders\orders.controller.ts Rerunning...
+[Multer] Storage mode: Local (disk)
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:13328) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:13328) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:13328) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+9:42:29 PM [tsx] change in ./src\modules\orders\orders.controller.ts Rerunning...
+[Multer] Storage mode: Local (disk)
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:24972) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:24972) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:24972) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+10:00:12 PM [tsx] change in ./src\models\Order.ts Rerunning...
+[Multer] Storage mode: Local (disk)
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:4336) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:4336) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:4336) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+10:03:01 PM [tsx] change in ./src\modules\orders\orders.controller.ts Rerunning...
+[Multer] Storage mode: Local (disk)
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:24080) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:24080) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:24080) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+10:05:03 PM [tsx] change in ./src\modules\orders\orders.controller.ts Rerunning...
+[Multer] Storage mode: Local (disk)
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:15536) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:15536) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:15536) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+10:19:30 PM [tsx] change in ./src\modules\orders\orders.controller.ts Rerunning...
+[Multer] Storage mode: Local (disk)
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:27580) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27580) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:27580) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+10:20:00 PM [tsx] change in ./src\modules\orders\orders.controller.ts Rerunning...
+[Multer] Storage mode: Local (disk)
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:17224) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:17224) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:17224) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+10:32:18 PM [tsx] change in ./src\modules\orders\orders.controller.ts Rerunning...
+[Multer] Storage mode: Local (disk)
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:3956) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:3956) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:3956) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+10:33:07 PM [tsx] change in ./src\modules\orders\orders.controller.ts Rerunning...
+[Multer] Storage mode: Local (disk)
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:15752) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:15752) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:15752) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+11:14:23 PM [tsx] change in ./src\modules\orders\orders.controller.ts Rerunning...
+11:14:38 PM [tsx] change in ./src\modules\orders\orders.controller.ts Restarting...
+node:internal/buffer:961
+    super(bufferOrLength, byteOffset, length);
+    ^
+
+RangeError: Array buffer allocation failed
+    at new ArrayBuffer (<anonymous>)
+    at new Uint8Array (<anonymous>)
+    at new FastBuffer (node:internal/buffer:961:5)
+    at Function.alloc (node:buffer:400:10)
+    at Object.allocate (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\node_modules\bson\src\utils\node_byte_utils.ts:92:19)
+    at Object.<anonymous> (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\node_modules\bson\src\bson.ts:77:24)
+    at Module._compile (node:internal/modules/cjs/loader:1554:14)
+    at Object.transformer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\node_modules\tsx\dist\register-C557imBs.cjs:9:3619)
+    at Module.load (node:internal/modules/cjs/loader:1289:32)
+    at Function._load (node:internal/modules/cjs/loader:1108:12)
+
+Node.js v22.14.0
+11:22:08 PM [tsx] change in ./src\modules\orders\orders.controller.ts Rerunning...
+[Multer] Storage mode: Local (disk)
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:13328) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:13328) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:13328) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+11:27:57 PM [tsx] change in ./src\modules\orders\orders.controller.ts Rerunning...
+[Multer] Storage mode: Local (disk)
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:14040) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14040) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:14040) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+11:33:05 PM [tsx] change in ./src\models\Order.ts Rerunning...
+[Multer] Storage mode: Local (disk)
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:25656) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:25656) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:25656) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+11:33:44 PM [tsx] change in ./src\modules\orders\orders.controller.ts Rerunning...
+[Multer] Storage mode: Local (disk)
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:7920) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:7920) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:7920) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+11:34:19 PM [tsx] change in ./src\modules\orders\orders.controller.ts Rerunning...
+[Multer] Storage mode: Local (disk)
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:12704) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:12704) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:12704) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+11:38:42 PM [tsx] change in ./src\modules\orders\orders.controller.ts Rerunning...
+[Multer] Storage mode: Local (disk)
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:21340) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:21340) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:21340) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+11:41:09 PM [tsx] change in ./src\modules\orders\orders.routes.ts Rerunning...
+[Multer] Storage mode: Local (disk)
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:20704) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:20704) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:20704) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+12:30:09 AM [tsx] change in ./src\modules\upload\upload.controller.ts Rerunning...
+[Multer] Storage mode: Local (disk)
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:6020) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:6020) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:6020) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+12:55:35 AM [tsx] unlink in ./src\modules\upload\upload.routes.ts Rerunning...
+node:internal/modules/cjs/loader:1225
+  const err = new Error(message);
+              ^
+
+Error: Cannot find module './modules/upload/upload.routes'
+Require stack:
+- C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts
+    at node:internal/modules/cjs/loader:1225:15
+    at nextResolveSimple (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\node_modules\tsx\dist\register-C557imBs.cjs:10:1006)
+    at C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\node_modules\tsx\dist\register-C557imBs.cjs:9:4959
+    at C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\node_modules\tsx\dist\register-C557imBs.cjs:9:4261
+    at resolveTsPaths (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\node_modules\tsx\dist\register-C557imBs.cjs:10:759)
+    at C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\node_modules\tsx\dist\register-C557imBs.cjs:10:1199
+    at j._resolveFilename (file:///C:/Users/DELL/.gemini/antigravity/scratch/freshoo-web/backend/node_modules/tsx/dist/register-C4vWVmug.mjs:2:17957)
+    at Function._load (node:internal/modules/cjs/loader:1055:27)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:220:24) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Users\\DELL\\.gemini\\antigravity\\scratch\\freshoo-web\\backend\\src\\server.ts'
+  ]
+}
+
+Node.js v22.14.0
+12:56:30 AM [tsx] change in ./src\server.ts Rerunning...
+12:56:41 AM [tsx] change in ./src\server.ts Restarting...
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:8092) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:8092) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:8092) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:98:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+12:58:21 AM [tsx] change in ./src\server.ts Rerunning...
+12:58:35 AM [tsx] change in ./src\server.ts Restarting...
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:26032) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:26032) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:26032) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:100:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0
+1:30:09 AM [tsx] change in ./src\server.ts Rerunning...
+[Server] Loading .env from: C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\.env
+[Server] Cloudinary config check: {
+  cloud_name: 'your-actual-cloud-name-here',
+  api_key_set: true,
+  api_secret_set: true
+}
+[MongoDB] Connected to DB: freshoo at ac-xsogmiy-shard-00-00.k0nuuy8.mongodb.net
+(node:5628) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"email":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:5628) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"phone":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+(node:5628) [MONGOOSE] Warning: mongoose: Duplicate schema index on {"role":1} for model "User". This is often due to declaring an index using both "index: true" and "schema.index()". MongoDB will not create the duplicate index and options on the duplicate definition (such as expireAfterSeconds or unique) will not be applied. Please remove the duplicate index definition.
+[Seed] Admin user already exists
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at startServer (C:\Users\DELL\.gemini\antigravity\scratch\freshoo-web\backend\src\server.ts:120:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.14.0

@@ -75,8 +75,8 @@ export const Footer: React.FC = () => {
         <div className="space-y-8">
           <div className="relative group inline-block">
             <div className="absolute -inset-2 bg-gradient-to-r from-brand-primary to-red-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
-            <div className="relative bg-white p-2.5 rounded-xl shadow-2xl">
-              <Logo variant="horizontal" size="sm" />
+            <div className="relative">
+              <Logo variant="light" size="sm" />
             </div>
           </div>
           <p className="text-sm text-slate-300 leading-relaxed font-bold">

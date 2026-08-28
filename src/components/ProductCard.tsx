@@ -56,7 +56,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       {/* Image Area */}
       <Link href={`/product/${product.id}`} className="block relative overflow-hidden aspect-square bg-slate-50">
         <img
-          src={product.image}
+          src={product.image || "/chicken1.png"}
           alt={product.name}
           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"
         />
