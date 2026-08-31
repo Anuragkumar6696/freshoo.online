@@ -1,7 +1,47 @@
 import { Response } from "express";
+import mongoose from "mongoose";
 import { AuthRequest } from "../../middleware/auth";
 import Order from "../../models/Order";
 import { successResponse, errorResponse } from "../../utils/response";
+
+const STATUS_LABELS: Record<string, string> = {
+  PENDING: "Order Placed",
+  CONFIRMED: "Order Placed",
+  PROCESSING: "Processing",
+  PREPARING: "Preparing",
+  READY_FOR_COLLECTION: "Ready for Collection",
+  COLLECTED: "Collected",
+  OUT_FOR_DELIVERY: "Out for Delivery",
+  DELIVERED: "Delivered",
+  CANCELLED: "Cancelled",
+};
+
+// Helper: Safely build MongoDB ID match query without triggering CastError
+const buildIdQuery = (id: string) => {
+  const isObjectId = mongoose.Types.ObjectId.isValid(id);
+  return isObjectId ? { $or: [{ friendlyId: id }, { _id: id }] } : { friendlyId: id };
+};
+
+// Helper: Standardize response object shape for client UI
+const formatOrder = (orderDoc: any) => {
+  const orderObj = typeof orderDoc.toObject === "function" ? orderDoc.toObject() : { ...orderDoc };
+  const rawDate = orderObj.createdAt || orderObj.date;
+
+  return {
+    ...orderObj,
+    id: orderObj.friendlyId || (orderObj._id ? orderObj._id.toString() : undefined),
+    date: rawDate
+      ? new Date(rawDate).toLocaleString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+      : "",
+    statusLabel: STATUS_LABELS[orderObj.status] || orderObj.status || "Order Placed",
+  };
+};
 
 // POST /api/v1/orders - Place order
 export const createOrder = async (req: AuthRequest, res: Response): Promise<Response> => {
@@ -26,23 +66,17 @@ export const createOrder = async (req: AuthRequest, res: Response): Promise<Resp
       return errorResponse(res, "Payment method required", 400);
     }
 
-    // Calculate pricing
-    const subtotal = items.reduce((sum: number, item: any) => sum + (item.price || 0) * (item.quantity || 1), 0);
-    const deliveryFee = 0;
-    const packagingFee = 0;
-    const tax = 0;
-    const total = subtotal;
+    const subtotal = items.reduce(
+      (sum: number, item: any) => sum + (item.price || 0) * (item.quantity || 1),
+      0
+    );
 
-    // Generate order ID
     const friendlyId = "FRSH-" + Math.floor(100000 + Math.random() * 900000);
 
-    // Customer info
     let userId: string | null = null;
     let customerName: string | null = null;
     let customerEmail: string | null = null;
     let customerPhone: string | null = null;
-    let guestEmail: string | null = null;
-    let guestPhone: string | null = null;
 
     if (!isGuest && req.user?.userId) {
       userId = req.user.userId;
@@ -50,21 +84,24 @@ export const createOrder = async (req: AuthRequest, res: Response): Promise<Resp
       customerPhone = (req.user as any)?.phone || null;
       customerName = (req.user as any)?.name || null;
     }
+
     if (guestDetails) {
       customerName = guestDetails.name || customerName;
       customerEmail = guestDetails.email || customerEmail;
       customerPhone = guestDetails.phone || customerPhone;
-      guestEmail = guestDetails.email || null;
-      guestPhone = guestDetails.phone || null;
     }
 
-    const order = await Order.create({
+    const normalizedEmail = customerEmail ? customerEmail.toLowerCase() : null;
+
+    const createdDoc = await Order.create({
       friendlyId,
-      userId,
-      customerName,
-      isGuestOrder: isGuest || !userId,
-      guestEmail,
-      guestPhone,
+      userId: userId || null,
+      customerName: customerName || "Guest",
+      customerEmail: normalizedEmail,
+      customerPhone,
+      isGuestOrder: Boolean(isGuest || !userId),
+      guestEmail: normalizedEmail,
+      guestPhone: customerPhone,
       items,
       address,
       geoLocation: geoLocation || null,
@@ -79,51 +116,21 @@ export const createOrder = async (req: AuthRequest, res: Response): Promise<Resp
       tax: 0,
       total: subtotal,
       idempotencyKey: `${Date.now()}-${Math.random()}`,
-      // Ensure customer info is always available for dashboard filters
-      customerName: customerName || guestDetails?.name || "Guest",
-      customerEmail: (guestDetails?.email || null),
-      customerPhone: (guestDetails?.phone || null),
     });
 
-    // Include formatted date in response
-    const orderJson = order.toJSON() as any;
-    orderJson.date = order.createdAt
-      ? new Date(order.createdAt).toLocaleString("en-IN", {
-          day: "numeric", month: "short", year: "numeric",
-          hour: "2-digit", minute: "2-digit",
-        })
-      : new Date().toLocaleString("en-IN", {
-          day: "numeric", month: "short", year: "numeric",
-          hour: "2-digit", minute: "2-digit",
-        });
-    // Map backend status to frontend-friendly label
-    const STATUS_LABELS: Record<string, string> = {
-      PENDING: "Order Placed",
-      CONFIRMED: "Order Placed",
-      PROCESSING: "Processing",
-      PREPARING: "Preparing",
-      READY_FOR_COLLECTION: "Ready for Collection",
-      COLLECTED: "Collected",
-      OUT_FOR_DELIVERY: "Out for Delivery",
-      DELIVERED: "Delivered",
-      CANCELLED: "Cancelled",
-    };
-    orderJson.statusLabel = STATUS_LABELS[order.status] || order.status;
+    const formattedOrder = formatOrder(createdDoc);
 
-    // Send Brevo notification (fire-and-forget, non-blocking)
+    // Send Brevo notification non-blocking
     void (async () => {
       try {
         const { notifyAdmin } = await import("../../lib/brevo");
-        const orderForEmail: any = { ...orderJson };
-        await Promise.allSettled([
-          notifyAdmin(orderForEmail),
-        ]);
+        await Promise.allSettled([notifyAdmin(formattedOrder)]);
       } catch (e) {
         console.log("[Brevo] notification error (non-fatal):", e);
       }
     })();
 
-    return successResponse(res, { order: orderJson }, "Order placed successfully", 201);
+    return successResponse(res, { order: formattedOrder }, "Order placed successfully", 201);
   } catch (err: any) {
     console.error("[Orders] Create error:", err?.stack || err?.message || err);
     return errorResponse(res, `Failed to place order: ${err?.message || "unknown"}`, 500);
@@ -131,31 +138,59 @@ export const createOrder = async (req: AuthRequest, res: Response): Promise<Resp
 };
 
 // GET /api/v1/user/orders
+// GET /api/v1/user/orders
 export const getUserOrders = async (req: AuthRequest, res: Response): Promise<Response> => {
   try {
-    const userId = req.user?.userId;
-    const userEmail = (req.user as any)?.email || null;
+    const userId = req.user?.userId || (req.user as any)?.id || (req.user as any)?._id;
+    const userEmail = (req.user as any)?.email ? (req.user as any).email.toLowerCase() : null;
     const userPhone = (req.user as any)?.phone || null;
+    const isAdmin = (req.user as any)?.isAdmin || (req.user as any)?.role === "ADMIN" || userEmail === "admin@freshoo.in";
 
-    let query: any = {};
-    if (userId) {
-      query = { userId: userId };
-    } else if (userEmail || userPhone) {
-      const or: any[] = [];
-      if (userEmail) or.push({ guestEmail: userEmail.toLowerCase() });
-      if (userPhone) or.push({ guestPhone: userPhone });
-      if (or.length > 0) query = { $or: or };
-    } else {
-      const qguest = req.query.guestEmail || req.query.guestPhone;
-      if (qguest) {
-        query = { $or: [{ guestEmail: String(qguest).toLowerCase() }, { guestPhone: String(qguest) }] };
-      } else {
-        query = { userId: null };
-      }
+    // 🚀 FIX: Agar Admin request kar raha hai, toh saare orders do (No user filter!)
+    if (isAdmin) {
+      const allOrders = await Order.find({}).sort({ createdAt: -1 }).limit(100).lean();
+      const formattedOrders = allOrders.map((order) => formatOrder(order));
+      return successResponse(res, { orders: formattedOrders });
     }
 
-    const orders = await Order.find(query).sort({ createdAt: -1 }).lean();
-    return successResponse(res, { orders });
+    // 🟢 AGAR NORMAL USER HAI, TOH SIRF USKE ORDERS FILTER KARO
+    const orConditions: any[] = [];
+
+    if (userId) {
+      orConditions.push({ userId });
+    }
+    if (userEmail) {
+      orConditions.push({ customerEmail: userEmail });
+      orConditions.push({ guestEmail: userEmail });
+    }
+    if (userPhone) {
+      orConditions.push({ customerPhone: userPhone });
+      orConditions.push({ guestPhone: userPhone });
+    }
+
+    const qEmail = req.query.email || req.query.guestEmail;
+    const qPhone = req.query.phone || req.query.guestPhone;
+    const qUserId = req.query.userId;
+
+    if (qUserId) orConditions.push({ userId: String(qUserId) });
+    if (qEmail) {
+      const normalizedQueryEmail = String(qEmail).toLowerCase();
+      orConditions.push({ customerEmail: normalizedQueryEmail });
+      orConditions.push({ guestEmail: normalizedQueryEmail });
+    }
+    if (qPhone) {
+      orConditions.push({ customerPhone: String(qPhone) });
+      orConditions.push({ guestPhone: String(qPhone) });
+    }
+
+    if (orConditions.length === 0) {
+      return successResponse(res, { orders: [] });
+    }
+
+    const orders = await Order.find({ $or: orConditions }).sort({ createdAt: -1 }).lean();
+    const formattedOrders = orders.map((order) => formatOrder(order));
+
+    return successResponse(res, { orders: formattedOrders });
   } catch (err: any) {
     console.error("[Orders] Get error:", err.message || err);
     return errorResponse(res, "Failed to fetch orders", 500);
@@ -165,7 +200,9 @@ export const getUserOrders = async (req: AuthRequest, res: Response): Promise<Re
 // GET /api/v1/orders - Admin list
 export const listOrders = async (_req: AuthRequest, res: Response): Promise<Response> => {
   try {
-    const orders = await Order.find({}).sort({ createdAt: -1 }).limit(100).lean();
+    const rawOrders = await Order.find({}).sort({ createdAt: -1 }).limit(100).lean();
+    const orders = rawOrders.map((order) => formatOrder(order));
+
     return successResponse(res, { orders });
   } catch (err: any) {
     console.error("[Orders] List error:", err.message || err);
@@ -177,9 +214,10 @@ export const listOrders = async (_req: AuthRequest, res: Response): Promise<Resp
 export const getOrder = async (req: AuthRequest, res: Response): Promise<Response> => {
   try {
     const { id } = req.params;
-    const order = await Order.findOne({ friendlyId: id }).lean();
+    const order = await Order.findOne(buildIdQuery(id)).lean();
     if (!order) return errorResponse(res, "Order not found", 404);
-    return successResponse(res, { order });
+
+    return successResponse(res, { order: formatOrder(order) });
   } catch (err: any) {
     console.error("[Orders] Get one error:", err.message || err);
     return errorResponse(res, "Failed to fetch order", 500);
@@ -192,13 +230,15 @@ export const updateOrderStatus = async (req: AuthRequest, res: Response): Promis
     const { id } = req.params;
     const { status } = req.body;
     if (!status) return errorResponse(res, "Status required", 400);
+
     const order = await Order.findOneAndUpdate(
-      { friendlyId: id },
+      buildIdQuery(id),
       { $set: { status } },
       { new: true }
-    );
+    ).lean();
+
     if (!order) return errorResponse(res, "Order not found", 404);
-    return successResponse(res, { order: order.toJSON() }, "Order status updated");
+    return successResponse(res, { order: formatOrder(order) }, "Order status updated");
   } catch (err: any) {
     console.error("[Orders] Update error:", err.message || err);
     return errorResponse(res, "Failed to update order", 500);
@@ -210,12 +250,13 @@ export const cancelOrder = async (req: AuthRequest, res: Response): Promise<Resp
   try {
     const { id } = req.params;
     const order = await Order.findOneAndUpdate(
-      { friendlyId: id },
+      buildIdQuery(id),
       { $set: { status: "CANCELLED" } },
       { new: true }
-    );
+    ).lean();
+
     if (!order) return errorResponse(res, "Order not found", 404);
-    return successResponse(res, { order: order.toJSON() }, "Order cancelled");
+    return successResponse(res, { order: formatOrder(order) }, "Order cancelled");
   } catch (err: any) {
     console.error("[Orders] Cancel error:", err.message || err);
     return errorResponse(res, "Failed to cancel order", 500);

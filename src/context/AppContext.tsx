@@ -79,6 +79,7 @@ export interface StoreSettings {
 }
 
 export interface PublicUser {
+  role: string;
   id?: string;
   name: string;
   email: string;

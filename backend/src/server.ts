@@ -16,6 +16,7 @@ import uploadRoutes from "./modules/upload/upload.routes";
 import productsRoutes from "./modules/products/products.routes";
 import ordersRoutes from "./modules/orders/orders.routes";
 import couponsRoutes from "./modules/coupons/coupons.routes";
+import userRoutes from "./modules/user/user.route"; // Import new user routes
 
 // Load environment variables with explicit path
 const envPath = path.resolve(__dirname, "../.env");
@@ -99,6 +100,11 @@ app.use("/api/v1/products", productsRoutes);
 app.use("/api/v1/orders", ordersRoutes);
 app.use("/api/v1/coupons", couponsRoutes);
 
+// Correctly mount user routes (handles POST & GET /api/v1/user/addresses)
+app.use("/api/v1/user", userRoutes);
+
+// Correctly mount user orders (handles GET /api/v1/user/orders)
+app.use("/api/v1/user/orders", ordersRoutes);
 // 404 Handler
 app.use((req: Request, res: Response) => {
   res.status(404).json({ success: false, error: "Route not found" });

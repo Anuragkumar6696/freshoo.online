@@ -204,13 +204,16 @@ export const Header: React.FC = () => {
                         >
                           Customer Dashboard
                         </Link>
-                        <Link
-                          href="/admin"
-                          onClick={() => setIsUserDropdownOpen(false)}
-                          className="block px-4 py-2 text-brand-primary bg-red-50/20 hover:bg-red-50/50 transition-colors font-bold border-y border-red-50/40"
-                        >
-                          ⚙️ Admin Control Panel
-                        </Link>
+                        {/* Conditionally render for Admins only */}
+                        {(user?.role === 'admin' || user?.isAdmin) && (
+                          <Link
+                            href="/admin"
+                            onClick={() => setIsUserDropdownOpen(false)}
+                            className="block px-4 py-2 text-brand-primary bg-red-50/20 hover:bg-red-50/50 transition-colors font-bold border-y border-red-50/40"
+                          >
+                            ⚙️ Admin Control Panel
+                          </Link>
+                        )}
                         <button
                           onClick={handleLogout}
                           className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-50 transition-colors cursor-pointer"

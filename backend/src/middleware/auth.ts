@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import { unauthorizedResponse } from "../utils/response";
 import { JWTPayload } from "../types";
+import User from "../models/User";
 
 const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || "default-secret";
 
@@ -28,7 +29,22 @@ export const authenticate = async (
 
     const decoded = jwt.verify(token, JWT_ACCESS_SECRET) as JWTPayload;
     console.log("[Auth] Token verified for user:", decoded.userId, "Role:", decoded.role);
-    req.user = decoded;
+    // Replace this line:
+    // req.user = decoded;
+
+    // With this line-by-line update:
+    const fullUser = await User.findById(decoded.userId).lean();
+    if (!fullUser) {
+      unauthorizedResponse(res, "User not found");
+      return;
+    }
+
+    // Cast to JWTPayload or any:
+  req.user = {
+    ...decoded,
+    ...fullUser,
+    userId: fullUser._id.toString(),
+  } as unknown as JWTPayload;
     next();
   } catch (err: any) {
     console.error("[Auth] Token verification failed:", err.message);
@@ -49,7 +65,18 @@ export const optionalAuth = async (
     const token = req.cookies?.accessToken || req.headers.authorization?.replace("Bearer ", "");
     if (token) {
       const decoded = jwt.verify(token, JWT_ACCESS_SECRET) as JWTPayload;
-      req.user = decoded;
+      // Replace this inside optionalAuth:
+// req.user = decoded;
+
+// With this update:
+const fullUser = await User.findById(decoded.userId).lean();
+if (fullUser) {
+  req.user = {
+    ...decoded,
+    ...fullUser,
+    userId: fullUser._id.toString(),
+  } as unknown as JWTPayload;
+}
     }
   } catch (err) {
     // Silently fail for optional auth

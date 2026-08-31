@@ -298,21 +298,19 @@ function AdminPageContent() {
           <aside className="lg:col-span-3 space-y-2 font-bold text-xs text-gray-700">
             <button
               onClick={() => setActiveTab("products")}
-              className={`w-full flex items-center gap-2.5 px-4.5 py-3 rounded-xl text-left transition-colors cursor-pointer ${
-                activeTab === "products"
+              className={`w-full flex items-center gap-2.5 px-4.5 py-3 rounded-xl text-left transition-colors cursor-pointer ${activeTab === "products"
                   ? "bg-red-50 text-brand-primary"
                   : "hover:bg-gray-50 text-gray-600"
-              }`}
+                }`}
             >
               <Package size={16} /> Manage Products
             </button>
             <button
               onClick={() => setActiveTab("orders")}
-              className={`w-full flex items-center gap-2.5 px-4.5 py-3 rounded-xl text-left transition-colors cursor-pointer ${
-                activeTab === "orders"
+              className={`w-full flex items-center gap-2.5 px-4.5 py-3 rounded-xl text-left transition-colors cursor-pointer ${activeTab === "orders"
                   ? "bg-red-50 text-brand-primary"
                   : "hover:bg-gray-50 text-gray-600"
-              }`}
+                }`}
             >
               <ShoppingBag size={16} /> Track Orders
               {orders.filter((o) => o.status === "Order Placed").length > 0 && (
@@ -323,31 +321,28 @@ function AdminPageContent() {
             </button>
             <button
               onClick={() => setActiveTab("locations")}
-              className={`w-full flex items-center gap-2.5 px-4.5 py-3 rounded-xl text-left transition-colors cursor-pointer ${
-                activeTab === "locations"
+              className={`w-full flex items-center gap-2.5 px-4.5 py-3 rounded-xl text-left transition-colors cursor-pointer ${activeTab === "locations"
                   ? "bg-red-50 text-brand-primary"
                   : "hover:bg-gray-50 text-gray-600"
-              }`}
+                }`}
             >
               <MapPin size={16} /> Service Locations
             </button>
             <button
               onClick={() => setActiveTab("timings")}
-              className={`w-full flex items-center gap-2.5 px-4.5 py-3 rounded-xl text-left transition-colors cursor-pointer ${
-                activeTab === "timings"
+              className={`w-full flex items-center gap-2.5 px-4.5 py-3 rounded-xl text-left transition-colors cursor-pointer ${activeTab === "timings"
                   ? "bg-red-50 text-brand-primary"
                   : "hover:bg-gray-50 text-gray-600"
-              }`}
+                }`}
             >
               <Clock size={16} /> Opening Timings
             </button>
             <button
               onClick={() => setActiveTab("customers")}
-              className={`w-full flex items-center gap-2.5 px-4.5 py-3 rounded-xl text-left transition-colors cursor-pointer ${
-                activeTab === "customers"
+              className={`w-full flex items-center gap-2.5 px-4.5 py-3 rounded-xl text-left transition-colors cursor-pointer ${activeTab === "customers"
                   ? "bg-red-50 text-brand-primary"
                   : "hover:bg-gray-50 text-gray-600"
-              }`}
+                }`}
             >
               <Users size={16} /> Customer Base
             </button>
@@ -432,14 +427,14 @@ function AdminPageContent() {
             {activeTab === "orders" && (
               <div className="border border-gray-100 rounded-2xl bg-white shadow-sm p-6 space-y-6 font-semibold text-xs text-gray-700">
                 <h3 className="font-display font-extrabold text-sm text-gray-900 pb-3 border-b border-gray-100">
-                  Track Incoming Orders ({orders.length} items)
+                  Track Incoming Orders ({orders?.length || 0} items)
                 </h3>
 
-                {orders.length > 0 ? (
+                {orders && orders.length > 0 ? (
                   <div className="space-y-6">
                     {orders.map((order) => (
                       <div
-                        key={order.id}
+                        key={order.id || order._id}
                         className="border border-gray-100 rounded-2xl overflow-hidden shadow-sm"
                       >
                         {/* Order info bar */}
@@ -447,25 +442,29 @@ function AdminPageContent() {
                           <div className="flex gap-4 flex-wrap">
                             <div>
                               <span className="text-[9px] text-gray-400 font-black uppercase">Order ID</span>
-                              <p className="text-gray-900 font-bold">{order.id}</p>
+                              <p className="text-gray-900 font-bold">{order.id || order._id}</p>
                             </div>
                             <div>
                               <span className="text-[9px] text-gray-400 font-black uppercase">Customer Info</span>
-                              <p className="text-gray-900 font-bold">{order.customerName || order.guestDetails?.name || (order.isGuestOrder ? "Guest" : "User")}</p>
-                              <p className="text-[10px] text-gray-500">{order.customerEmail || order.guestEmail || "—"}</p>
-                              <p className="text-[10px] text-gray-500">{order.customerPhone || order.guestPhone || "—"}</p>
+                              <p className="text-gray-900 font-bold">
+                                {order.customerName || order.guestDetails?.name || order.name || (order.isGuestOrder ? "Guest" : "User")}
+                              </p>
+                              <p className="text-[10px] text-gray-500">{order.customerEmail || order.guestEmail || order.email || "—"}</p>
+                              <p className="text-[10px] text-gray-500">{order.customerPhone || order.guestPhone || order.phone || "—"}</p>
                             </div>
                             <div>
                               <span className="text-[9px] text-gray-400 font-black uppercase">Address</span>
-                              <p className="text-gray-900 font-bold text-[10px]">{order.address?.addressLine || "—"}</p>
+                              <p className="text-gray-900 font-bold text-[10px]">
+                                {typeof order.address === "string" ? order.address : order.address?.addressLine || "—"}
+                              </p>
                             </div>
                             <div>
                               <span className="text-[9px] text-gray-400 font-black uppercase">Total Bill</span>
-                              <p className="text-brand-primary font-extrabold">₹{order.total}</p>
+                              <p className="text-brand-primary font-extrabold">₹{order.total || order.totalAmount || 0}</p>
                             </div>
                             <div>
                               <span className="text-[9px] text-gray-400 font-black uppercase">Status</span>
-                              <p className="text-gray-900 font-bold">{order.status}</p>
+                              <p className="text-gray-900 font-bold">{order.status || "Pending"}</p>
                             </div>
                           </div>
 
@@ -503,16 +502,22 @@ function AdminPageContent() {
                           </div>
                         </div>
 
-                        {/* Order items lists */}
+                        {/* Order items list with Null-Safety */}
                         <div className="p-4 bg-white divide-y divide-gray-100 text-xs">
-                          {order.items.map((item) => (
-                            <div key={item.id} className="flex justify-between py-2 text-gray-700">
-                              <span>
-                                {item.product.name} ({item.selectedWeight}) × {item.quantity}
-                              </span>
-                              <span className="font-extrabold text-gray-900">₹{item.price * item.quantity}</span>
-                            </div>
-                          ))}
+                          {order.items && order.items.length > 0 ? (
+                            order.items.map((item, idx) => (
+                              <div key={item.id || idx} className="flex justify-between py-2 text-gray-700">
+                                <span>
+                                  {item.product?.name || item.name || "Product Item"} ({item.selectedWeight || item.weight || "Standard"}) × {item.quantity || 1}
+                                </span>
+                                <span className="font-extrabold text-gray-900">
+                                  ₹{(item.price || 0) * (item.quantity || 1)}
+                                </span>
+                              </div>
+                            ))
+                          ) : (
+                            <p className="text-gray-400 italic">No item details available</p>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -520,7 +525,7 @@ function AdminPageContent() {
                 ) : (
                   <div className="text-center py-12 text-gray-400 space-y-2">
                     <ShoppingBag size={32} className="mx-auto text-gray-300" />
-                    <p className="text-xs font-bold text-gray-500">No active orders placed during this session.</p>
+                    <p className="text-xs font-bold text-gray-500">No orders found in database.</p>
                   </div>
                 )}
               </div>
@@ -682,13 +687,12 @@ function AdminPageContent() {
                           </td>
                           <td className="p-3 text-center font-bold text-gray-750">{cust.orders}</td>
                           <td className="p-3 text-right">
-                            <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded ${
-                              cust.status === "Active Premium"
+                            <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded ${cust.status === "Active Premium"
                                 ? "bg-red-50 text-brand-primary"
                                 : cust.status === "Active"
-                                ? "bg-emerald-50 text-emerald-600"
-                                : "bg-gray-100 text-gray-500"
-                            }`}>
+                                  ? "bg-emerald-50 text-emerald-600"
+                                  : "bg-gray-100 text-gray-500"
+                              }`}>
                               {cust.status}
                             </span>
                           </td>

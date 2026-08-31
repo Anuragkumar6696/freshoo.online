@@ -87,9 +87,7 @@ export const ProductDetailsClient: React.FC<ProductDetailsClientProps> = ({ id }
 
   // Mock product image gallery: Using raw stock, vacuum pack, and finished dish angles
   const galleryImages = [
-    product.image,
-    "https://images.unsplash.com/photo-1606787366850-de6330128bfc?auto=format&fit=crop&q=80&w=600", // Cooking/prepared representation
-    "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=600", // Alternative packaging/view
+    product.image 
   ];
 
   const hasDiscount = activeWeightOption.originalPrice && activeWeightOption.originalPrice > activeWeightOption.price;

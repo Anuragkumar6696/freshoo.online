@@ -15,9 +15,11 @@ export interface IOrder extends Document {
   _id: mongoose.Types.ObjectId;
   friendlyId: string; // FRSH-XXXXXX
   userId?: mongoose.Types.ObjectId | null;
+  customerName?: string | null;
+  customerEmail?: string | null;
+  customerPhone?: string | null;
   guestEmail?: string | null;
   guestPhone?: string | null;
-  customerName?: string | null;
   isGuestOrder: boolean;
 
   items: any[]; // CartItem snapshots
@@ -53,9 +55,11 @@ const OrderSchema = new Schema<IOrder>(
   {
     friendlyId: { type: String, required: true, unique: true, index: true },
     userId: { type: Schema.Types.ObjectId, ref: "User", default: null, index: true },
+    customerName: { type: String, default: null, trim: true },
+    customerEmail: { type: String, default: null, lowercase: true, trim: true, index: true },
+    customerPhone: { type: String, default: null, trim: true, index: true },
     guestEmail: { type: String, default: null, lowercase: true, trim: true, index: true },
     guestPhone: { type: String, default: null, trim: true, index: true },
-    customerName: { type: String, default: null, trim: true },
     isGuestOrder: { type: Boolean, default: false, index: true },
 
     items: { type: Schema.Types.Mixed, required: true },
@@ -115,7 +119,7 @@ const OrderSchema = new Schema<IOrder>(
         const r = ret as any;
         r.id = r.friendlyId;
         r.date = r.createdAt ? new Date(r.createdAt).toISOString() : new Date().toISOString();
-        // Normalize: dashboard filters by customerEmail/customerPhone
+        // Normalize: fallback between customer and guest contact details
         r.customerEmail = r.customerEmail || r.guestEmail || null;
         r.customerPhone = r.customerPhone || r.guestPhone || null;
         delete r._id;
@@ -129,7 +133,10 @@ const OrderSchema = new Schema<IOrder>(
 
 OrderSchema.index({ userId: 1, createdAt: -1 });
 OrderSchema.index({ status: 1, createdAt: -1 });
+OrderSchema.index({ customerEmail: 1, createdAt: -1 });
+OrderSchema.index({ customerPhone: 1, createdAt: -1 });
 OrderSchema.index({ guestEmail: 1, createdAt: -1 });
+OrderSchema.index({ guestPhone: 1, createdAt: -1 });
 
 export const Order =
   (mongoose.models.Order as mongoose.Model<IOrder>) ||

@@ -10,7 +10,8 @@ export const requireRole = (...roles: UserRole[]) => {
       return;
     }
 
-    if (!roles.includes(req.user.role)) {
+    // FIXED: Safely check if user role exists in allowed roles
+    if (!roles.includes(req.user.role as UserRole)) {
       forbiddenResponse(res, "Insufficient permissions");
       return;
     }
@@ -29,7 +30,8 @@ export const requireAdmin = (
     return;
   }
 
-  if (!req.user.isAdmin) {
+  // FIXED: Check req.user.role instead of non-existent req.user.isAdmin
+  if (req.user.role !== "ADMIN") {
     forbiddenResponse(res, "Admin access required");
     return;
   }
