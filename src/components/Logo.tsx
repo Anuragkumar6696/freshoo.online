@@ -32,7 +32,7 @@ export const Logo: React.FC<LogoProps> = ({
 
   const LogoMark = ({ invert = false }: { invert?: boolean }) => (
     <div
-      className="relative flex items-center justify-center rounded-xl transition-transform duration-300 hover:scale-105"
+      className="relative flex items-center justify-center rounded-xl overflow-hidden transition-transform duration-300 hover:scale-105 p-1"
       style={{
         width: width,
         height: height,
@@ -41,11 +41,11 @@ export const Logo: React.FC<LogoProps> = ({
       }}
     >
       <Image
-        src="/logo.jpeg"
+        src={invert ? "/freshoo-icon.png" : "/freshoo-icon-white.png"}
         alt="Freshoo"
-        width={Math.round(width * 0.7)}
-        height={Math.round(height * 0.7)}
-        className={`object-contain ${invert ? "" : "brightness-0 invert"}`}
+        width={Math.round(width * 0.72)}
+        height={Math.round(height * 0.72)}
+        className="object-contain"
         priority
       />
     </div>
