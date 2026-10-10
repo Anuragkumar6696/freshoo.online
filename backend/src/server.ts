@@ -1,6 +1,11 @@
 import express, { Express, Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import path from "path";
+
+// Load environment variables immediately before application imports
+const envPath = path.resolve(__dirname, "../.env");
+dotenv.config({ path: envPath });
+
 import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
@@ -18,9 +23,6 @@ import ordersRoutes from "./modules/orders/orders.routes";
 import couponsRoutes from "./modules/coupons/coupons.routes";
 import userRoutes from "./modules/user/user.route"; // Import new user routes
 
-// Load environment variables with explicit path
-const envPath = path.resolve(__dirname, "../.env");
-dotenv.config({ path: envPath });
 console.log("[Server] Loading .env from:", envPath);
 console.log("[Server] Cloudinary config check:", {
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

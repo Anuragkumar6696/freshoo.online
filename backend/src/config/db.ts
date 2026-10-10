@@ -1,10 +1,9 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+import path from "path";
 
-const MONGODB_URI = process.env.MONGODB_URI || "";
-
-if (!MONGODB_URI) {
-  console.warn("[MongoDB] Warning: MONGODB_URI is not set in environment.");
-}
+// Ensure environment variables are loaded regardless of import order
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 type CachedMongoose = {
   conn: typeof mongoose | null;
@@ -30,7 +29,8 @@ export async function connectDB(): Promise<typeof mongoose> {
     return cached.conn;
   }
 
-  if (!MONGODB_URI) {
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
     throw new Error("Please define MONGODB_URI in your .env file");
   }
 
@@ -43,7 +43,7 @@ export async function connectDB(): Promise<typeof mongoose> {
     };
 
     cached.promise = mongoose
-      .connect(MONGODB_URI, opts)
+      .connect(uri, opts)
       .then((m) => {
         console.log(
           `[MongoDB] Connected to DB: ${
