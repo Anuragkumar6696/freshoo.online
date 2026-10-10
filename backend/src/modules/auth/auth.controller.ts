@@ -52,13 +52,13 @@ export const register = async (req: Request, res: Response): Promise<Response> =
         isAdmin: user.isAdmin,
       },
       JWT_ACCESS_SECRET,
-      { expiresIn: JWT_ACCESS_EXPIRES_IN }
+      { expiresIn: JWT_ACCESS_EXPIRES_IN as any }
     );
 
     const refreshToken = jwt.sign(
       { userId: user._id.toString() },
       JWT_REFRESH_SECRET,
-      { expiresIn: JWT_REFRESH_EXPIRES_IN }
+      { expiresIn: JWT_REFRESH_EXPIRES_IN as any }
     );
 
     res.cookie("accessToken", accessToken, {
@@ -157,13 +157,13 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
         isAdmin: user.isAdmin,
       },
       JWT_ACCESS_SECRET,
-      { expiresIn: JWT_ACCESS_EXPIRES_IN }
+      { expiresIn: JWT_ACCESS_EXPIRES_IN as any }
     );
 
     const refreshToken = jwt.sign(
       { userId: user._id.toString() },
       JWT_REFRESH_SECRET,
-      { expiresIn: JWT_REFRESH_EXPIRES_IN }
+      { expiresIn: JWT_REFRESH_EXPIRES_IN as any }
     );
 
     res.cookie("accessToken", accessToken, {
@@ -242,7 +242,7 @@ export const me = async (req: AuthRequest, res: Response): Promise<Response> => 
 };
 
 // Logout
-export const logout = async (req: Request, res: Response): Promise<Response> => {
+export const logout = async (_req: Request, res: Response): Promise<Response> => {
   res.clearCookie("accessToken");
   res.clearCookie("refreshToken");
   return successResponse(res, null, "Logout successful");

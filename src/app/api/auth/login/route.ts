@@ -6,7 +6,6 @@ import {
   normalizePhone,
   phoneRegex,
   serializeAuthCookie,
-  serializeLogoutCookie,
   signToken,
   verifyPassword,
 } from "@/lib/auth";
@@ -28,7 +27,7 @@ export async function POST(req: NextRequest) {
 
     await connectDB();
 
-    let query: any = {};
+    const query: any = {};
     if (emailRegex.test(identifier)) {
       query.email = normalizeEmail(identifier);
     } else {

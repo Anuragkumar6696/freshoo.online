@@ -90,7 +90,7 @@ io.on("connection", (socket) => {
 app.use("/uploads", express.static(path.resolve(__dirname, "../uploads")));
 
 // 4. API Routes
-app.get("/api/v1/health", (req: Request, res: Response) => {
+app.get("/api/v1/health", (_req: Request, res: Response) => {
   res.status(200).json({ success: true, message: "Freshoo API is healthy" });
 });
 
@@ -106,12 +106,12 @@ app.use("/api/v1/user", userRoutes);
 // Correctly mount user orders (handles GET /api/v1/user/orders)
 app.use("/api/v1/user/orders", ordersRoutes);
 // 404 Handler
-app.use((req: Request, res: Response) => {
+app.use((_req: Request, res: Response) => {
   res.status(404).json({ success: false, error: "Route not found" });
 });
 
 // 5. Error Handling
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err.stack);
   res.status(500).json({ success: false, error: "Something went wrong!" });
 });

@@ -417,7 +417,7 @@ export default function CheckoutPage() {
                     </p>
                   </div>
                 </div>
-              ) : currentGeo && currentGeo.latitude !== null ? (
+              ) : currentGeo && currentGeo.latitude != null && currentGeo.longitude != null ? (
                 <div className="flex items-start justify-between gap-4 p-4 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-800">
                   <div className="flex items-start gap-3">
                     <div className="p-2 bg-white rounded-lg shadow-sm border border-emerald-100 shrink-0 mt-0.5">

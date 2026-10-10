@@ -631,8 +631,8 @@ useEffect(() => {
                   </div>
                 )}
 
-                {order.geoLocation?.latitude !== null &&
-                  order.geoLocation?.latitude !== undefined && (
+                {order.geoLocation?.latitude != null &&
+                  order.geoLocation?.longitude != null && (
                     <div className="flex items-start gap-2 p-2.5 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-700">
                       <Navigation size={14} className="shrink-0 mt-0.5" />
                       <div>
@@ -777,7 +777,7 @@ useEffect(() => {
               <p className="text-gray-500 text-[11px]">{addr.city} - {addr.pincode}</p>
             </div>
             <button
-              onClick={() => removeAddress(idx)}
+              onClick={() => removeAddress(addr.id || String(idx))}
               className="mt-4 text-xs font-bold text-red-500 hover:underline self-start"
             >
               Remove

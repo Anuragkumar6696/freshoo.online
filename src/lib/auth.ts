@@ -1,12 +1,9 @@
 import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import * as cookieLib from "cookie";
 
 function serializeCookie(name: string, value: string, options: any = {}): string {
-  const libSer = (cookieLib as any).serialize || (cookieLib as any).serializeCookie;
-  if (typeof libSer === "function") return libSer(name, value, options || {});
-  const parts: string[] = [`${name}=${value}`];
+  const parts: string[] = [`${name}=${encodeURIComponent(value)}`];
   if (options?.httpOnly) parts.push("HttpOnly");
   if (options?.secure) parts.push("Secure");
   if (options?.sameSite) {
@@ -24,15 +21,17 @@ function serializeCookie(name: string, value: string, options: any = {}): string
 }
 
 function parseCookieHeader(header: string): Record<string, string> {
-  const libParse = (cookieLib as any).parse || (cookieLib as any).parseCookie;
-  if (typeof libParse === "function") return libParse(header || "");
   const out: Record<string, string> = {};
   if (!header) return out;
   String(header).split(";").forEach((pair) => {
     const [k, ...rest] = pair.split("=");
     const key = k.trim();
     if (!key) return;
-    out[key] = rest.join("=").trim();
+    try {
+      out[key] = decodeURIComponent(rest.join("=").trim());
+    } catch {
+      out[key] = rest.join("=").trim();
+    }
   });
   return out;
 }

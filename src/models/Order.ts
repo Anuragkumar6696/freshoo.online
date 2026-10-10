@@ -16,7 +16,7 @@ const ORDER_STATUSES: OrderStatus[] = [
   "Cancelled",
 ];
 
-export interface IOrder extends Document, Omit<OrderT, "id"> {
+export interface IOrder extends Document, Omit<OrderT, "id" | "_id"> {
   _id: mongoose.Types.ObjectId;
   // Friendly public order id (FRSH-XXXXXX)
   friendlyId: string;

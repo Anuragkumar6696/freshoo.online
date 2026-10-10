@@ -374,7 +374,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               <div className="text-center text-xs text-gray-500 pt-1">
                 {isLogin ? (
                   <>
-                    Don't have an account?{" "}
+                    Don&apos;t have an account?{" "}
                     <button
                       type="button"
                       onClick={() => {

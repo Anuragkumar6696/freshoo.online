@@ -208,12 +208,12 @@ export async function GET(req: NextRequest) {
       if (force) await User.deleteOne({ email: adminEmail });
       await User.create({
         name: "Freshoo Admin",
-        email: freshoo.online@gmail.com,
+        email: adminEmail,
         phone: "9310593167",
         passwordHash: await hashPassword("Admin@123"),
         addresses: [
           {
-            tag: "Store",
+            tag: "Work",
             addressLine: "Freshoo HQ, Pocket 22, Sector 22, Rohini",
             city: "Delhi",
             pincode: "110086",
@@ -249,7 +249,7 @@ export async function GET(req: NextRequest) {
 
     result.tip =
       "Now login via AuthModal or start placing orders! Brevo notifications activate when you set BREVO_API_KEY + STORE_OWNER_EMAIL + BREVO_ORDER_NOTIFY_ENABLED=true in .env.local";
-    result.mongoDB = (await import("@/lib/db")).mongoose.connection?.name || "(default)";
+    result.mongoDB = (await import("@/lib/db")).default.connection?.name || "(default)";
 
     return jsonOk(result);
   } catch (e: any) {

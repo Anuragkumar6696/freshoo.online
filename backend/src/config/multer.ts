@@ -1,8 +1,6 @@
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import { errorResponse } from "../utils/response";
-
 // Ensure uploads directory exists
 const uploadsDir = path.resolve(__dirname, "../../uploads");
 if (!fs.existsSync(uploadsDir)) {
@@ -23,7 +21,7 @@ const diskStorage = multer.diskStorage({
 });
 
 // File filter - only accept images
-const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+const fileFilter = (_req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   const allowedMimes = ["image/jpeg", "image/png", "image/jpg", "image/webp", "image/gif"];
 
   if (allowedMimes.includes(file.mimetype)) {

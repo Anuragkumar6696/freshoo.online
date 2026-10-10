@@ -1,14 +1,6 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI =
-  process.env.MONGODB_URI ||
-  "mongodb+srv://officialanurag6696_db_user:mNUYxPlpowMEyM8K@cluster0.k0nuuy8.mongodb.net/freshoo?retryWrites=true&w=majority&appName=Cluster0";
-
-if (!MONGODB_URI) {
-  throw new Error(
-    "Please define the MONGODB_URI environment variable inside .env.local"
-  );
-}
+const MONGODB_URI = process.env.MONGODB_URI || "";
 
 type CachedMongoose = {
   conn: typeof mongoose | null;
@@ -32,6 +24,12 @@ if (!global.mongoose) {
 export async function connectDB(): Promise<typeof mongoose> {
   if (cached.conn) {
     return cached.conn;
+  }
+
+  if (!MONGODB_URI) {
+    throw new Error(
+      "Please define the MONGODB_URI environment variable inside .env.local or Vercel Environment Variables"
+    );
   }
 
   if (!cached.promise) {

@@ -51,19 +51,19 @@ export default function CartPage() {
 
   const totalCartItems = cart.reduce((acc, item) => acc + item.quantity, 0);
 
-  const handleApplyCoupon = (e: React.FormEvent) => {
+  const handleApplyCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
     setCouponError("");
     setCouponSuccess(false);
 
     if (!couponCode.trim()) return;
 
-    const success = applyCoupon(couponCode);
-    if (success) {
+    const err = await applyCoupon(couponCode);
+    if (!err) {
       setCouponSuccess(true);
       setCouponCode("");
     } else {
-      setCouponError("Invalid coupon code! Try 'WELCOME20' or 'FRESH100' (min ₹499).");
+      setCouponError(err || "Invalid coupon code! Try 'WELCOME20' or 'FRESH100' (min ₹499).");
     }
   };
 

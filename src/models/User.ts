@@ -55,7 +55,6 @@ const UserSchema = new Schema<IUser>(
       unique: true,
       lowercase: true,
       trim: true,
-      index: true,
     },
     phone: {
       type: String,
@@ -103,9 +102,6 @@ UserSchema.methods.toPublicJSON = function toPublicJSON() {
     createdAt: obj.createdAt,
   };
 };
-
-UserSchema.index({ email: 1 }, { unique: true });
-UserSchema.index({ phone: 1 });
 
 export const User =
   (mongoose.models.User as mongoose.Model<IUser>) ||

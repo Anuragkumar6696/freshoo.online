@@ -1,11 +1,9 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI =
-  process.env.MONGODB_URI ||
-  "mongodb+srv://officialanurag6696_db_user:mNUYxPlpowMEyM8K@cluster0.k0nuuy8.mongodb.net/freshoo?retryWrites=true&w=majority&appName=Cluster0";
+const MONGODB_URI = process.env.MONGODB_URI || "";
 
 if (!MONGODB_URI) {
-  throw new Error("Please define MONGODB_URI in .env");
+  console.warn("[MongoDB] Warning: MONGODB_URI is not set in environment.");
 }
 
 type CachedMongoose = {
@@ -30,6 +28,10 @@ if (!global.mongoose) {
 export async function connectDB(): Promise<typeof mongoose> {
   if (cached.conn) {
     return cached.conn;
+  }
+
+  if (!MONGODB_URI) {
+    throw new Error("Please define MONGODB_URI in your .env file");
   }
 
   if (!cached.promise) {

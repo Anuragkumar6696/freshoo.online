@@ -12,11 +12,9 @@ const nextConfig: NextConfig = {
       { protocol: "http", hostname: "localhost" },
     ],
   },
+  serverExternalPackages: ["mongoose"],
   experimental: {
-    // Allow large payloads for cart orders with many items and base64 images if any
-    serverActions: {
-      bodySizeLimit: "5mb",
-    },
+    optimizePackageImports: ["lucide-react", "framer-motion"],
   },
   async rewrites() {
     return [

@@ -19,9 +19,12 @@ export interface Product {
     originalPrice?: number;
   }[];
   stock: number;
+  available?: boolean;
 }
 
 export interface CartItem {
+  weight?: string;
+  name?: string;
   id: string;
   product: Product;
   selectedWeight: string;
@@ -48,6 +51,14 @@ export interface Address {
 
 export interface Order {
   id: string;
+  _id?: string;
+  phone?: string | null;
+  email?: string | null;
+  totalAmount?: number;
+  name?: any;
+  guestPhone?: string | null;
+  guestEmail?: string | null;
+  guestDetails?: any;
   date: string;
   items: CartItem[];
   subtotal: number;
@@ -79,7 +90,7 @@ export interface StoreSettings {
 }
 
 export interface PublicUser {
-  role: string;
+  role?: string;
   id?: string;
   name: string;
   email: string;
@@ -170,10 +181,27 @@ const apiFetch = async <T = any,>(
   path: string,
   init: RequestInit = {}
 ): Promise<ApiResult<T>> => {
-  const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000/api/v1";
-  const base = path.startsWith("http") ? path : `${BACKEND_BASE}${path.startsWith("/") ? path : `/${path}`}`;
+  const isBrowser = typeof window !== "undefined";
+  const isVercelOrRemote = isBrowser && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1";
+  const backendEnv = process.env.NEXT_PUBLIC_BACKEND_URL?.trim();
+
+  let base: string;
+  if (path.startsWith("http")) {
+    base = path;
+  } else if (isVercelOrRemote && (!backendEnv || backendEnv.includes("localhost"))) {
+    // In production on Vercel/domain, fallback to internal Next.js /api to avoid dead localhost calls
+    base = `/api${path.startsWith("/") ? path : `/${path}`}`;
+  } else {
+    const rawBase = backendEnv || "http://localhost:4000/api/v1";
+    base = `${rawBase.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
+  }
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 4000);
+
   const opts: RequestInit = {
     credentials: "include",
+    signal: controller.signal,
     headers: {
       "Content-Type": "application/json",
       ...(init.headers || {}),
@@ -182,6 +210,7 @@ const apiFetch = async <T = any,>(
   };
   try {
     const r = await fetch(base, opts);
+    clearTimeout(timer);
     const text = await r.text();
     let json: any = {};
     try { json = JSON.parse(text); } catch { /* noop */ }
@@ -192,7 +221,8 @@ const apiFetch = async <T = any,>(
       ? { success: false, error: json?.error || "Failed", ...json }
       : { success: true, ...json, data: json?.data ?? json };
   } catch (e: any) {
-    return { success: false, error: e?.message || "Network error" };
+    clearTimeout(timer);
+    return { success: false, error: e?.name === "AbortError" ? "Request timeout" : e?.message || "Network error" };
   }
 };
 

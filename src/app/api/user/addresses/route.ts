@@ -50,14 +50,16 @@ export async function POST(req: NextRequest) {
     const last = user.addresses[user.addresses.length - 1];
     return jsonOk(
       {
-        address: {
-          id: (last._id || last.id).toString(),
-          tag: last.tag,
-          addressLine: last.addressLine,
-          city: last.city,
-          pincode: last.pincode,
-          geoLocation: last.geoLocation || null,
-        },
+        address: last
+          ? {
+              id: (last._id || last.id || "").toString(),
+              tag: last.tag,
+              addressLine: last.addressLine,
+              city: last.city,
+              pincode: last.pincode,
+              geoLocation: last.geoLocation || null,
+            }
+          : null,
         addresses: user.addresses.map((a: any) => ({
           id: (a._id || a.id).toString(),
           tag: a.tag,
