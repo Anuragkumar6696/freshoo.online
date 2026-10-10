@@ -1,14 +1,11 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI || "";
-
 type CachedMongoose = {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
 };
 
 declare global {
-  // eslint-disable-next-line no-var
   var mongoose: CachedMongoose | undefined;
 }
 
@@ -22,13 +19,14 @@ if (!global.mongoose) {
 }
 
 export async function connectDB(): Promise<typeof mongoose> {
-  if (cached.conn) {
+  if (cached.conn && cached.conn.connection.readyState === 1) {
     return cached.conn;
   }
 
-  if (!MONGODB_URI) {
+  const uri = process.env.MONGODB_URI?.trim();
+  if (!uri) {
     throw new Error(
-      "Please define the MONGODB_URI environment variable inside .env.local or Vercel Environment Variables"
+      "Missing MONGODB_URI. Please set MONGODB_URI in Vercel Project Settings (Settings > Environment Variables) or .env.local file."
     );
   }
 
@@ -36,13 +34,13 @@ export async function connectDB(): Promise<typeof mongoose> {
     const opts: mongoose.ConnectOptions = {
       bufferCommands: false,
       maxPoolSize: 10,
-      serverSelectionTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 8000,
       socketTimeoutMS: 45000,
       family: 4,
     };
 
     cached.promise = mongoose
-      .connect(MONGODB_URI, opts)
+      .connect(uri, opts)
       .then((m) => {
         console.log(
           `[MongoDB] Connected to DB: ${
@@ -54,7 +52,9 @@ export async function connectDB(): Promise<typeof mongoose> {
       .catch((err) => {
         console.error("[MongoDB] Connection error:", err);
         cached.promise = null;
-        throw err;
+        throw new Error(
+          `MongoDB connection failed (${err?.message || "unreachable"}). Ensure Network Access in MongoDB Atlas allows 0.0.0.0/0 (anywhere) and MONGODB_URI is valid in Vercel.`
+        );
       });
   }
 

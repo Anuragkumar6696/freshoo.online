@@ -197,7 +197,7 @@ const apiFetch = async <T = any,>(
   }
 
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 4000);
+  const timer = setTimeout(() => controller.abort(), 15000);
 
   const opts: RequestInit = {
     credentials: "include",
@@ -222,7 +222,13 @@ const apiFetch = async <T = any,>(
       : { success: true, ...json, data: json?.data ?? json };
   } catch (e: any) {
     clearTimeout(timer);
-    return { success: false, error: e?.name === "AbortError" ? "Request timeout" : e?.message || "Network error" };
+    return {
+      success: false,
+      error:
+        e?.name === "AbortError"
+          ? "Request timed out. Please check your internet connection and ensure MongoDB Atlas Network Access allows 0.0.0.0/0."
+          : e?.message || "Network error",
+    };
   }
 };
 
