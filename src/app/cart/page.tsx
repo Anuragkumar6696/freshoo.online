@@ -68,7 +68,7 @@ export default function CartPage() {
   };
 
   const handleCheckout = () => {
-    if (cart.length === 0 || !selectedLocation) return;
+    if (cart.length === 0) return;
     
     // Save chosen address in session storage for checkout page
     if (selectedAddressId) {
@@ -293,22 +293,16 @@ export default function CartPage() {
 
                 {/* Checkout Trigger */}
                 <button
-                  disabled={!isStoreOpen() || !selectedLocation}
                   onClick={handleCheckout}
+                  disabled={cart.length === 0 || storeSettings.isTemporarilyClosed}
                   className={`w-full py-3.5 font-bold rounded-xl text-xs text-white shadow-md flex items-center justify-center gap-1.5 transition-all ${
-                    !isStoreOpen() || !selectedLocation
+                    cart.length === 0 || storeSettings.isTemporarilyClosed
                       ? "bg-gray-300 shadow-none cursor-not-allowed"
-                      : "bg-brand-primary hover:bg-red-700 hover:shadow-lg cursor-pointer"
+                      : "bg-brand-primary hover:bg-red-700 hover:shadow-lg cursor-pointer active:scale-[0.99]"
                   }`}
                 >
                   Proceed to Checkout <ArrowRight size={14} strokeWidth={3} />
                 </button>
-
-                {!selectedLocation && (
-                  <p className="text-[10px] text-center text-red-500 font-bold">
-                    * Please select delivery area in header.
-                  </p>
-                )}
               </div>
 
               {/* Secure payment certificate */}

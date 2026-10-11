@@ -19,25 +19,40 @@ export interface BrevoSendResult {
   messageId?: string;
 }
 
+export function getBrevoApiKey(): string {
+  return process.env.BREVO_API_KEY?.trim() || API_KEY;
+}
+
+export function getBrevoSenderEmail(): string {
+  return process.env.BREVO_SENDER_EMAIL?.trim() || SENDER_EMAIL || "freshoo.online@gmail.com";
+}
+
+export function getBrevoSenderName(): string {
+  return process.env.BREVO_SENDER_NAME?.trim() || SENDER_NAME || "freshoo";
+}
+
 async function brevoSendRaw(
   payload: Record<string, any>
 ): Promise<{ ok: boolean; status: number; text: string }> {
-  if (!API_KEY) {
+  const apiKey = getBrevoApiKey();
+  if (!apiKey) {
     return { ok: false, status: 0, text: "BREVO_API_KEY missing in env" };
   }
   try {
     const res = await fetch(`${API_BASE}/smtp/email`, {
       method: "POST",
       headers: {
-        "api-key": API_KEY,
+        "api-key": apiKey,
         "Content-Type": "application/json",
         accept: "application/json",
       },
       body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(7000),
     });
     const text = await res.text();
     return { ok: res.ok, status: res.status, text };
   } catch (e: any) {
+    console.error("[Brevo] Network/timeout during send:", e?.message || e);
     return { ok: false, status: 0, text: e?.message || "Network error" };
   }
 }
@@ -60,7 +75,7 @@ async function sendTemplate(
     templateId,
     to,
     params,
-    sender: { name: SENDER_NAME, email: SENDER_EMAIL },
+    sender: { name: getBrevoSenderName(), email: getBrevoSenderEmail() },
   };
   if (opts?.replyTo) payload.replyTo = opts.replyTo;
   if (opts?.cc) payload.cc = [{ email: opts.cc }];
@@ -95,7 +110,7 @@ async function sendHtml(
     name: toName || email,
   }));
   const payload: any = {
-    sender: { name: SENDER_NAME, email: SENDER_EMAIL },
+    sender: { name: getBrevoSenderName(), email: getBrevoSenderEmail() },
     to,
     subject,
     htmlContent: html,
@@ -387,8 +402,9 @@ export function buildOrderCustomerConfirmHtml(order: Order): string {
 export async function sendOrderCustomerConfirmation(
   order: Order
 ): Promise<BrevoSendResult> {
-  if (!NOTIFY_ENABLED) {
-    return { ok: false, error: "Brevo not configured" };
+  const apiKey = getBrevoApiKey();
+  if (!apiKey) {
+    return { ok: false, error: "Brevo not configured (missing BREVO_API_KEY)" };
   }
   const toEmail = order.customerEmail;
   if (!toEmail) return { ok: false, error: "Customer has no email" };

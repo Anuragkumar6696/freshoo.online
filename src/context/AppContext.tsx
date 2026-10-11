@@ -291,7 +291,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     try {
       const loc = localStorage.getItem("freshoo_location");
-      if (loc) setSelectedLocation(loc);
+      if (loc) {
+        setSelectedLocation(loc);
+      } else {
+        setSelectedLocation("Sector 22, Rohini, Delhi");
+      }
       const savedCart = localStorage.getItem("freshoo_cart");
       if (savedCart) setCart(JSON.parse(savedCart));
       const savedSettings = localStorage.getItem("freshoo_settings");
@@ -765,6 +769,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         geoLocation: finalGeo,
         isGuest: !user || isGuest,
         guestDetails,
+        customerName: guestDetails?.name || user?.name || "Customer",
+        customerEmail: guestDetails?.email || user?.email || null,
+        customerPhone: guestDetails?.phone || user?.phone || null,
         couponCode: appliedCoupon?.code,
       }),
     });

@@ -98,11 +98,15 @@ export async function POST(req: NextRequest) {
       customerPhone = ctx.user.phone || null;
     }
 
-    if (isGuest && guestDetails) {
-      customerName = guestDetails.name || customerName;
-      customerEmail = guestDetails.email || customerEmail;
-      customerPhone = guestDetails.phone || customerPhone;
+    // Always prefer explicit details provided at checkout (whether logged in or guest)
+    if (guestDetails) {
+      if (guestDetails.name?.trim()) customerName = guestDetails.name.trim();
+      if (guestDetails.email?.trim()) customerEmail = guestDetails.email.trim();
+      if (guestDetails.phone?.trim()) customerPhone = guestDetails.phone.trim();
     }
+    if (body.customerName?.trim()) customerName = body.customerName.trim();
+    if (body.customerEmail?.trim()) customerEmail = body.customerEmail.trim();
+    if (body.customerPhone?.trim()) customerPhone = body.customerPhone.trim();
 
     const rawDate = new Date().toLocaleString("en-IN", {
       day: "numeric",
@@ -140,18 +144,16 @@ export async function POST(req: NextRequest) {
 
     const jsonOrder = created.toJSON() as unknown as OrderT;
 
-    // Non-blocking Brevo email alerts
-    void (async () => {
-      try {
-        const results = await Promise.allSettled([
-          sendNewOrderAdminNotification(jsonOrder),
-          sendOrderCustomerConfirmation(jsonOrder),
-        ]);
-        console.log("[Brevo] order notification dispatched:", JSON.stringify(results));
-      } catch (err) {
-        console.warn("[Brevo] order notification failed:", err);
-      }
-    })();
+    // Await both Brevo emails before returning so Vercel Serverless doesn't terminate background promises prematurely
+    try {
+      const results = await Promise.allSettled([
+        sendNewOrderAdminNotification(jsonOrder),
+        sendOrderCustomerConfirmation(jsonOrder),
+      ]);
+      console.log("[Brevo] order notification dispatched:", JSON.stringify(results));
+    } catch (err) {
+      console.warn("[Brevo] order notification failed:", err);
+    }
 
     return jsonOk({ order: jsonOrder }, { status: 201 });
   } catch (e: any) {

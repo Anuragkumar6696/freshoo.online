@@ -603,19 +603,20 @@ export const Header: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Mobile Bottom Navigation Bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/80 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] px-2 py-1.5 flex items-center justify-around">
-        <Link
-          href="/"
-          className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-colors ${
-            pathname === "/"
-              ? "text-brand-primary font-black"
-              : "text-slate-500 font-semibold hover:text-slate-900"
-          }`}
-        >
-          <Home size={20} />
-          <span className="text-[10px] tracking-tight">Home</span>
-        </Link>
+      {/* Mobile Bottom Navigation Bar (Hidden on checkout & admin) */}
+      {!pathname.startsWith("/checkout") && !pathname.startsWith("/admin") && (
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/80 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] px-2 py-1.5 flex items-center justify-around">
+          <Link
+            href="/"
+            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-colors ${
+              pathname === "/"
+                ? "text-brand-primary font-black"
+                : "text-slate-500 font-semibold hover:text-slate-900"
+            }`}
+          >
+            <Home size={20} />
+            <span className="text-[10px] tracking-tight">Home</span>
+          </Link>
         <Link
           href="/shop"
           className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-colors ${
@@ -670,6 +671,7 @@ export const Header: React.FC = () => {
           </span>
         </Link>
       </nav>
+      )}
 
       {/* Global Modals */}
       <LocationSelector

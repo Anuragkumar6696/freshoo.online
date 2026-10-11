@@ -37,7 +37,7 @@ const isPhoneValid = (phone: string) => phone.replace(/\D/g, "").length >= 10;
 const isPincodeValid = (pincode: string) =>
   /^\d{6}$/.test(pincode.replace(/\D/g, ""));
 const isNameValid = (name: string) => name.trim().length >= 2;
-const isAddressValid = (addr: string) => addr.trim().length >= 10;
+const isAddressValid = (addr: string) => addr.trim().length >= 5;
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -206,7 +206,12 @@ export default function CheckoutPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
+    if (!validate()) {
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 150, behavior: "smooth" });
+      }
+      return;
+    }
 
     const addressPayload = resolveAddressForOrder();
     if (!addressPayload) return;
@@ -249,12 +254,7 @@ export default function CheckoutPage() {
     }
   };
 
-  const canSubmit =
-    !isSubmitting &&
-    cart.length > 0 &&
-    (addressMode === "saved"
-      ? !!selectedAddressId && !!activeSavedAddress
-      : isAddressValid(newAddressLine) && isPincodeValid(newAddressPincode));
+  const canSubmit = !isSubmitting && cart.length > 0;
 
   return (
     <div className="min-h-screen flex flex-col bg-white w-full max-w-full overflow-x-hidden">

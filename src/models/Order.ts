@@ -49,44 +49,23 @@ const AddressSchema = new Schema<
   Omit<Address, "id"> & { _id?: mongoose.Types.ObjectId }
 >(
   {
-    tag: { type: String, enum: ["Home", "Work", "Other"], default: "Home" },
+    tag: { type: String, default: "Home", trim: true },
     addressLine: { type: String, required: true, trim: true },
     city: { type: String, required: true, trim: true, default: "Delhi" },
     pincode: { type: String, required: true, trim: true },
     geoLocation: { type: GeoSchema, default: null },
   },
-  { _id: true }
+  { _id: true, strict: false }
 );
 
-const ProductSubSchema = new Schema(
+const CartItemSchema = new Schema(
   {
-    id: { type: String, required: true, trim: true },
-    name: { type: String, required: true, trim: true },
-    category: {
-      type: String,
-      required: true,
-      enum: ["Chicken", "Mutton", "Fish", "Eggs"],
-    },
-    description: { type: String, default: "", trim: true },
-    image: { type: String, required: true, trim: true },
-    rating: { type: Number, default: 4.5 },
-    reviewsCount: { type: Number, default: 0 },
-    freshnessBadge: { type: String, default: "", trim: true },
-    isBestSeller: { type: Boolean, default: false },
-    weights: { type: Schema.Types.Mixed, default: [] },
-    stock: { type: Number, default: 0 },
-  },
-  { _id: false }
-);
-
-const CartItemSchema = new Schema<Omit<CartItem, "id"> & { _id?: any }>(
-  {
-    product: { type: ProductSubSchema, required: true },
+    product: { type: Schema.Types.Mixed, required: true },
     selectedWeight: { type: String, required: true, trim: true },
     price: { type: Number, required: true, min: 0 },
     quantity: { type: Number, required: true, min: 1 },
   },
-  { _id: true }
+  { _id: true, strict: false }
 );
 
 const OrderSchema = new Schema<IOrder>(
@@ -103,7 +82,7 @@ const OrderSchema = new Schema<IOrder>(
       type: String,
       required: true,
       default: "cod",
-      enum: ["cod", "upi", "card", "wallet"],
+      trim: true,
       index: true,
     },
     status: {
