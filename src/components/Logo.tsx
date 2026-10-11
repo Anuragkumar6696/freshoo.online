@@ -63,7 +63,7 @@ export const Logo: React.FC<LogoProps> = ({
       <span
         className={`${subSize} font-bold tracking-[0.18em] uppercase ${
           invert ? "text-slate-400" : "text-slate-500"
-        } mt-0.5`}
+        } mt-0.5 hidden sm:block`}
       >
         Fresh • Cut • Deliver
       </span>
@@ -89,7 +89,7 @@ export const Logo: React.FC<LogoProps> = ({
 
   if (variant === "light") {
     return (
-      <div className={`flex items-center gap-3 ${className}`}>
+      <div className={`flex items-center gap-2 sm:gap-3 ${className}`}>
         <LogoMark invert />
         <WordMark invert />
       </div>
@@ -97,7 +97,7 @@ export const Logo: React.FC<LogoProps> = ({
   }
 
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
+    <div className={`flex items-center gap-2 sm:gap-3 ${className}`}>
       <LogoMark />
       <WordMark />
     </div>

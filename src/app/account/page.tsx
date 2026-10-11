@@ -201,10 +201,10 @@ useEffect(() => {
   const displayTotalOrders = displayOrders.length;
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-white w-full max-w-full overflow-x-hidden">
       <Header />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 flex-1 w-full">
         <div className="flex items-center gap-2 mb-8 font-semibold text-xs text-gray-400">
           <Link href="/" className="hover:text-brand-primary">
             Home

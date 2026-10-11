@@ -20,6 +20,8 @@ import {
   Plus,
   Minus,
   AlertTriangle,
+  Home,
+  Store,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -75,20 +77,20 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-[#fdfdfd] border-b border-gray-200 shadow-sm">
+      <header className="sticky top-0 z-40 bg-[#fdfdfd] border-b border-gray-200 shadow-sm w-full">
         {/* Top Mini Bar */}
-        <div className="bg-slate-900 py-2 px-4 sm:px-6 lg:px-8 text-[11px] font-bold text-white tracking-wider uppercase">
-          <div className="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-4">
-              <span className="flex items-center gap-2 text-emerald-400">
-                <Clock size={14} strokeWidth={2.5} />
-                Fresh Cut Guarantee: Cut only after your order placement.
+        <div className="bg-slate-900 py-1.5 px-3 sm:px-6 lg:px-8 text-[10px] sm:text-[11px] font-bold text-white tracking-wider uppercase overflow-hidden">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 overflow-hidden truncate">
+              <span className="flex items-center gap-1.5 text-emerald-400 truncate">
+                <Clock size={13} strokeWidth={2.5} className="shrink-0" />
+                <span className="truncate">Fresh Cut Guarantee: Cut only after order</span>
               </span>
             </div>
-            <div className="flex items-center gap-6">
+            <div className="hidden md:flex items-center gap-6 shrink-0">
               <span className="opacity-90">Delivery Hours: 2:00 PM – 2:00 AM Daily</span>
               {user?.name && (
-                <span className="hidden md:inline bg-brand-primary text-white px-3 py-1 rounded-full text-[10px] font-black">
+                <span className="bg-brand-primary text-white px-3 py-1 rounded-full text-[10px] font-black">
                   HELLO, {user.name.split(" ")[0].toUpperCase()}!
                 </span>
               )}
@@ -97,16 +99,36 @@ export const Header: React.FC = () => {
         </div>
 
         {/* Main Nav Bar */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-6">
-          {/* Logo */}
-          <Link href="/" className="shrink-0 active:scale-95">
-            <Logo size="md" />
-          </Link>
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-6">
+          <div className="flex items-center gap-1.5 sm:gap-4 shrink-0">
+            {/* Logo */}
+            <Link href="/" className="shrink-0 active:scale-95">
+              <div className="block sm:hidden">
+                <Logo size="sm" />
+              </div>
+              <div className="hidden sm:block">
+                <Logo size="md" />
+              </div>
+            </Link>
 
-          {/* Location Display */}
+            {/* Mobile / Tablet Location Display */}
+            <button
+              onClick={() => setIsLocationOpen(true)}
+              className="flex lg:hidden items-center gap-1 px-2 py-1 rounded-lg bg-red-50 hover:bg-red-100/80 text-brand-primary border border-red-100/80 text-[11px] font-bold max-w-[105px] xs:max-w-[130px] sm:max-w-[200px] truncate transition-all cursor-pointer"
+              title="Select Delivery Area"
+            >
+              <MapPin size={12} className="shrink-0 text-brand-primary" />
+              <span className="truncate">
+                {selectedLocation ? selectedLocation.split(",")[0] : "Location"}
+              </span>
+              <ChevronDown size={10} className="shrink-0" />
+            </button>
+          </div>
+
+          {/* Desktop Location Display */}
           <button
             onClick={() => setIsLocationOpen(true)}
-            className="hidden lg:flex items-center gap-3 px-4 py-2 rounded-xl hover:bg-gray-50 border border-gray-200 text-left transition-all cursor-pointer w-48 shadow-sm"
+            className="hidden lg:flex items-center gap-3 px-4 py-2 rounded-xl hover:bg-gray-50 border border-gray-200 text-left transition-all cursor-pointer w-48 shadow-sm shrink-0"
           >
             <div className="p-1.5 rounded-lg bg-red-50 text-brand-primary shrink-0">
               <MapPin size={18} />
@@ -121,10 +143,10 @@ export const Header: React.FC = () => {
             </div>
           </button>
 
-          {/* Search Bar - Expanded */}
+          {/* Search Bar - Desktop Only */}
           <form
             onSubmit={handleSearchSubmit}
-            className="flex-1 max-w-xl relative group mx-2"
+            className="hidden md:flex flex-1 max-w-xl relative group mx-2"
           >
             <input
               type="text"
@@ -228,7 +250,7 @@ export const Header: React.FC = () => {
             ) : (
               <button
                 onClick={() => setIsAuthOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-50 text-slate-800 transition-colors font-bold text-xs cursor-pointer"
+                className="hidden sm:flex items-center gap-2 px-3.5 py-2 border border-gray-200 rounded-xl hover:bg-gray-50 text-slate-800 transition-colors font-bold text-xs cursor-pointer"
               >
                 <User size={16} className="text-slate-500" />
                 <span>Sign In</span>
@@ -238,12 +260,13 @@ export const Header: React.FC = () => {
             {/* Cart Button */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="flex items-center gap-3 px-5 py-2.5 bg-brand-primary text-white font-black rounded-xl transition-all hover:bg-red-700 shadow-md hover:shadow-lg active:scale-95 cursor-pointer text-xs uppercase tracking-widest"
+              className="flex items-center gap-1.5 sm:gap-3 px-2.5 sm:px-5 py-2 sm:py-2.5 bg-brand-primary text-white font-black rounded-xl transition-all hover:bg-red-700 shadow-md hover:shadow-lg active:scale-95 cursor-pointer text-xs uppercase tracking-widest shrink-0"
+              title="View Shopping Cart"
             >
-              <ShoppingBag size={18} />
+              <ShoppingBag size={17} />
               <span className="hidden sm:inline">Cart</span>
               {totalCartItems > 0 && (
-                <span className="bg-white text-brand-primary min-w-[20px] h-5 rounded-md flex items-center justify-center text-[10px] font-black px-1 leading-none">
+                <span className="bg-white text-brand-primary min-w-[17px] sm:min-w-[20px] h-4 sm:h-5 rounded-md flex items-center justify-center text-[10px] font-black px-1 leading-none">
                   {totalCartItems}
                 </span>
               )}
@@ -252,7 +275,8 @@ export const Header: React.FC = () => {
             {/* Hamburger Mobile Menu */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 lg:hidden text-gray-500 hover:bg-gray-50 rounded-full cursor-pointer"
+              className="p-1.5 sm:p-2 lg:hidden text-gray-500 hover:bg-gray-50 rounded-full cursor-pointer shrink-0"
+              aria-label="Toggle menu"
             >
               <Menu size={22} />
             </button>
@@ -267,11 +291,11 @@ export const Header: React.FC = () => {
               placeholder="Search fresh chicken, fish, mutton..."
               value={searchVal}
               onChange={(e) => setSearchVal(e.target.value)}
-              className="w-full pl-4 pr-10 py-2 bg-gray-50 border border-gray-100 rounded-full outline-none text-xs"
+              className="w-full pl-4 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none text-xs font-semibold focus:border-brand-primary focus:bg-white focus:ring-2 focus:ring-red-50 transition-all shadow-sm"
             />
             <button
               type="submit"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-primary cursor-pointer p-1"
             >
               <Search size={16} />
             </button>
@@ -578,6 +602,74 @@ export const Header: React.FC = () => {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Mobile Bottom Navigation Bar */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/80 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] px-2 py-1.5 flex items-center justify-around">
+        <Link
+          href="/"
+          className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-colors ${
+            pathname === "/"
+              ? "text-brand-primary font-black"
+              : "text-slate-500 font-semibold hover:text-slate-900"
+          }`}
+        >
+          <Home size={20} />
+          <span className="text-[10px] tracking-tight">Home</span>
+        </Link>
+        <Link
+          href="/shop"
+          className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-colors ${
+            pathname.startsWith("/shop")
+              ? "text-brand-primary font-black"
+              : "text-slate-500 font-semibold hover:text-slate-900"
+          }`}
+        >
+          <Store size={20} />
+          <span className="text-[10px] tracking-tight">Shop</span>
+        </Link>
+        <button
+          onClick={() => setIsCartOpen(true)}
+          className="flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-colors text-slate-500 font-semibold relative cursor-pointer"
+        >
+          <div className="relative">
+            <ShoppingBag
+              size={20}
+              className={totalCartItems > 0 ? "text-brand-primary" : ""}
+            />
+            {totalCartItems > 0 && (
+              <span className="absolute -top-1.5 -right-2 bg-brand-primary text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
+                {totalCartItems}
+              </span>
+            )}
+          </div>
+          <span
+            className={`text-[10px] tracking-tight ${
+              totalCartItems > 0 ? "text-brand-primary font-black" : ""
+            }`}
+          >
+            Cart
+          </span>
+        </button>
+        <Link
+          href={user ? "/account" : "#"}
+          onClick={(e) => {
+            if (!user) {
+              e.preventDefault();
+              setIsAuthOpen(true);
+            }
+          }}
+          className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-colors ${
+            pathname.startsWith("/account")
+              ? "text-brand-primary font-black"
+              : "text-slate-500 font-semibold hover:text-slate-900"
+          }`}
+        >
+          <User size={20} />
+          <span className="text-[10px] tracking-tight">
+            {user ? "Account" : "Sign In"}
+          </span>
+        </Link>
+      </nav>
 
       {/* Global Modals */}
       <LocationSelector

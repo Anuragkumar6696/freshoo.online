@@ -114,10 +114,10 @@ export const ProductDetailsClient: React.FC<ProductDetailsClientProps> = ({ id }
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-white w-full max-w-full overflow-x-hidden">
       <Header />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 flex-1 w-full">
         {/* Navigation Breadcrumb */}
         <div className="flex items-center gap-2 mb-8 font-semibold text-xs text-gray-400">
           <Link href="/" className="hover:text-brand-primary">Home</Link>
@@ -378,7 +378,7 @@ export const ProductDetailsClient: React.FC<ProductDetailsClientProps> = ({ id }
             <h3 className="font-display font-black text-xl sm:text-2xl text-gray-900 mb-8">
               Related Products
             </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
               {relatedProducts.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}

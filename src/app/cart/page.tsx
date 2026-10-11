@@ -78,10 +78,10 @@ export default function CartPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-white w-full max-w-full overflow-x-hidden">
       <Header />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 flex-1 w-full">
         {/* Navigation Breadcrumb */}
         <div className="flex items-center gap-2 mb-8 font-semibold text-xs text-gray-400">
           <Link href="/" className="hover:text-brand-primary">Home</Link>
@@ -111,62 +111,65 @@ export default function CartPage() {
               )}
 
               {/* Items List */}
-              <div className="border border-gray-100 rounded-2xl overflow-hidden shadow-sm bg-white p-6 space-y-4">
+              <div className="border border-gray-100 rounded-2xl overflow-hidden shadow-sm bg-white p-4 sm:p-6 space-y-4">
                 <h3 className="font-display font-extrabold text-sm text-gray-900 pb-3 border-b border-gray-100">
                   Cart Items
                 </h3>
 
                 <div className="divide-y divide-gray-100">
                   {cart.map((item) => (
-                    <div key={item.id} className="flex gap-4 py-4 first:pt-0 last:pb-0 items-center">
-                      {/* Image */}
-                      <img
-                        src={item.product.image}
-                        alt={item.product.name}
-                        className="w-16 h-16 object-cover rounded-xl bg-gray-50 border border-gray-100 shrink-0"
-                      />
-
-                      {/* Details */}
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-bold text-gray-900 text-xs sm:text-sm truncate">
-                          {item.product.name}
-                        </h4>
-                        <p className="text-[10px] font-bold text-brand-primary uppercase tracking-wide mt-0.5">
-                          {item.selectedWeight} • {item.product.freshnessBadge}
-                        </p>
+                    <div key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 py-4 first:pt-0 last:pb-0">
+                      {/* Image & Details */}
+                      <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                        <img
+                          src={item.product.image}
+                          alt={item.product.name}
+                          className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-xl bg-gray-50 border border-gray-100 shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-bold text-gray-900 text-xs sm:text-sm truncate">
+                            {item.product.name}
+                          </h4>
+                          <p className="text-[10px] font-bold text-brand-primary uppercase tracking-wide mt-0.5">
+                            {item.selectedWeight} • {item.product.freshnessBadge}
+                          </p>
+                        </div>
                       </div>
 
-                      {/* Quantity Selector */}
-                      <div className="flex items-center gap-2.5 border border-gray-200 rounded-lg bg-gray-50 p-1 shrink-0">
-                        <button
-                          onClick={() => updateCartQuantity(item.id, item.quantity - 1)}
-                          className="p-1 hover:bg-white rounded transition-colors text-gray-500 cursor-pointer"
-                        >
-                          <Minus size={12} strokeWidth={3} />
-                        </button>
-                        <span className="text-xs font-extrabold px-1 text-gray-700 min-w-[14px] text-center">
-                          {item.quantity}
-                        </span>
-                        <button
-                          onClick={() => updateCartQuantity(item.id, item.quantity + 1)}
-                          className="p-1 hover:bg-white rounded transition-colors text-gray-500 cursor-pointer"
-                        >
-                          <Plus size={12} strokeWidth={3} />
-                        </button>
-                      </div>
+                      {/* Quantity & Price Row */}
+                      <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 pl-17 sm:pl-0">
+                        {/* Quantity Selector */}
+                        <div className="flex items-center gap-2 border border-gray-200 rounded-lg bg-gray-50 p-1 shrink-0">
+                          <button
+                            onClick={() => updateCartQuantity(item.id, item.quantity - 1)}
+                            className="p-1 hover:bg-white rounded transition-colors text-gray-500 cursor-pointer"
+                          >
+                            <Minus size={12} strokeWidth={3} />
+                          </button>
+                          <span className="text-xs font-extrabold px-1 text-gray-700 min-w-[14px] text-center">
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() => updateCartQuantity(item.id, item.quantity + 1)}
+                            className="p-1 hover:bg-white rounded transition-colors text-gray-500 cursor-pointer"
+                          >
+                            <Plus size={12} strokeWidth={3} />
+                          </button>
+                        </div>
 
-                      {/* Price & Delete */}
-                      <div className="flex items-center gap-3 shrink-0 text-right min-w-[80px] justify-end">
-                        <span className="text-xs sm:text-sm font-extrabold text-gray-900">
-                          ₹{item.price * item.quantity}
-                        </span>
-                        <button
-                          onClick={() => removeFromCart(item.id)}
-                          className="text-gray-400 hover:text-red-600 p-1.5 transition-colors cursor-pointer"
-                          title="Remove item"
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                        {/* Price & Delete */}
+                        <div className="flex items-center gap-3 shrink-0 text-right min-w-[80px] justify-end">
+                          <span className="text-xs sm:text-sm font-extrabold text-gray-900">
+                            ₹{item.price * item.quantity}
+                          </span>
+                          <button
+                            onClick={() => removeFromCart(item.id)}
+                            className="text-gray-400 hover:text-red-600 p-1.5 transition-colors cursor-pointer"
+                            title="Remove item"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}

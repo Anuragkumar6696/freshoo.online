@@ -1,7 +1,13 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Outfit, Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "@/context/AppContext";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -33,10 +39,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className="scroll-smooth max-w-full overflow-x-hidden">
       <body
         suppressHydrationWarning
-        className={`${outfit.variable} ${inter.variable} ${playfair.variable} antialiased bg-white text-gray-900 font-sans`}
+        className={`${outfit.variable} ${inter.variable} ${playfair.variable} antialiased bg-white text-gray-900 font-sans max-w-full overflow-x-hidden min-h-screen relative`}
       >
         <AppProvider>
           {children}

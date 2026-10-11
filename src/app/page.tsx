@@ -86,17 +86,17 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#fdfdfd]">
+    <div className="min-h-screen flex flex-col bg-[#fdfdfd] w-full max-w-full overflow-x-hidden">
       <Header />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-red-50/50 via-white to-slate-50 py-12 sm:py-16 border-b border-slate-200/50">
+      <section className="relative overflow-hidden bg-gradient-to-br from-red-50/50 via-white to-slate-50 py-8 sm:py-16 border-b border-slate-200/50 w-full">
         {/* Abstract background blobs */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-primary/5 rounded-full blur-[100px] -mr-48 -mt-24 animate-pulse" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-[100px] -ml-48 -mb-24 animate-pulse" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-primary/5 rounded-full blur-[100px] -mr-48 -mt-24 animate-pulse pointer-events-none hidden sm:block" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-[100px] -ml-48 -mb-24 animate-pulse pointer-events-none hidden sm:block" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          <div className="lg:col-span-6 space-y-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          <div className="lg:col-span-6 space-y-6 sm:space-y-8">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -115,7 +115,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-5xl sm:text-6xl lg:text-7xl font-display font-black text-slate-950 leading-[1.05] tracking-tight"
+              className="text-4xl sm:text-6xl lg:text-7xl font-display font-black text-slate-950 leading-[1.1] sm:leading-[1.05] tracking-tight"
             >
               The Freshest <br />
               <span className="gradient-text">Meat & Eggs</span> <br />
@@ -126,7 +126,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-lg sm:text-xl text-slate-600 font-bold leading-relaxed max-w-xl"
+              className="text-base sm:text-xl text-slate-600 font-bold leading-relaxed max-w-xl"
             >
               Cleaned, hygienically vacuum-packed, and cut only after you order. From farm-fresh chicken to premium mutton and seafood, delivered in 20 minutes.
             </motion.p>
@@ -135,17 +135,17 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex flex-wrap gap-4 pt-2"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2"
             >
               <Link
                 href="/shop"
-                className="bg-brand-primary hover:bg-red-700 text-white px-10 py-5 rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-xl shadow-red-500/30 hover:shadow-red-500/40 hover:-translate-y-1 active:scale-95 cursor-pointer"
+                className="w-full sm:w-auto text-center bg-brand-primary hover:bg-red-700 text-white px-6 sm:px-10 py-3.5 sm:py-5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-widest transition-all shadow-xl shadow-red-500/30 hover:shadow-red-500/40 hover:-translate-y-1 active:scale-95 cursor-pointer"
               >
                 Order Fresh Now
               </Link>
               <Link
                 href="/about"
-                className="bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 px-10 py-5 rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-premium hover:-translate-y-1 active:scale-95 cursor-pointer"
+                className="w-full sm:w-auto text-center bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 px-6 sm:px-10 py-3.5 sm:py-5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-widest transition-all shadow-premium hover:-translate-y-1 active:scale-95 cursor-pointer"
               >
                 Our Quality Story
               </Link>
@@ -155,21 +155,21 @@ export default function Home() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1, delay: 0.5 }}
-              className="flex items-center gap-8 pt-8 border-t border-slate-100"
+              className="flex items-center justify-between sm:justify-start gap-4 sm:gap-8 pt-6 sm:pt-8 border-t border-slate-100"
             >
               <div className="flex flex-col">
-                <span className="text-2xl font-black text-slate-900 tracking-tight">Zero</span>
-                <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Chemicals</span>
+                <span className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Zero</span>
+                <span className="text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-widest">Chemicals</span>
               </div>
-              <div className="h-10 w-px bg-slate-200" />
+              <div className="h-8 sm:h-10 w-px bg-slate-200" />
               <div className="flex flex-col">
-                <span className="text-2xl font-black text-slate-900 tracking-tight">100%</span>
-                <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Hygienic</span>
+                <span className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">100%</span>
+                <span className="text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-widest">Hygienic</span>
               </div>
-              <div className="h-10 w-px bg-slate-200" />
+              <div className="h-8 sm:h-10 w-px bg-slate-200" />
               <div className="flex flex-col">
-                <span className="text-2xl font-black text-slate-900 tracking-tight">₹0</span>
-                <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Delivery Fee</span>
+                <span className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">₹0</span>
+                <span className="text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-widest">Delivery Fee</span>
               </div>
             </motion.div>
           </div>
@@ -188,22 +188,22 @@ export default function Home() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60" />
               
-              <div className="absolute bottom-6 left-6 right-6">
-                <div className="bg-white/10 backdrop-blur-xl p-5 rounded-3xl border border-white/20 shadow-2xl">
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex -space-x-3">
+              <div className="absolute bottom-3 sm:bottom-6 left-3 sm:left-6 right-3 sm:right-6">
+                <div className="bg-white/10 backdrop-blur-xl p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-white/20 shadow-2xl">
+                  <div className="flex items-center justify-between gap-2 sm:gap-4">
+                    <div className="flex -space-x-2 sm:-space-x-3">
                       {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-slate-100 overflow-hidden shadow-sm">
+                        <div key={i} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white bg-slate-100 overflow-hidden shadow-sm">
                           <img src={`https://i.pravatar.cc/100?img=${i+20}`} alt="Happy Customer" />
                         </div>
                       ))}
                     </div>
-                    <div className="flex items-center gap-1.5 bg-emerald-500/90 text-white px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg">
+                    <div className="flex items-center gap-1 sm:gap-1.5 bg-emerald-500/90 text-white px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest shadow-lg shrink-0">
                       <CheckCircle size={12} strokeWidth={3} />
                       FSSAI Certified
                     </div>
                   </div>
-                  <p className="text-white text-sm font-bold leading-snug mt-4">
+                  <p className="text-white text-xs sm:text-sm font-bold leading-snug mt-2 sm:mt-4">
                     &quot;The vacuum packing is so clean, and the meat is incredibly tender. Best in Delhi!&quot;
                   </p>
                 </div>
@@ -211,8 +211,8 @@ export default function Home() {
             </div>
             
             {/* Decorative background elements */}
-            <div className="absolute -top-6 -right-6 w-32 h-32 bg-brand-primary/10 rounded-full blur-2xl animate-pulse" />
-            <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl animate-pulse" />
+            <div className="absolute -top-6 -right-6 w-32 h-32 bg-brand-primary/10 rounded-full blur-2xl animate-pulse pointer-events-none hidden sm:block" />
+            <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl animate-pulse pointer-events-none hidden sm:block" />
           </motion.div>
         </div>
       </section>
@@ -236,24 +236,24 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           {categoriesList.map((cat) => (
             <Link
               key={cat.name}
               href={`/shop?category=${cat.name}`}
-              className={`group flex items-center gap-4 p-4 border rounded-2xl shadow-sm transition-all hover:-translate-y-1 hover:shadow-md cursor-pointer ${cat.bg}`}
+              className={`group flex items-center gap-2.5 sm:gap-4 p-3 sm:p-4 border rounded-2xl shadow-sm transition-all hover:-translate-y-1 hover:shadow-md cursor-pointer ${cat.bg}`}
             >
               <img
                 src={cat.image}
                 alt={cat.name}
-                className="w-14 h-14 object-cover rounded-xl bg-white border border-gray-100 shrink-0 shadow-sm"
+                className="w-11 h-11 sm:w-14 sm:h-14 object-cover rounded-xl bg-white border border-gray-100 shrink-0 shadow-sm"
               />
               <div className="min-w-0">
-                <h3 className={`font-display font-extrabold text-sm text-gray-900 group-hover:text-brand-primary transition-colors`}>
+                <h3 className={`font-display font-extrabold text-xs sm:text-sm text-gray-900 group-hover:text-brand-primary transition-colors truncate`}>
                   {cat.name}
                 </h3>
-                <p className="text-[10px] text-gray-400 mt-0.5 font-semibold">
-                  {cat.count} Items Available
+                <p className="text-[9px] sm:text-[10px] text-gray-400 mt-0.5 font-semibold truncate">
+                  {cat.count} Available
                 </p>
               </div>
             </Link>
@@ -262,9 +262,9 @@ export default function Home() {
       </section>
 
       {/* Best Sellers Grid */}
-      <section className="py-16 bg-gray-50/50 border-y border-gray-100/50">
+      <section className="py-12 sm:py-16 bg-gray-50/50 border-y border-gray-100/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center md:text-left mb-10 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="text-center md:text-left mb-8 sm:mb-10 flex flex-col md:flex-row items-center justify-between gap-4">
             <div>
               <div className="inline-flex items-center gap-1.5 text-xs text-brand-primary font-bold uppercase tracking-wider mb-1">
                 <TrendingUp size={14} /> Most Demanded Cuts
@@ -282,7 +282,7 @@ export default function Home() {
           </div>
 
           {/* Grid list of Product Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
             {bestSellers.map((prod) => (
               <ProductCard key={prod.id} product={prod} />
             ))}
@@ -420,10 +420,10 @@ export default function Home() {
             </p>
 
             {/* Mock Badge Buttons */}
-            <div className="flex justify-center lg:justify-start gap-4">
+            <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-3 sm:gap-4">
               <button
                 type="button"
-                className="px-5 py-2 border border-gray-200 hover:border-gray-300 rounded-xl bg-white flex items-center gap-3 text-left transition-colors cursor-pointer"
+                className="px-5 py-2.5 border border-gray-200 hover:border-gray-300 rounded-xl bg-white flex items-center justify-center sm:justify-start gap-3 text-left transition-colors cursor-pointer w-full sm:w-auto"
               >
                 <Smartphone className="text-gray-700 shrink-0" size={24} />
                 <div>
@@ -433,7 +433,7 @@ export default function Home() {
               </button>
               <button
                 type="button"
-                className="px-5 py-2 border border-gray-200 hover:border-gray-300 rounded-xl bg-white flex items-center gap-3 text-left transition-colors cursor-pointer"
+                className="px-5 py-2.5 border border-gray-200 hover:border-gray-300 rounded-xl bg-white flex items-center justify-center sm:justify-start gap-3 text-left transition-colors cursor-pointer w-full sm:w-auto"
               >
                 <Smartphone className="text-gray-700 shrink-0" size={24} />
                 <div>

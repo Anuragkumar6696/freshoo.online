@@ -107,7 +107,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }}
             transition={{ type: "spring", duration: 0.4 }}
-            className="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 overflow-hidden mx-4"
+            className="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-2xl p-5 sm:p-6 overflow-y-auto max-h-[90vh] mx-3 sm:mx-4"
           >
             {selectedLocation && (
               <button

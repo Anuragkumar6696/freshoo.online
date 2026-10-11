@@ -16,11 +16,11 @@ import {
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="bg-[#0b1120] text-slate-300 mt-20 pt-20 pb-10 font-medium relative overflow-hidden">
+    <footer className="bg-[#0b1120] text-slate-300 mt-20 pt-16 sm:pt-20 pb-24 md:pb-10 font-medium relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-brand-primary to-transparent opacity-30" />
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-primary/10 rounded-full blur-[120px] -mr-48 -mt-24" />
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-red-500/10 rounded-full blur-[120px] -ml-48 -mb-24" />
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-primary/10 rounded-full blur-[120px] -mr-48 -mt-24 pointer-events-none hidden sm:block" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-red-500/10 rounded-full blur-[120px] -ml-48 -mb-24 pointer-events-none hidden sm:block" />
 
       {/* Brand Trust Promises banner */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 border-b border-slate-800/40">

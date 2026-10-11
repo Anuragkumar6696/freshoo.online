@@ -45,10 +45,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     : 0;
 
   return (
-    <div className="group relative flex flex-col bg-white border border-slate-200/60 rounded-3xl overflow-hidden hover:shadow-premium shadow-hover transition-all duration-500 card-gradient">
+    <div className="group relative flex flex-col bg-white border border-slate-200/60 rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-premium shadow-hover transition-all duration-500 card-gradient">
       {/* Discount Badge */}
       {hasDiscount && (
-        <div className="absolute top-4 left-4 z-10 bg-brand-primary text-white text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg shadow-lg shadow-red-500/20">
+        <div className="absolute top-2.5 sm:top-4 left-2.5 sm:left-4 z-10 bg-brand-primary text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg shadow-lg shadow-red-500/20">
           {discountPercent}% OFF
         </div>
       )}
@@ -64,15 +64,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </Link>
 
       {/* Body Content */}
-      <div className="p-5 flex flex-col flex-1">
+      <div className="p-3 sm:p-5 flex flex-col flex-1">
         {/* Rating and Freshness Badge */}
-        <div className="flex items-center justify-between gap-2 mb-3 flex-wrap">
-          <span className="inline-flex items-center gap-1.5 text-[10px] font-black bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full border border-emerald-200/50 uppercase tracking-wider">
+        <div className="flex items-center justify-between gap-1.5 sm:gap-2 mb-2 sm:mb-3 flex-wrap">
+          <span className="inline-flex items-center gap-1 sm:gap-1.5 text-[9px] sm:text-[10px] font-black bg-emerald-50 text-emerald-700 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-emerald-200/50 uppercase tracking-wider">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             {product.freshnessBadge}
           </span>
-          <div className="flex items-center gap-1 text-amber-500 text-xs font-black bg-amber-50 px-2 py-1 rounded-lg border border-amber-100 shrink-0">
-            <Star size={12} fill="currentColor" />
+          <div className="flex items-center gap-1 text-amber-500 text-[10px] sm:text-xs font-black bg-amber-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg border border-amber-100 shrink-0">
+            <Star size={11} fill="currentColor" />
             <span>{product.rating}</span>
           </div>
         </div>
@@ -80,19 +80,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         {/* Title */}
         <Link
           href={`/product/${product.id}`}
-          className="font-display font-black text-base text-slate-800 group-hover:text-brand-primary transition-colors line-clamp-2 leading-tight mb-3 flex-1"
+          className="font-display font-black text-xs sm:text-base text-slate-800 group-hover:text-brand-primary transition-colors line-clamp-2 leading-snug sm:leading-tight mb-2 sm:mb-3 flex-1"
         >
           {product.name}
         </Link>
 
         {/* Weights Selector */}
-        <div className="mb-4">
+        <div className="mb-2.5 sm:mb-4">
           {product.weights.length > 1 ? (
             <div className="relative group/select">
               <select
                 value={selectedWeight}
                 onChange={(e) => setSelectedWeight(e.target.value)}
-                className="w-full text-xs font-black text-slate-600 bg-slate-50 hover:bg-white border border-slate-200 rounded-xl px-3 py-2 outline-none appearance-none cursor-pointer pr-10 transition-all hover:border-brand-primary/30 hover:ring-4 hover:ring-red-50"
+                className="w-full text-[11px] sm:text-xs font-black text-slate-600 bg-slate-50 hover:bg-white border border-slate-200 rounded-xl px-2 sm:px-3 py-1.5 sm:py-2 outline-none appearance-none cursor-pointer pr-8 sm:pr-10 transition-all hover:border-brand-primary/30 hover:ring-2 hover:ring-red-50"
               >
                 {product.weights.map((w) => (
                   <option key={w.weight} value={w.weight}>
@@ -100,51 +100,53 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                   </option>
                 ))}
               </select>
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover/select:text-brand-primary transition-colors">
-                <HelpCircle size={14} strokeWidth={3} />
+              <div className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover/select:text-brand-primary transition-colors">
+                <HelpCircle size={13} strokeWidth={2.5} />
               </div>
             </div>
           ) : (
-            <div className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black text-slate-600 inline-block">
+            <div className="px-2 sm:px-3 py-1 sm:py-2 bg-slate-50 border border-slate-200 rounded-xl text-[11px] sm:text-xs font-black text-slate-600 inline-block">
               {activeWeightOption.weight}
             </div>
           )}
         </div>
 
         {/* Price & Add Button */}
-        <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between gap-4">
+        <div className="mt-auto pt-2.5 sm:pt-4 border-t border-slate-100 flex items-center justify-between gap-1.5 sm:gap-4">
           <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-              <span className="text-xl font-black text-slate-900">₹{activeWeightOption.price}</span>
+            <div className="flex items-center gap-1 sm:gap-2">
+              <span className="text-sm sm:text-xl font-black text-slate-900">₹{activeWeightOption.price}</span>
               {hasDiscount && (
-                <span className="text-xs text-slate-400 line-through font-bold">₹{activeWeightOption.originalPrice}</span>
+                <span className="text-[10px] sm:text-xs text-slate-400 line-through font-bold">₹{activeWeightOption.originalPrice}</span>
               )}
             </div>
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Fixed Price</span>
+            <span className="hidden sm:block text-[10px] font-black text-slate-400 uppercase tracking-widest">Fixed Price</span>
           </div>
 
           {quantityInCart > 0 ? (
             <div className="flex items-center bg-brand-primary text-white rounded-xl shadow-lg shadow-red-500/20 overflow-hidden ring-2 ring-red-100">
               <button
                 onClick={handleDecrement}
-                className="p-2.5 hover:bg-white/10 transition-colors cursor-pointer"
+                className="p-1.5 sm:p-2.5 hover:bg-white/10 transition-colors cursor-pointer"
+                aria-label="Decrease quantity"
               >
-                <Minus size={16} strokeWidth={3} />
+                <Minus size={13} strokeWidth={3} />
               </button>
-              <span className="w-8 text-center font-black text-sm">{quantityInCart}</span>
+              <span className="w-5 sm:w-8 text-center font-black text-xs sm:text-sm">{quantityInCart}</span>
               <button
                 onClick={handleIncrement}
-                className="p-2.5 hover:bg-white/10 transition-colors cursor-pointer"
+                className="p-1.5 sm:p-2.5 hover:bg-white/10 transition-colors cursor-pointer"
+                aria-label="Increase quantity"
               >
-                <Plus size={16} strokeWidth={3} />
+                <Plus size={13} strokeWidth={3} />
               </button>
             </div>
           ) : (
             <button
               onClick={handleAdd}
-              className="flex items-center gap-2 bg-slate-900 hover:bg-brand-primary text-white px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all duration-300 shadow-lg hover:shadow-red-500/20 active:scale-95 cursor-pointer group/btn"
+              className="flex items-center gap-1 sm:gap-2 bg-slate-900 hover:bg-brand-primary text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl font-black text-[11px] sm:text-xs uppercase tracking-wider transition-all duration-300 shadow-md hover:shadow-red-500/20 active:scale-95 cursor-pointer group/btn"
             >
-              Add <Plus size={14} strokeWidth={3} className="group-hover/btn:rotate-90 transition-transform" />
+              Add <Plus size={12} strokeWidth={3} className="group-hover/btn:rotate-90 transition-transform" />
             </button>
           )}
         </div>

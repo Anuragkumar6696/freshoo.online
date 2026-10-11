@@ -98,11 +98,11 @@ function ShopContent() {
   const weightFilters = ["All", "500g", "1kg", "6 Pcs", "12 Pcs"];
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-white w-full max-w-full overflow-x-hidden">
       <Header />
 
       {/* Main Container */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 flex-1 w-full">
         {/* Breadcrumb & Location Notice */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
@@ -225,37 +225,54 @@ function ShopContent() {
           </aside>
 
           {/* Product Grid Area */}
-          <div className="lg:col-span-3 space-y-6">
+          <div className="lg:col-span-3 space-y-4 sm:space-y-6">
+            {/* Mobile / Tablet Horizontal Category Chips */}
+            <div className="lg:hidden flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all shrink-0 cursor-pointer ${
+                    selectedCategory === cat
+                      ? "bg-brand-primary text-white shadow-sm shadow-red-500/20"
+                      : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
             {/* Top Toolbar */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-gray-50 border border-gray-100/50 p-3 rounded-2xl font-bold text-xs text-gray-600">
-              <div>
+            <div className="flex flex-row items-center justify-between gap-3 bg-gray-50 border border-gray-100/50 p-3 rounded-2xl font-bold text-xs text-gray-600">
+              <div className="text-[11px] sm:text-xs">
                 Showing <span className="text-gray-900">{filteredProducts.length}</span> Cuts
               </div>
 
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-2">
                 {/* Mobile Filter Toggle */}
                 <button
                   onClick={() => setShowMobileFilters(true)}
-                  className="lg:hidden flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer shadow-sm"
+                  className="lg:hidden flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer shadow-sm text-[11px] sm:text-xs"
                 >
-                  <SlidersHorizontal size={14} /> Filter
+                  <SlidersHorizontal size={13} /> Filter
                 </button>
 
                 {/* Sort dropdown */}
-                <div className="flex items-center gap-1.5">
-                  <span>Sort By:</span>
+                <div className="flex items-center gap-1 sm:gap-1.5">
+                  <span className="hidden sm:inline">Sort:</span>
                   <div className="relative">
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
-                      className="bg-white border border-gray-200 rounded-xl px-2.5 py-1.5 outline-none appearance-none cursor-pointer pr-7 hover:border-gray-300 shadow-sm"
+                      className="bg-white border border-gray-200 rounded-xl px-2.5 py-1.5 outline-none appearance-none cursor-pointer pr-7 hover:border-gray-300 shadow-sm text-[11px] sm:text-xs font-bold"
                     >
                       <option value="popular">Popularity</option>
                       <option value="price-asc">Price: Low to High</option>
                       <option value="price-desc">Price: High to Low</option>
                       <option value="rating">Rating</option>
                     </select>
-                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                    <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
                   </div>
                 </div>
               </div>
@@ -263,8 +280,8 @@ function ShopContent() {
 
             {/* Active filters display tags */}
             {(selectedCategory !== "All" || maxPrice < 1000 || selectedWeight !== "All" || searchQuery) && (
-              <div className="flex items-center gap-2 flex-wrap text-[10px] font-bold text-gray-500">
-                <span>Active Filters:</span>
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap text-[10px] font-bold text-gray-500">
+                <span>Active:</span>
                 {selectedCategory !== "All" && (
                   <span className="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded-lg">
                     {selectedCategory}
@@ -285,7 +302,7 @@ function ShopContent() {
                 )}
                 {searchQuery && (
                   <span className="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded-lg">
-                    Search: &quot;{searchQuery}&quot;
+                    &quot;{searchQuery}&quot;
                     <X size={10} className="cursor-pointer text-gray-400 hover:text-gray-600" onClick={() => setSearchQuery("")} />
                   </span>
                 )}
@@ -295,7 +312,7 @@ function ShopContent() {
 
             {/* Grid List */}
             {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6">
                 {filteredProducts.map((prod) => (
                   <ProductCard key={prod.id} product={prod} />
                 ))}

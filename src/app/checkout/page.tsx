@@ -257,10 +257,10 @@ export default function CheckoutPage() {
       : isAddressValid(newAddressLine) && isPincodeValid(newAddressPincode));
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-white w-full max-w-full overflow-x-hidden">
       <Header />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 flex-1 w-full">
         <div className="flex items-center gap-2 mb-8 font-semibold text-xs text-gray-400">
           <Link href="/" className="hover:text-brand-primary">
             Home
@@ -298,7 +298,7 @@ export default function CheckoutPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <form onSubmit={handleSubmit} className="lg:col-span-8 space-y-6">
             {/* Guest / Customer Identity Details */}
-            <div className="border border-gray-100 rounded-2xl p-6 bg-white shadow-sm space-y-4 font-semibold text-xs text-gray-700">
+            <div className="border border-gray-100 rounded-2xl p-4 sm:p-6 bg-white shadow-sm space-y-4 font-semibold text-xs text-gray-700">
               <h3 className="font-display font-extrabold text-sm text-gray-900 pb-2 border-b border-gray-100 flex items-center gap-1.5">
                 <User size={18} className="text-brand-primary" /> Contact &
                 Customer Details
@@ -401,7 +401,7 @@ export default function CheckoutPage() {
             </div>
 
             {/* Exact Geolocation Capture */}
-            <div className="border border-gray-100 rounded-2xl p-6 bg-white shadow-sm space-y-4 font-semibold text-xs text-gray-700">
+            <div className="border border-gray-100 rounded-2xl p-4 sm:p-6 bg-white shadow-sm space-y-4 font-semibold text-xs text-gray-700">
               <h3 className="font-display font-extrabold text-sm text-gray-900 pb-2 border-b border-gray-100 flex items-center gap-1.5">
                 <Navigation size={18} className="text-brand-primary" /> Exact
                 Delivery Location (GPS)
@@ -488,7 +488,7 @@ export default function CheckoutPage() {
             </div>
 
             {/* Delivery Address */}
-            <div className="border border-gray-100 rounded-2xl p-6 bg-white shadow-sm space-y-4 font-semibold text-xs text-gray-700">
+            <div className="border border-gray-100 rounded-2xl p-4 sm:p-6 bg-white shadow-sm space-y-4 font-semibold text-xs text-gray-700">
               <h3 className="font-display font-extrabold text-sm text-gray-900 pb-2 border-b border-gray-100 flex items-center gap-1.5">
                 <MapPin size={18} className="text-brand-primary" /> Delivery
                 Address
@@ -680,7 +680,7 @@ export default function CheckoutPage() {
             </div>
 
             {/* Instructions */}
-            <div className="border border-gray-100 rounded-2xl p-6 bg-white shadow-sm space-y-4 font-semibold text-xs text-gray-700">
+            <div className="border border-gray-100 rounded-2xl p-4 sm:p-6 bg-white shadow-sm space-y-4 font-semibold text-xs text-gray-700">
               <h3 className="font-display font-extrabold text-sm text-gray-900 pb-2 border-b border-gray-100 flex items-center gap-1.5">
                 <MessageSquare size={18} className="text-brand-primary" />{" "}
                 Special Delivery Instructions
@@ -697,7 +697,7 @@ export default function CheckoutPage() {
             </div>
 
             {/* Payment Method - COD ONLY */}
-            <div className="border border-gray-100 rounded-2xl p-6 bg-white shadow-sm space-y-4 font-semibold text-xs text-gray-700">
+            <div className="border border-gray-100 rounded-2xl p-4 sm:p-6 bg-white shadow-sm space-y-4 font-semibold text-xs text-gray-700">
               <h3 className="font-display font-extrabold text-sm text-gray-900 pb-2 border-b border-gray-100 flex items-center gap-1.5">
                 <CreditCard size={18} className="text-brand-primary" /> Payment
                 Method
@@ -736,7 +736,7 @@ export default function CheckoutPage() {
 
           {/* Right Side Summary */}
           <div className="lg:col-span-4 space-y-6">
-            <div className="border border-gray-100 rounded-2xl p-6 bg-white shadow-sm space-y-4 font-semibold text-xs text-gray-700 lg:sticky lg:top-28">
+            <div className="border border-gray-100 rounded-2xl p-4 sm:p-6 bg-white shadow-sm space-y-4 font-semibold text-xs text-gray-700 lg:sticky lg:top-28">
               <h3 className="font-display font-extrabold text-sm text-gray-900 pb-2 border-b border-gray-100">
                 Order Summary
               </h3>
