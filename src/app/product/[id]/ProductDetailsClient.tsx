@@ -85,9 +85,31 @@ export const ProductDetailsClient: React.FC<ProductDetailsClientProps> = ({ id }
     router.push("/checkout");
   };
 
+  const fallbackImg = (() => {
+    switch (product.category?.toLowerCase()) {
+      case "mutton":
+        return "/1000098711.jpg";
+      case "eggs":
+      case "egg":
+        return "/egg.jpeg";
+      case "fish":
+        return "/fish.png";
+      default:
+        return "/chicken1.png";
+    }
+  })();
+
+  const [currentImg, setCurrentImg] = useState(product.image || fallbackImg);
+  const [hasImgError, setHasImgError] = useState(false);
+
+  React.useEffect(() => {
+    setCurrentImg(product.image || fallbackImg);
+    setHasImgError(false);
+  }, [product.image, fallbackImg]);
+
   // Mock product image gallery: Using raw stock, vacuum pack, and finished dish angles
   const galleryImages = [
-    product.image 
+    currentImg 
   ];
 
   const hasDiscount = activeWeightOption.originalPrice && activeWeightOption.originalPrice > activeWeightOption.price;
@@ -142,12 +164,18 @@ export const ProductDetailsClient: React.FC<ProductDetailsClientProps> = ({ id }
             {/* Big Image */}
             <div className="relative aspect-square border border-gray-100 rounded-3xl overflow-hidden bg-gray-50 shadow-sm">
               <img
-                src={galleryImages[activeImageIndex]}
+                src={galleryImages[activeImageIndex] || fallbackImg}
                 alt={product.name}
+                onError={() => {
+                  if (!hasImgError) {
+                    setHasImgError(true);
+                    setCurrentImg(fallbackImg);
+                  }
+                }}
                 className="w-full h-full object-cover transition-all duration-300"
               />
               {hasDiscount && (
-                <div className="absolute top-4 left-4 bg-brand-primary text-white text-xs font-black px-2.5 py-1 rounded-md shadow-md">
+                <div className="absolute top-4 left-4 z-20 pointer-events-none bg-brand-primary text-white text-xs font-black px-2.5 py-1 rounded-md shadow-md">
                   {discountPercent}% OFF
                 </div>
               )}

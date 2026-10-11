@@ -19,14 +19,7 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion"],
   },
-  async rewrites() {
-    return [
-      {
-        source: "/uploads/:path*",
-        destination: "http://localhost:4000/uploads/:path*",
-      },
-    ];
-  },
+
   async headers() {
     return [
       {

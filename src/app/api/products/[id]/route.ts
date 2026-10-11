@@ -7,6 +7,16 @@ import { sendProductAdminAlert } from "@/lib/brevo";
 
 export const dynamic = "force-dynamic";
 
+function sanitizeProductImage(img?: string): string {
+  if (!img || typeof img !== "string" || !img.trim()) return "/chicken1.png";
+  let cleaned = img.trim().replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i, "");
+  if (!cleaned) return "/chicken1.png";
+  if (!cleaned.startsWith("http://") && !cleaned.startsWith("https://") && !cleaned.startsWith("/")) {
+    cleaned = `/${cleaned}`;
+  }
+  return cleaned;
+}
+
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -16,7 +26,9 @@ export async function GET(
     await connectDB();
     const p = await Product.findById(id);
     if (!p) return notFound("Product not found");
-    return jsonOk({ product: p.toJSON() });
+    const json = p.toJSON();
+    json.image = sanitizeProductImage(json.image);
+    return jsonOk({ product: json });
   } catch (e: any) {
     return jsonErr(e?.message || "Failed to load product", 500);
   }
@@ -34,12 +46,17 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await req.json();
+    if (body.image) {
+      body.image = sanitizeProductImage(body.image);
+    }
     await connectDB();
     const updated = await Product.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,
     });
     if (!updated) return notFound("Product not found");
+    const json = updated.toJSON();
+    json.image = sanitizeProductImage(json.image);
 
     // Non-blocking admin alert for product update
     void (async () => {

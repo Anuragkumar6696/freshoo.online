@@ -232,14 +232,47 @@ const apiFetch = async <T = any,>(
   }
 };
 
+const getCategoryFallbackImage = (category?: string): string => {
+  switch (category?.toLowerCase()) {
+    case "mutton":
+      return "/1000098711.jpg";
+    case "eggs":
+    case "egg":
+      return "/egg.jpeg";
+    case "fish":
+      return "/fish.png";
+    default:
+      return "/chicken1.png";
+  }
+};
+
+const sanitizeImageUrl = (image: any, category?: string): string => {
+  if (!image || typeof image !== "string" || !image.trim()) {
+    return getCategoryFallbackImage(category);
+  }
+  let cleaned = image.trim();
+  // Strip localhost / 127.0.0.1
+  cleaned = cleaned.replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i, "");
+  if (!cleaned) {
+    return getCategoryFallbackImage(category);
+  }
+  // Keep valid external remote URLs
+  if (cleaned.startsWith("http://") || cleaned.startsWith("https://")) {
+    return cleaned;
+  }
+  // Ensure relative path starts with /
+  if (!cleaned.startsWith("/")) {
+    cleaned = `/${cleaned}`;
+  }
+  return cleaned;
+};
+
 const productFromAny = (p: any): Product => ({
   id: String(p.id || p._id),
   name: p.name,
   category: p.category,
   description: p.description,
-  image: (p.image && p.image.trim())
-    ? (p.image.startsWith("http") ? p.image : `${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000"}${p.image.startsWith("/") ? p.image : `/${p.image}`}`)
-    : "/chicken1.png",
+  image: sanitizeImageUrl(p.image, p.category),
   rating: Number(p.rating ?? 4.5),
   reviewsCount: Number(p.reviewsCount ?? 0),
   freshnessBadge: p.freshnessBadge || "Cut After Order",

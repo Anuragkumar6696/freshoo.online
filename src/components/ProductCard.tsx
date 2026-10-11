@@ -9,9 +9,32 @@ interface ProductCardProps {
   product: Product;
 }
 
+const getCategoryFallback = (cat?: string) => {
+  switch (cat?.toLowerCase()) {
+    case "mutton":
+      return "/1000098711.jpg";
+    case "eggs":
+    case "egg":
+      return "/egg.jpeg";
+    case "fish":
+      return "/fish.png";
+    default:
+      return "/chicken1.png";
+  }
+};
+
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { cart, addToCart, updateCartQuantity } = useApp();
   const [selectedWeight, setSelectedWeight] = useState(product.weights[0].weight);
+
+  const fallbackImg = getCategoryFallback(product.category);
+  const [imgSrc, setImgSrc] = useState(product.image || fallbackImg);
+  const [hasError, setHasError] = useState(false);
+
+  React.useEffect(() => {
+    setImgSrc(product.image || fallbackImg);
+    setHasError(false);
+  }, [product.image, fallbackImg]);
 
   const activeWeightOption = product.weights.find((w) => w.weight === selectedWeight) || product.weights[0];
   const cartItemId = `${product.id}-${selectedWeight}`;
@@ -48,16 +71,23 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     <div className="group relative flex flex-col bg-white border border-slate-200/60 rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-premium shadow-hover transition-all duration-500 card-gradient">
       {/* Discount Badge */}
       {hasDiscount && (
-        <div className="absolute top-2.5 sm:top-4 left-2.5 sm:left-4 z-10 bg-brand-primary text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg shadow-lg shadow-red-500/20">
+        <div className="absolute top-2.5 sm:top-4 left-2.5 sm:left-4 z-20 pointer-events-none bg-brand-primary text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg shadow-lg shadow-red-500/20">
           {discountPercent}% OFF
         </div>
       )}
 
       {/* Image Area */}
-      <Link href={`/product/${product.id}`} className="block relative overflow-hidden aspect-square bg-slate-50">
+      <Link href={`/product/${product.id}`} className="block relative overflow-hidden aspect-square bg-slate-100">
         <img
-          src={product.image || "/chicken1.png"}
+          src={imgSrc}
           alt={product.name}
+          onError={() => {
+            if (!hasError) {
+              setHasError(true);
+              setImgSrc(fallbackImg);
+            }
+          }}
+          loading="lazy"
           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />

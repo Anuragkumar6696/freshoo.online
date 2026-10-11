@@ -198,6 +198,11 @@ function AdminPageContent() {
 
     if (!finalImageUrl || finalImageUrl === "") {
       finalImageUrl = "/chicken1.png";
+    } else {
+      finalImageUrl = finalImageUrl.replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i, "").trim();
+      if (!finalImageUrl.startsWith("http://") && !finalImageUrl.startsWith("https://") && !finalImageUrl.startsWith("/")) {
+        finalImageUrl = `/${finalImageUrl}`;
+      }
     }
 
     const payload = {

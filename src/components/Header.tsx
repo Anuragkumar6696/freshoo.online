@@ -367,8 +367,11 @@ export const Header: React.FC = () => {
                       >
                         {/* Image */}
                         <img
-                          src={item.product.image}
+                          src={item.product.image || "/chicken1.png"}
                           alt={item.product.name}
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).src = "/chicken1.png";
+                          }}
                           className="w-16 h-16 object-cover rounded-lg bg-gray-50 border border-gray-100 shrink-0"
                         />
 

@@ -7,6 +7,16 @@ import { sendProductAdminAlert } from "@/lib/brevo";
 
 export const dynamic = "force-dynamic";
 
+function sanitizeProductImage(img?: string): string {
+  if (!img || typeof img !== "string" || !img.trim()) return "/chicken1.png";
+  let cleaned = img.trim().replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i, "");
+  if (!cleaned) return "/chicken1.png";
+  if (!cleaned.startsWith("http://") && !cleaned.startsWith("https://") && !cleaned.startsWith("/")) {
+    cleaned = `/${cleaned}`;
+  }
+  return cleaned;
+}
+
 export async function GET(req: NextRequest) {
   try {
     await connectDB();
@@ -23,7 +33,9 @@ export async function GET(req: NextRequest) {
     if (id) {
       const p = await Product.findById(id);
       if (!p) return jsonErr("Product not found", 404);
-      return jsonOk({ product: p.toJSON() });
+      const json = p.toJSON();
+      json.image = sanitizeProductImage(json.image);
+      return jsonOk({ product: json });
     }
 
     let query = Product.find(q).sort({ isBestSeller: -1, createdAt: -1 });
@@ -38,6 +50,7 @@ export async function GET(req: NextRequest) {
     const list = await query.lean().exec();
     const products = list.map((p: any) => ({
       ...p,
+      image: sanitizeProductImage(p.image),
       id: (p._id || p.id).toString(),
       _id: undefined,
       __v: undefined,
@@ -61,6 +74,9 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     if (!body.name || !body.category || !body.weights?.length)
       return jsonErr("Name, category, and at least one weight option are required.");
+    if (body.image) {
+      body.image = sanitizeProductImage(body.image);
+    }
     const p = await Product.create(body);
 
     // Admin alert for product creation (non-blocking)
