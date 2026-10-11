@@ -13,6 +13,8 @@ import { User, IUser } from "@/models/User";
 import { jsonErr, methodNotAllowed } from "@/lib/response";
 import { sendLoginAlertEmail } from "@/lib/brevo";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
