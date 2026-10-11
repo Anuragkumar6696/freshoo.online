@@ -152,26 +152,39 @@ export function buildNewOrderAdminEmailHtml(order: Order): string {
     })
     .join("");
 
+  const geo = order.geoLocation || order.address?.geoLocation;
+  const addressQuery = encodeURIComponent(
+    `${order.address?.addressLine || ""}, ${order.address?.city || ""} - ${order.address?.pincode || ""}`
+  );
+  const mapsAddressUrl = `https://www.google.com/maps/search/?api=1&query=${addressQuery}`;
+
   const gps =
-    order.geoLocation && order.geoLocation.latitude != null
-      ? `<div style="padding:10px 14px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;margin-top:10px">
-          <div style="font-weight:700;color:#065f46;font-size:13px">📍 GPS Attached</div>
+    geo && geo.latitude != null
+      ? `<div style="padding:14px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;margin-top:12px">
+          <div style="font-weight:800;color:#065f46;font-size:13px">📍 Exact Customer GPS Location</div>
           <div style="font-family:ui-monospace,Menlo,monospace;color:#064e3b;margin-top:4px;font-size:12px">
-            ${order.geoLocation.latitude.toFixed(6)}, ${
-          order.geoLocation.longitude?.toFixed(6)
-        }
-            ${
-              order.geoLocation.accuracy
-                ? ` • ±${Math.round(order.geoLocation.accuracy)}m`
-                : ""
-            }
+            Coordinates: ${geo.latitude.toFixed(6)}, ${geo.longitude?.toFixed(6)}
+            ${geo.accuracy ? ` • Accuracy: ±${Math.round(geo.accuracy)}m` : ""}
           </div>
-          <a href="https://www.google.com/maps?q=${encodeURIComponent(
-            `${order.geoLocation.latitude},${order.geoLocation.longitude}`
-          )}" target="_blank" rel="noopener noreferrer"
-            style="display:inline-block;margin-top:6px;font-size:12px;color:#059669;text-decoration:underline">Open in Google Maps →</a>
+          <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+            <a href="https://www.google.com/maps?q=${encodeURIComponent(`${geo.latitude},${geo.longitude}`)}" target="_blank" rel="noopener noreferrer"
+              style="display:inline-block;background:#059669;color:#ffffff;font-weight:800;font-size:12px;padding:8px 16px;border-radius:8px;text-decoration:none">
+              🗺️ Open Exact GPS Pin in Google Maps →
+            </a>
+            <a href="${mapsAddressUrl}" target="_blank" rel="noopener noreferrer"
+              style="display:inline-block;background:#ffffff;color:#374151;font-weight:700;font-size:12px;padding:8px 14px;border-radius:8px;text-decoration:none;border:1px solid #d1d5db">
+              📍 Open Street Address in Google Maps →
+            </a>
+          </div>
         </div>`
-      : `<div style="padding:10px 14px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;margin-top:10px;color:#92400e;font-size:12px">No GPS coordinates attached.</div>`;
+      : `<div style="padding:14px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;margin-top:12px">
+          <div style="font-weight:800;color:#1e40af;font-size:13px">📍 Customer Delivery Location (Google Maps)</div>
+          <div style="color:#1e3a8a;font-size:12px;margin-top:3px">Navigate to customer delivery address:</div>
+          <a href="${mapsAddressUrl}" target="_blank" rel="noopener noreferrer"
+            style="display:inline-block;background:#2563eb;color:#ffffff;font-weight:800;font-size:12px;padding:8px 16px;border-radius:8px;text-decoration:none;margin-top:8px">
+            🗺️ Open Address in Google Maps →
+          </a>
+        </div>`;
 
   const customerBlock = order.isGuestOrder
     ? `<span style="background:#fef3c7;color:#92400e;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;margin-left:8px">GUEST</span>`
@@ -182,37 +195,31 @@ export function buildNewOrderAdminEmailHtml(order: Order): string {
   <body style="background:#f1f5f9;margin:0;padding:0;font-family:Inter,system-ui,Arial,sans-serif;color:#0f172a">
     <div style="max-width:640px;margin:0 auto;padding:20px">
       <div style="background:linear-gradient(135deg,#c81e25,#991b1b);padding:22px 26px;border-top-left-radius:16px;border-top-right-radius:16px;color:white">
-        <div style="font-size:20px;font-weight:900;letter-spacing:-0.02em">Fresh<span style="color:#fecaca">oo</span></div>
-        <div style="font-size:11px;letter-spacing:0.22em;font-weight:700;margin-top:2px;opacity:0.85">NEW ORDER RECEIVED</div>
+        <div style="font-size:22px;font-weight:900;letter-spacing:-0.02em">Fresh<span style="color:#fecaca">oo</span></div>
+        <div style="font-size:11px;letter-spacing:0.22em;font-weight:700;margin-top:2px;opacity:0.9">NEW ORDER RECEIVED • ALERT</div>
       </div>
       <div style="background:white;padding:26px;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0">
-        <h2 style="margin:0 0 10px 0;font-size:18px;font-weight:800">🛒 Order ${order.id}</h2>
-        <div style="font-size:13px;color:#64748b">${order.date} • Status: <span style="font-weight:700;color:#c81e25">${
-    order.status
-  }</span> • Payment: <span style="font-weight:700">${order.paymentMethod.toUpperCase()}</span></div>
+        <h2 style="margin:0 0 8px 0;font-size:20px;font-weight:900;color:#0f172a">🛒 Order ${order.id}</h2>
+        <div style="font-size:13px;color:#64748b;margin-bottom:12px">
+          📅 ${order.date} • Status: <span style="font-weight:800;color:#c81e25;background:#fee2e2;padding:2px 8px;border-radius:6px">${order.status}</span> • Payment: <span style="font-weight:800;color:#065f46;background:#d1fae5;padding:2px 8px;border-radius:6px">${order.paymentMethod.toUpperCase()} (Collect ₹${order.total})</span>
+        </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0 6px 0">
           <div style="padding:14px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0">
             <div style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:0.08em;text-transform:uppercase">Customer ${customerBlock}</div>
-            <div style="margin-top:6px;font-weight:700;color:#0f172a">${
-              order.customerName || "—"
-            }</div>
-            <div style="font-size:13px;color:#334155;margin-top:2px">📞 ${
-              order.customerPhone || "—"
-            }</div>
-            <div style="font-size:13px;color:#334155;margin-top:2px">✉️ ${
-              order.customerEmail || "—"
-            }</div>
+            <div style="margin-top:6px;font-weight:800;font-size:15px;color:#0f172a">${order.customerName || "Customer"}</div>
+            <div style="font-size:13px;color:#334155;margin-top:4px">
+              📞 <a href="tel:${order.customerPhone || ""}" style="color:#0f172a;font-weight:700;text-decoration:underline">${order.customerPhone || "—"}</a>
+            </div>
+            <div style="font-size:13px;color:#334155;margin-top:4px">
+              ✉️ <a href="mailto:${order.customerEmail || ""}" style="color:#0f172a;font-weight:600;text-decoration:underline">${order.customerEmail || "—"}</a>
+            </div>
           </div>
           <div style="padding:14px;background:#fef2f2;border-radius:12px;border:1px solid #fecaca">
             <div style="font-size:11px;font-weight:700;color:#991b1b;letter-spacing:0.08em;text-transform:uppercase">Delivery Address</div>
             <div style="margin-top:6px">
-              <span style="font-size:10px;font-weight:800;background:hsl(354,84%,96%);color:#c81e25;padding:2px 7px;border-radius:6px">${
-                order.address.tag
-              }</span>
-              <div style="margin-top:6px;font-size:13px;font-weight:600;color:#0f172a;line-height:1.5">${
-                order.address.addressLine
-              }, ${order.address.city} - ${order.address.pincode}</div>
+              <span style="font-size:10px;font-weight:800;background:hsl(354,84%,96%);color:#c81e25;padding:2px 7px;border-radius:6px;text-transform:uppercase">${order.address.tag || "Home"}</span>
+              <div style="margin-top:6px;font-size:13px;font-weight:600;color:#0f172a;line-height:1.5">${order.address.addressLine}, ${order.address.city} - ${order.address.pincode}</div>
             </div>
           </div>
         </div>
@@ -220,13 +227,11 @@ export function buildNewOrderAdminEmailHtml(order: Order): string {
         ${gps}
 
         <div style="margin-top:20px">
-          <div style="font-weight:800;margin-bottom:8px;color:#0f172a">Items (${
-            (order.items || []).length
-          })</div>
+          <div style="font-weight:800;margin-bottom:8px;color:#0f172a">Ordered Items (${(order.items || []).length})</div>
           <table style="width:100%;border-collapse:separate;border-spacing:0;background:#fafbfc;border:1px solid #eef2f7;border-radius:10px;overflow:hidden">
             <thead>
               <tr style="background:#f1f5f9">
-                <th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:800;color:#64748b;letter-spacing:0.08em;text-transform:uppercase"></th>
+                <th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:800;color:#64748b;letter-spacing:0.08em;text-transform:uppercase">Image</th>
                 <th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:800;color:#64748b;letter-spacing:0.08em;text-transform:uppercase">Product</th>
                 <th style="padding:10px 12px;text-align:right;font-size:11px;font-weight:800;color:#64748b;letter-spacing:0.08em;text-transform:uppercase">Amount</th>
               </tr>
@@ -236,33 +241,22 @@ export function buildNewOrderAdminEmailHtml(order: Order): string {
         </div>
 
         <div style="margin-top:16px;padding:16px;background:#fef2f2;border-radius:12px;border:1px solid #fecaca">
-          <div style="display:flex;justify-content:space-between;font-size:13px;color:#334155;margin-bottom:4px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;color:#334155;margin-bottom:5px">
             <span>Subtotal</span><span>₹${order.subtotal}</span>
           </div>
-          ${
-            order.discount > 0
-              ? `<div style="display:flex;justify-content:space-between;font-size:13px;color:#059669;margin-bottom:4px"><span>Discount</span><span>-₹${order.discount}</span></div>`
-              : ""
-          }
-          <div style="display:flex;justify-content:space-between;font-size:13px;color:#059669;margin-bottom:4px">
-            <span>Delivery</span><span>FREE</span>
+          ${order.discount > 0 ? `<div style="display:flex;justify-content:space-between;font-size:13px;color:#059669;margin-bottom:5px"><span>Discount</span><span>-₹${order.discount}</span></div>` : ""}
+          <div style="display:flex;justify-content:space-between;font-size:13px;color:#059669;margin-bottom:5px">
+            <span>Delivery Fee</span><span>FREE (₹0)</span>
           </div>
-          <div style="border-top:1px dashed #fca5a5;margin-top:8px;padding-top:8px;display:flex;justify-content:space-between;font-weight:800;font-size:15px;color:#c81e25">
-            <span>Grand Total</span><span>₹${order.total}</span>
+          <div style="border-top:1px dashed #fca5a5;margin-top:8px;padding-top:8px;display:flex;justify-content:space-between;font-weight:900;font-size:16px;color:#c81e25">
+            <span>Total To Collect</span><span>₹${order.total}</span>
           </div>
         </div>
 
-        ${
-          order.instructions
-            ? `<div style="margin-top:14px;padding:12px 14px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px">
-              <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;color:#92400e;text-transform:uppercase">Special Instructions</div>
-              <div style="margin-top:4px;font-size:13px;color:#78350f;font-weight:600">${order.instructions}</div>
-            </div>`
-            : ""
-        }
+        ${order.instructions ? `<div style="margin-top:14px;padding:12px 14px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px"><div style="font-size:11px;font-weight:800;letter-spacing:0.08em;color:#92400e;text-transform:uppercase">⚠️ Special Delivery Instructions</div><div style="margin-top:4px;font-size:13px;color:#78350f;font-weight:700">${order.instructions}</div></div>` : ""}
       </div>
       <div style="padding:18px 26px;background:#f8fafc;border:1px solid #e2e8f0;border-top:none;border-bottom-left-radius:16px;border-bottom-right-radius:16px;text-align:center;font-size:11px;color:#94a3b8;font-weight:600">
-        Please start cutting. Delivery boy will be assigned once preparation begins.
+        Freshoo Hyperlocal Order Notification System • Keep chicken, mutton & fish refrigerated.
       </div>
     </div>
   </body></html>`;
@@ -406,9 +400,18 @@ export async function sendOrderCustomerConfirmation(
   if (!apiKey) {
     return { ok: false, error: "Brevo not configured (missing BREVO_API_KEY)" };
   }
-  const toEmail = order.customerEmail;
-  if (!toEmail) return { ok: false, error: "Customer has no email" };
+  const toEmail = (
+    order.customerEmail ||
+    order.guestEmail ||
+    order.email ||
+    (order as any).guestDetails?.email
+  )?.trim();
+  if (!toEmail) {
+    console.warn(`[Brevo] Customer confirmation skipped: No customer email found on order ${order.id}`);
+    return { ok: false, error: "Customer has no email" };
+  }
   const toName = order.customerName || "Valued Customer";
+  console.log(`[Brevo] Dispatching customer confirmation for ${order.id} to: ${toEmail}`);
 
   if (CUSTOMER_ORDER_CONFIRM_TEMPLATE_ID) {
     const params = {

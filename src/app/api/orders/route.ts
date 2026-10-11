@@ -144,6 +144,16 @@ export async function POST(req: NextRequest) {
 
     const jsonOrder = created.toJSON() as unknown as OrderT;
 
+    // Explicitly guarantee customer identity and location details on jsonOrder for Brevo:
+    jsonOrder.customerName = customerName || "Customer";
+    jsonOrder.customerEmail = customerEmail ? customerEmail.toLowerCase() : null;
+    jsonOrder.customerPhone = customerPhone || null;
+    jsonOrder.guestEmail = customerEmail ? customerEmail.toLowerCase() : null;
+    jsonOrder.guestPhone = customerPhone || null;
+    if (!jsonOrder.geoLocation && (geoLocation || address?.geoLocation)) {
+      jsonOrder.geoLocation = geoLocation || address?.geoLocation;
+    }
+
     // Await both Brevo emails before returning so Vercel Serverless doesn't terminate background promises prematurely
     try {
       const results = await Promise.allSettled([
