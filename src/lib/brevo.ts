@@ -5,10 +5,10 @@ const API_KEY = process.env.BREVO_API_KEY || "";
 const SENDER_EMAIL = process.env.BREVO_SENDER_EMAIL || "freshoo.online@gmail.com";
 const SENDER_NAME = process.env.BREVO_SENDER_NAME || "freshoo";
 const NOTIFY_EMAIL =
-  process.env.STORE_OWNER_EMAIL || process.env.ADMIN_EMAIL || "";
-const NOTIFY_ENABLED = !!API_KEY;
+  process.env.STORE_OWNER_EMAIL || process.env.ADMIN_EMAIL || "freshoo.online@gmail.com";
+const NOTIFY_ENABLED = !!(process.env.BREVO_API_KEY || API_KEY);
 const ORDER_NOTIFY_ENABLED =
-  process.env.BREVO_ORDER_NOTIFY_ENABLED === "true" && NOTIFY_ENABLED && !!NOTIFY_EMAIL;
+  NOTIFY_ENABLED && process.env.BREVO_ORDER_NOTIFY_ENABLED !== "false";
 const WELCOME_TEMPLATE_ID = Number(process.env.BREVO_WELCOME_TEMPLATE_ID || "0") || 0;
 const CUSTOMER_ORDER_CONFIRM_TEMPLATE_ID =
   Number(process.env.BREVO_CUSTOMER_ORDER_CONFIRM_TEMPLATE_ID || "0") || 0;
@@ -79,14 +79,21 @@ async function sendTemplate(
 }
 
 async function sendHtml(
-  toEmail: string,
+  toEmail: string | string[],
   toName: string,
   subject: string,
   html: string,
   opts?: { ccToAdmin?: boolean }
 ): Promise<BrevoSendResult> {
-  if (!toEmail) return { ok: false, error: "Recipient missing" };
-  const to = [{ email: toEmail, name: toName || toEmail }];
+  const recipients = (Array.isArray(toEmail) ? toEmail : [toEmail])
+    .map((e) => e?.trim())
+    .filter(Boolean) as string[];
+  if (recipients.length === 0) return { ok: false, error: "Recipient missing" };
+
+  const to = recipients.map((email) => ({
+    email,
+    name: toName || email,
+  }));
   const payload: any = {
     sender: { name: SENDER_NAME, email: SENDER_EMAIL },
     to,
@@ -94,7 +101,7 @@ async function sendHtml(
     htmlContent: html,
     tags: ["freshoo"],
   };
-  if (opts?.ccToAdmin && NOTIFY_EMAIL && NOTIFY_EMAIL !== toEmail) {
+  if (opts?.ccToAdmin && NOTIFY_EMAIL && !recipients.includes(NOTIFY_EMAIL)) {
     payload.bcc = [{ email: NOTIFY_EMAIL, name: "Freshoo Admin" }];
   }
   const r = await brevoSendRaw(payload);
@@ -246,21 +253,45 @@ export function buildNewOrderAdminEmailHtml(order: Order): string {
   </body></html>`;
 }
 
+export function getAdminEmails(): string[] {
+  const set = new Set<string>();
+  set.add("freshoo.online@gmail.com");
+  if (process.env.STORE_OWNER_EMAIL?.trim()) {
+    set.add(process.env.STORE_OWNER_EMAIL.trim().toLowerCase());
+  }
+  if (process.env.ADMIN_EMAIL?.trim()) {
+    set.add(process.env.ADMIN_EMAIL.trim().toLowerCase());
+  }
+  return Array.from(set);
+}
+
 export async function sendNewOrderAdminNotification(
   order: Order
 ): Promise<BrevoSendResult> {
-  if (!ORDER_NOTIFY_ENABLED) {
+  const apiKey = process.env.BREVO_API_KEY?.trim() || API_KEY;
+  if (!apiKey) {
     console.log(
-      "[Brevo] Admin notify SKIPPED: set BREVO_ORDER_NOTIFY_ENABLED=true + STORE_OWNER_EMAIL + BREVO_API_KEY to enable."
+      "[Brevo] Admin notify skipped: BREVO_API_KEY is missing in environment variables."
     );
-    return { ok: false, error: "Brevo admin notify not configured" };
+    return { ok: false, error: "Brevo admin notify not configured (missing BREVO_API_KEY)" };
   }
+  if (process.env.BREVO_ORDER_NOTIFY_ENABLED === "false") {
+    console.log(
+      "[Brevo] Admin notify skipped: BREVO_ORDER_NOTIFY_ENABLED is set to false."
+    );
+    return { ok: false, error: "Brevo admin notify disabled" };
+  }
+
+  const recipients = getAdminEmails();
   const html = buildNewOrderAdminEmailHtml(order);
+
+  console.log(`[Brevo] Sending new order alert for ${order.id} to: ${recipients.join(", ")}`);
+
   return sendHtml(
-    NOTIFY_EMAIL,
+    recipients,
     "Freshoo Store Admin",
     `🛒 NEW ORDER ${order.id} • ₹${order.total} • ${
-      order.customerName || "Guest"
+      order.customerName || "Customer"
     }`,
     html
   );

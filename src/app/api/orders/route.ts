@@ -143,10 +143,11 @@ export async function POST(req: NextRequest) {
     // Non-blocking Brevo email alerts
     void (async () => {
       try {
-        await Promise.allSettled([
+        const results = await Promise.allSettled([
           sendNewOrderAdminNotification(jsonOrder),
           sendOrderCustomerConfirmation(jsonOrder),
         ]);
+        console.log("[Brevo] order notification dispatched:", JSON.stringify(results));
       } catch (err) {
         console.warn("[Brevo] order notification failed:", err);
       }

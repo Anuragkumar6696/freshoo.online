@@ -1,7 +1,17 @@
 /* Brevo backend mail helper — sends order notification to admin */
 const API_KEY = process.env.BREVO_API_KEY || "";
 const SENDER = process.env.BREVO_SENDER_EMAIL || "freshoo.online@gmail.com";
-const ADMIN = process.env.STORE_OWNER_EMAIL || process.env.ADMIN_EMAIL || "freshoo.online@gmail.com";
+const ADMIN_RECIPIENTS = Array.from(
+  new Set(
+    [
+      "freshoo.online@gmail.com",
+      process.env.STORE_OWNER_EMAIL,
+      process.env.ADMIN_EMAIL,
+    ]
+      .map((e) => e?.trim().toLowerCase())
+      .filter(Boolean) as string[]
+  )
+);
 
 export async function notifyAdmin(order: any): Promise<{ ok: boolean; msg?: string }> {
   if (!API_KEY) return { ok: false, msg: "No BREVO_API_KEY" };
@@ -65,7 +75,7 @@ export async function notifyAdmin(order: any): Promise<{ ok: boolean; msg?: stri
       headers: { "api-key": API_KEY, "Content-Type": "application/json" },
       body: JSON.stringify({
         sender: { name: "Freshoo", email: SENDER },
-        to: [{ email: ADMIN, name: "Freshoo Admin" }],
+        to: ADMIN_RECIPIENTS.map((email) => ({ email, name: "Freshoo Store Admin" })),
         subject: `🍽️ New Freshoo Order — ${order.id || order.friendlyId} — ${customerName}`,
         htmlContent,
       }),
