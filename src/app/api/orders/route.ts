@@ -112,8 +112,13 @@ export async function POST(req: NextRequest) {
       minute: "2-digit",
     });
 
+    const idempotencyKey =
+      body?.idempotencyKey ||
+      `idemp-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
     const created = await Order.create({
       friendlyId,
+      idempotencyKey,
       date: rawDate,
       userId: userId || null,
       customerName,

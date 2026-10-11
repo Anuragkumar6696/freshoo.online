@@ -31,6 +31,7 @@ export interface IOrder extends Document, Omit<OrderT, "id" | "_id"> {
   updatedAt: Date;
   // Soft geo duplicate of the address subdoc, also stored inside address.geoLocation for frontend compat
   geoLocation: GeoLocation | null;
+  idempotencyKey?: string;
 }
 
 const GeoSchema = new Schema<GeoLocation>(
@@ -119,6 +120,12 @@ const OrderSchema = new Schema<IOrder>(
     isGuestOrder: { type: Boolean, default: false, index: true },
     instructions: { type: String, default: null, trim: true },
     adminNotes: { type: String, default: null, trim: true },
+    idempotencyKey: {
+      type: String,
+      unique: true,
+      sparse: true,
+      default: () => `idemp-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+    },
     // Database linkage (null for guests)
     userId: { type: Schema.Types.ObjectId, ref: "User", default: null, index: true },
     guestEmail: { type: String, default: null, lowercase: true, trim: true, index: true },
