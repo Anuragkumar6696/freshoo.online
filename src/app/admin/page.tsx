@@ -1650,7 +1650,7 @@ function AdminPageContent() {
                         {p.category}
                       </span>
                     </div>
-                    <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed">{p.description}</p>
+                    <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed">{p.description ? p.description.replace(/\*\*/g, "") : ""}</p>
                     <div className="mt-2 flex gap-2">
                       {p.weights.map((w) => (
                         <span key={w.weight} className="text-[11px] font-bold bg-red-50 text-brand-primary px-2 py-0.5 rounded border border-red-100">

@@ -23,6 +23,95 @@ interface ProductDetailsClientProps {
   id: string;
 }
 
+// Helper: Parse inline markdown (**bold**, emojis, formatting)
+const renderInlineMarkdown = (text: string) => {
+  if (!text) return null;
+  const parts = text.split(/(\*\*[^*]+?\*\*)/g);
+  return parts.map((part, idx) => {
+    if (part.startsWith("**") && part.endsWith("**") && part.length >= 4) {
+      return (
+        <strong key={idx} className="font-extrabold text-stone-900">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    return <React.Fragment key={idx}>{part}</React.Fragment>;
+  });
+};
+
+// Formatted Product Description Component
+const FormattedProductDescription: React.FC<{ text: string }> = ({ text }) => {
+  if (!text) return null;
+
+  const rawLines = text.split(/\r?\n/);
+  const blocks: Array<{ type: "paragraph" | "bullet" | "highlight"; content: string }> = [];
+
+  for (const rawLine of rawLines) {
+    const line = rawLine.trim();
+    if (!line) continue;
+
+    if (line.startsWith("* ") || line.startsWith("- ") || line.startsWith("• ")) {
+      blocks.push({
+        type: "bullet",
+        content: line.replace(/^[*•-]\s+/, ""),
+      });
+    } else if (
+      (line.startsWith("🥩") || line.startsWith("⚡") || line.startsWith("💰") || line.startsWith("🍗") || line.startsWith("❤️")) &&
+      line.includes("**")
+    ) {
+      blocks.push({
+        type: "highlight",
+        content: line,
+      });
+    } else {
+      blocks.push({
+        type: "paragraph",
+        content: line,
+      });
+    }
+  }
+
+  const highlightBlocks = blocks.filter((b) => b.type === "highlight");
+  const nonHighlightBlocks = blocks.filter((b) => b.type !== "highlight");
+
+  return (
+    <div className="space-y-3.5 text-xs sm:text-sm text-stone-700 leading-relaxed">
+      {nonHighlightBlocks.map((block, idx) => {
+        if (block.type === "bullet") {
+          return (
+            <div key={idx} className="flex items-start gap-2.5 pl-1 py-0.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-primary mt-2 shrink-0" />
+              <div className="leading-relaxed text-stone-700 font-medium">
+                {renderInlineMarkdown(block.content)}
+              </div>
+            </div>
+          );
+        }
+
+        return (
+          <p key={idx} className="leading-relaxed font-medium">
+            {renderInlineMarkdown(block.content)}
+          </p>
+        );
+      })}
+
+      {/* Render feature highlights as clean, high-contrast badges if present */}
+      {highlightBlocks.length > 0 && (
+        <div className="pt-2 flex flex-wrap gap-2">
+          {highlightBlocks.map((hb, hIdx) => (
+            <div
+              key={hIdx}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-50 border border-red-200/70 text-stone-900 text-xs font-semibold shadow-2xs"
+            >
+              <span>{renderInlineMarkdown(hb.content)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const ProductDetailsClient: React.FC<ProductDetailsClientProps> = ({ id }) => {
   const router = useRouter();
   const { products, cart, addToCart, updateCartQuantity, selectedLocation } = useApp();
@@ -129,13 +218,14 @@ export const ProductDetailsClient: React.FC<ProductDetailsClientProps> = ({ id }
     .filter((p) => p.category === product.category && p.id !== product.id)
     .slice(0, 4);
 
-  // Mock specifications
+  // Product specifications (Strict fresh-cut-on-order standards)
   const specs = [
-    { label: "Storage Temp", value: "0°C to 4°C Chilled" },
-    { label: "Shelf Life", value: "48 Hours" },
-    { label: "Source", value: "FSSAI Registered Local Farms" },
+    { label: "Fresh Cut", value: "Cut strictly after you place your order (Never Frozen)" },
+    { label: "Processing", value: "100% Chilled Farm-Fresh, Zero Chemical Preservatives" },
+    { label: "Shelf Life", value: "48 Hours (Keep Chilled at 0°C to 4°C)" },
+    { label: "Source", value: "Bio-Secure FSSAI Registered Local Farms" },
     { label: "Type", value: product.category === "Eggs" ? "Vegetarian" : "Non-Vegetarian" },
-    { label: "Hygiene", value: "Vacuum sealed, cut in clean hubs" },
+    { label: "Hygiene", value: "Vacuum sealed in sanitized hyperlocal cutting hubs" },
   ];
 
   return (
@@ -242,9 +332,9 @@ export const ProductDetailsClient: React.FC<ProductDetailsClientProps> = ({ id }
             <hr className="border-gray-100" />
 
             {/* Description */}
-            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-semibold">
-              {product.description}
-            </p>
+            <div className="pt-1">
+              <FormattedProductDescription text={product.description} />
+            </div>
 
             {/* Weight Chips Selector */}
             <div className="space-y-3">
@@ -376,11 +466,11 @@ export const ProductDetailsClient: React.FC<ProductDetailsClientProps> = ({ id }
 
           <div className="max-w-3xl">
             {activeTab === "details" && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-semibold">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-semibold">
                 {specs.map((spec) => (
-                  <div key={spec.label} className="flex justify-between p-3 border-b border-gray-100">
-                    <span className="text-gray-400">{spec.label}</span>
-                    <span className="text-gray-900 font-bold">{spec.value}</span>
+                  <div key={spec.label} className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-stone-50/70 border border-stone-100 rounded-xl gap-1">
+                    <span className="text-stone-400 font-medium">{spec.label}</span>
+                    <span className="text-stone-900 font-bold text-left sm:text-right">{spec.value}</span>
                   </div>
                 ))}
               </div>
