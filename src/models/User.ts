@@ -14,6 +14,7 @@ export interface IUser extends Document {
   passwordHash?: string;
   addresses: IAddress[];
   isAdmin: boolean;
+  role?: string;
   isActive: boolean;
   lastLoginAt?: Date;
   createdAt: Date;

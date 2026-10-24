@@ -51,6 +51,7 @@ export async function GET(req: NextRequest) {
     const products = list.map((p: any) => ({
       ...p,
       image: sanitizeProductImage(p.image),
+      images: Array.isArray(p.images) && p.images.length > 0 ? p.images.map(sanitizeProductImage) : [sanitizeProductImage(p.image)],
       id: (p._id || p.id).toString(),
       _id: undefined,
       __v: undefined,
@@ -74,8 +75,14 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     if (!body.name || !body.category || !body.weights?.length)
       return jsonErr("Name, category, and at least one weight option are required.");
-    if (body.image) {
+    if (Array.isArray(body.images)) {
+      body.images = body.images.slice(0, 5).map(sanitizeProductImage);
+      if (!body.image && body.images.length > 0) {
+        body.image = body.images[0];
+      }
+    } else if (body.image) {
       body.image = sanitizeProductImage(body.image);
+      body.images = [body.image];
     }
     const p = await Product.create(body);
 
@@ -100,7 +107,16 @@ export async function POST(req: NextRequest) {
       }
     })();
 
-    return jsonOk({ product: p.toJSON() }, { status: 201 });
+    const json = p.toJSON();
+    json.image = sanitizeProductImage(json.image);
+    json.images =
+      Array.isArray(json.images) && json.images.length > 0
+        ? json.images.map(sanitizeProductImage)
+        : Array.isArray(body.images) && body.images.length > 0
+        ? body.images.map(sanitizeProductImage)
+        : [json.image];
+
+    return jsonOk({ product: json }, { status: 201 });
   } catch (e: any) {
     console.error("products POST error:", e);
     return jsonErr(e?.message || "Failed to create product", 500);

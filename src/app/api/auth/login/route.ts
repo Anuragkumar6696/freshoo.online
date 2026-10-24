@@ -116,12 +116,20 @@ export async function POST(req: NextRequest) {
         success: true,
         data: {
           user: user.toPublicJSON(),
+          token,
           message: `Welcome back, ${user.name.split(" ")[0]}!`,
         },
       },
       { status: 200 }
     );
     res.headers.set("Set-Cookie", serializeAuthCookie(token));
+    res.cookies.set(process.env.AUTH_COOKIE_NAME || "freshoo_auth", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 30 * 24 * 60 * 60,
+    });
     return res;
   } catch (e: any) {
     console.error("auth/login error:", e);

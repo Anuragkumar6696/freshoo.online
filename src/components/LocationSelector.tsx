@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useApp } from "@/context/AppContext";
-import { MapPin, Search, X, Check, Navigation, Loader2 } from "lucide-react";
+import { MapPin, Search, X, Check, Navigation, Loader2, AlertCircle } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 interface LocationSelectorProps {
@@ -16,12 +16,26 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
   onClose,
   forceShow = false,
 }) => {
-  const { locations, selectedLocation, selectLocation, captureGeoLocation, addLocation } = useApp();
+  const {
+    locations,
+    selectedLocation,
+    selectLocation,
+    captureGeoLocation,
+    addLocation,
+    serviceability,
+    selectedFranchise,
+  } = useApp();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [internalOpen, setInternalOpen] = useState(false);
   const [detecting, setDetecting] = useState(false);
   const [detectError, setDetectError] = useState<string | null>(null);
-  const [detectedCoords, setDetectedCoords] = useState<{ lat: number; lng: number; accuracy: number } | null>(null);
+  const [detectedCoords, setDetectedCoords] = useState<{
+    lat: number;
+    lng: number;
+    accuracy: number;
+    label?: string | null;
+  } | null>(null);
 
   useEffect(() => {
     if (!selectedLocation && typeof window !== "undefined") {
@@ -62,28 +76,26 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
 
     if (!geo || geo.latitude === null || geo.longitude === null) {
       setDetectError(
-        "We couldn't access your location. Please ensure location permissions are enabled in your browser, or select an area from the list below."
+        "We couldn't access your location. Please check location permissions in your browser or select your area below."
       );
       return;
     }
+
+    const realLabel =
+      geo.addressLabel ||
+      `GPS: ${geo.latitude.toFixed(4)}, ${geo.longitude.toFixed(4)}`;
 
     setDetectedCoords({
       lat: geo.latitude,
       lng: geo.longitude,
       accuracy: geo.accuracy ?? 0,
+      label: realLabel,
     });
 
-    const approxLabel =
-      geo.accuracy && geo.accuracy <= 300
-        ? "Near Rohini Sector 22, Delhi (Precise)"
-        : geo.accuracy && geo.accuracy <= 1200
-        ? "Rohini / North West Delhi"
-        : "Delhi NCR (Broad match)";
-
-    if (!locations.includes(approxLabel)) {
-      addLocation(approxLabel);
+    if (!locations.includes(realLabel)) {
+      addLocation(realLabel);
     }
-    handleSelect(approxLabel);
+    handleSelect(realLabel);
   };
 
   const filteredLocations = locations.filter((loc) =>
@@ -96,93 +108,102 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.4 }}
+            animate={{ opacity: 0.5 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black"
+            className="absolute inset-0 bg-stone-900/60 backdrop-blur-xs"
             onClick={handleClose}
           />
 
           <motion.div
-            initial={{ scale: 0.95, opacity: 0, y: 20 }}
+            initial={{ scale: 0.95, opacity: 0, y: 16 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.95, opacity: 0, y: 20 }}
-            transition={{ type: "spring", duration: 0.4 }}
-            className="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-2xl p-5 sm:p-6 overflow-y-auto max-h-[90vh] mx-3 sm:mx-4"
+            exit={{ scale: 0.95, opacity: 0, y: 16 }}
+            transition={{ type: "spring", duration: 0.35 }}
+            className="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-xl p-6 overflow-y-auto max-h-[90vh] mx-3 sm:mx-4 border border-stone-100"
           >
             {selectedLocation && (
               <button
                 onClick={handleClose}
-                className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+                className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-stone-100 text-stone-400 hover:text-stone-700 transition-colors"
+                aria-label="Close location selector"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             )}
 
-            <div className="text-center mb-6 mt-2">
-              <div className="inline-flex p-3 rounded-full bg-red-50 text-brand-primary mb-3">
-                <MapPin size={28} className="animate-bounce" />
+            <div className="text-center mb-5 mt-1">
+              <div className="inline-flex p-3 rounded-full bg-red-50 text-brand-primary mb-2.5">
+                <MapPin size={24} />
               </div>
-              <h3 className="font-display text-xl font-extrabold text-gray-900">
-                Select Your Delivery Area
+              <h3 className="text-lg font-bold text-stone-900">
+                Choose Delivery Location
               </h3>
-              <p className="text-sm text-gray-500 mt-1">
-                We currently deliver fresh cut meat and fish in select areas of Delhi.
+              <p className="text-xs text-stone-500 mt-1 max-w-xs mx-auto">
+                Fresh meat & seafood delivered within our 15 km hub freshness radius in Ghaziabad & Delhi.
               </p>
             </div>
 
-            <div className="relative mb-5">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <div className="relative mb-4">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" size={16} />
               <input
                 type="text"
-                placeholder="Search your sector, locality..."
+                placeholder="Search sector, colony or area..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-brand-primary focus:bg-white focus:ring-1 focus:ring-brand-primary outline-none transition-all text-sm"
+                className="w-full pl-9 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:border-brand-primary focus:bg-white focus:ring-1 focus:ring-red-100 outline-none transition-all text-xs font-medium text-stone-800 placeholder:text-stone-400"
               />
             </div>
 
             <button
               onClick={handleDetectLocation}
               disabled={detecting}
-              className={`w-full flex items-center justify-center gap-2 py-3 mb-4 font-semibold rounded-xl text-sm border-dashed border transition-all cursor-pointer ${
+              className={`w-full flex items-center justify-center gap-2 py-2.5 mb-4 font-semibold rounded-xl text-xs border transition-all cursor-pointer ${
                 detecting
-                  ? "bg-gray-50 text-gray-400 border-gray-200 cursor-wait"
-                  : "bg-red-50 hover:bg-red-100/80 text-brand-primary border-red-200"
+                  ? "bg-stone-50 text-stone-400 border-stone-200 cursor-wait"
+                  : "bg-red-50 hover:bg-red-100/70 text-brand-primary border-red-200"
               }`}
             >
               {detecting ? (
                 <>
-                  <Loader2 size={16} className="animate-spin" />
-                  Detecting your exact location…
+                  <Loader2 size={15} className="animate-spin text-brand-primary" />
+                  Detecting precise coordinates…
                 </>
               ) : (
                 <>
-                  <Navigation size={16} />
-                  Use My Current Location
+                  <Navigation size={15} />
+                  Detect My Location Automatically (GPS)
                 </>
               )}
             </button>
 
             {detectError && (
-              <div className="mb-4 p-3 bg-amber-50 border border-amber-100 text-amber-700 text-[11px] font-semibold rounded-xl leading-relaxed">
-                {detectError}
+              <div className="mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl flex items-start gap-2">
+                <AlertCircle size={15} className="shrink-0 mt-0.5 text-amber-600" />
+                <span>{detectError}</span>
               </div>
             )}
 
             {detectedCoords && (
-              <div className="mb-4 p-3 bg-emerald-50 border border-emerald-100 text-emerald-700 text-[11px] font-semibold rounded-xl">
-                <div className="flex items-center gap-2">
+              <div className="mb-4 p-3 bg-red-50/70 border border-red-200 text-brand-primary text-xs rounded-xl">
+                <div className="flex items-center gap-1.5 font-bold text-brand-primary">
                   <Check size={14} />
-                  <span className="font-extrabold">GPS captured</span>
+                  <span>Location Verified</span>
                 </div>
-                <div className="mt-1 text-emerald-600 font-medium">
-                  {detectedCoords.lat.toFixed(4)}, {detectedCoords.lng.toFixed(4)}
-                  <span className="opacity-70"> • ±{Math.round(detectedCoords.accuracy)}m</span>
+                <div className="mt-1 text-stone-700 font-medium">
+                  {detectedCoords.label}
                 </div>
+                {serviceability && (
+                  <div className="mt-1.5 text-[11px] font-semibold text-brand-primary">
+                    {serviceability.message}
+                  </div>
+                )}
               </div>
             )}
 
-            <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+            <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1">
+              <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider px-1 pb-1">
+                Supported Delivery Localities
+              </p>
               {filteredLocations.length > 0 ? (
                 filteredLocations.map((loc) => {
                   const isSelected = selectedLocation === loc;
@@ -190,46 +211,46 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
                     <button
                       key={loc}
                       onClick={() => handleSelect(loc)}
-                      className={`w-full flex items-center justify-between p-3.5 rounded-xl text-left border transition-all cursor-pointer ${
+                      className={`w-full flex items-center justify-between p-3 rounded-xl text-left border transition-all cursor-pointer ${
                         isSelected
-                          ? "border-brand-primary bg-red-50/40 text-brand-primary shadow-sm"
-                          : "border-gray-100 hover:border-gray-300 hover:bg-gray-50 text-gray-700"
+                          ? "border-brand-primary bg-red-50/50 text-brand-primary font-semibold"
+                          : "border-stone-100 hover:border-stone-200 hover:bg-stone-50 text-stone-700"
                       }`}
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2.5">
                         <MapPin
-                          size={18}
-                          className={isSelected ? "text-brand-primary" : "text-gray-400"}
+                          size={16}
+                          className={isSelected ? "text-brand-primary" : "text-stone-400"}
                         />
                         <div>
-                          <p className="font-semibold text-sm">
+                          <p className="text-xs font-semibold text-stone-800">
                             {loc.split(",")[0]}
                           </p>
-                          <p className="text-xs text-gray-500">
-                            {loc.split(",").slice(1).join(", ").trim()}
+                          <p className="text-[11px] text-stone-500">
+                            {loc.split(",").slice(1).join(", ").trim() || "Delhi NCR"}
                           </p>
                         </div>
                       </div>
                       {isSelected && (
                         <div className="p-1 rounded-full bg-brand-primary text-white">
-                          <Check size={12} strokeWidth={3} />
+                          <Check size={11} strokeWidth={3} />
                         </div>
                       )}
                     </button>
                   );
                 })
               ) : (
-                <div className="text-center py-6 text-gray-500">
-                  <p className="text-sm font-semibold">No outlets in this area yet</p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    Stay tuned! We are expanding fast.
+                <div className="text-center py-5 text-stone-500">
+                  <p className="text-xs font-semibold">Location not in quick list</p>
+                  <p className="text-[11px] text-stone-400 mt-0.5">
+                    You can type your full street address directly during checkout.
                   </p>
                 </div>
               )}
             </div>
 
-            <div className="mt-5 text-center text-[11px] text-gray-400">
-              *By choosing a location, product availability and custom delivery slots will update.
+            <div className="mt-4 pt-3 border-t border-stone-100 text-center text-[11px] text-stone-500 font-medium">
+              Active Hubs: Ghaziabad (Siddharth Vihar) & Delhi (Rohini Sector 22) within 15 km.
             </div>
           </motion.div>
         </div>

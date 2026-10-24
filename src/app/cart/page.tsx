@@ -227,14 +227,14 @@ export default function CartPage() {
                 <form onSubmit={handleApplyCoupon} className="flex gap-2">
                   <input
                     type="text"
-                    placeholder="Enter code (e.g. WELCOME20)"
+                    placeholder="Enter coupon code (e.g. WELCOME20)"
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value)}
-                    className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:border-brand-primary focus:bg-white focus:ring-1 focus:ring-brand-primary outline-none transition-all text-xs font-semibold uppercase"
+                    className="flex-1 px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:border-emerald-700 focus:bg-white focus:ring-1 focus:ring-emerald-700 outline-none transition-all text-xs font-semibold uppercase"
                   />
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-brand-primary hover:bg-red-700 text-white font-extrabold rounded-xl transition-colors cursor-pointer"
+                    className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl transition-colors cursor-pointer text-xs"
                   >
                     Apply
                   </button>
@@ -298,10 +298,10 @@ export default function CartPage() {
                 <button
                   onClick={handleCheckout}
                   disabled={cart.length === 0 || storeSettings.isTemporarilyClosed}
-                  className={`w-full py-3.5 font-bold rounded-xl text-xs text-white shadow-md flex items-center justify-center gap-1.5 transition-all ${
+                  className={`w-full py-3.5 font-bold rounded-xl text-xs text-white shadow-xs flex items-center justify-center gap-1.5 transition-all ${
                     cart.length === 0 || storeSettings.isTemporarilyClosed
-                      ? "bg-gray-300 shadow-none cursor-not-allowed"
-                      : "bg-brand-primary hover:bg-red-700 hover:shadow-lg cursor-pointer active:scale-[0.99]"
+                      ? "bg-stone-300 shadow-none cursor-not-allowed"
+                      : "bg-emerald-700 hover:bg-emerald-800 cursor-pointer active:scale-[0.99]"
                   }`}
                 >
                   Proceed to Checkout <ArrowRight size={14} strokeWidth={3} />
@@ -309,26 +309,26 @@ export default function CartPage() {
               </div>
 
               {/* Secure payment certificate */}
-              <div className="flex items-center justify-center gap-2 text-[10px] text-gray-400 font-semibold">
-                <ShieldCheck size={14} className="text-emerald-600" />
+              <div className="flex items-center justify-center gap-2 text-[10px] text-stone-400 font-semibold">
+                <ShieldCheck size={14} className="text-emerald-700" />
                 <span>Secure SSL Checkouts • FSSAI Sanitized Delivery</span>
               </div>
             </div>
           </div>
         ) : (
-          <div className="text-center py-20 border border-gray-100 rounded-3xl bg-gray-50/20 max-w-md mx-auto space-y-4">
-            <div className="inline-flex p-4 rounded-full bg-red-50 text-brand-primary">
+          <div className="text-center py-20 border border-stone-200 rounded-3xl bg-white max-w-md mx-auto space-y-4 shadow-xs">
+            <div className="inline-flex p-4 rounded-full bg-emerald-50 text-emerald-800">
               <ShoppingBag size={40} />
             </div>
-            <h3 className="font-display font-extrabold text-gray-900 text-lg">
+            <h3 className="font-bold text-stone-900 text-lg">
               Your cart is empty
             </h3>
-            <p className="text-xs text-gray-500 max-w-xs mx-auto leading-relaxed">
-              Add some fresh meat cuts or seafood to begin compiling your hyperlocal basket.
+            <p className="text-xs text-stone-500 max-w-xs mx-auto leading-relaxed">
+              Add fresh meat cuts, seafood, or farm eggs to begin your order.
             </p>
             <Link
               href="/shop"
-              className="inline-block px-6 py-2.5 bg-brand-primary text-white text-xs font-bold rounded-xl hover:bg-red-700 transition-colors shadow-sm"
+              className="inline-block px-6 py-2.5 bg-emerald-700 text-white text-xs font-bold rounded-xl hover:bg-emerald-800 transition-colors shadow-xs"
             >
               Start Shopping
             </Link>

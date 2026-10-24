@@ -4,7 +4,8 @@
   --background: #fdfdfd;
   --foreground: #0f172a;
   
-  --primary: 354 84% 45%;
+  /* Signature Freshoo Red and Clean White Palette */
+  --primary: 354 84% 45%; /* Deep Premium Freshoo Red #c81e25 */
   --primary-foreground: 0 0% 100%;
   
   --secondary: 210 40% 96%;
@@ -13,13 +14,17 @@
   --muted: 210 40% 94%;
   --muted-foreground: 215 16% 47%;
   
-  --accent: 354 84% 96%;
+  --accent: 354 84% 96%; /* Soft pink/red background for badges */
   --accent-foreground: 354 84% 45%;
   
   --success: 142 76% 36%;
   
   --border: 214 32% 91%;
   --radius: 16px;
+  
+  --font-inter: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-outfit: "Outfit", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-playfair: "Playfair Display", Georgia, Cambria, "Times New Roman", Times, serif;
 }
 
 @theme inline {
@@ -122,6 +127,61 @@ a {
   color: inherit;
   text-decoration: none;
   transition: color 0.2s ease;
+}
+
+/* Ensure all red buttons, pills, links, badges, and their icons render crisp white text */
+.bg-brand-primary,
+[class*="bg-brand-primary"],
+.bg-red-600,
+.bg-red-700,
+a[class*="bg-brand-primary"],
+button[class*="bg-brand-primary"] {
+  color: #ffffff !important;
+}
+
+.bg-brand-primary *,
+[class*="bg-brand-primary"] *,
+.bg-red-600 *,
+.bg-red-700 * {
+  color: inherit;
+}
+
+/* Ensure badges and contrasting chips inside red containers keep their proper foreground */
+.bg-brand-primary .bg-white,
+[class*="bg-brand-primary"] .bg-white,
+.bg-red-600 .bg-white,
+.bg-red-700 .bg-white {
+  color: #c81e25 !important;
+}
+
+.bg-brand-primary svg,
+[class*="bg-brand-primary"] svg,
+.bg-red-600 svg,
+.bg-red-700 svg {
+  color: #ffffff !important;
+  stroke: currentColor !important;
+}
+
+/* Ensure footer text and headings are high-contrast and crystal clear */
+footer h1,
+footer h2,
+footer h3,
+footer h4,
+footer h5,
+footer h6 {
+  color: #ffffff !important;
+}
+
+footer p {
+  color: #cbd5e1 !important;
+}
+
+footer a {
+  color: #cbd5e1;
+}
+
+footer a:hover {
+  color: #ffffff;
 }
 
 .font-serif-display {

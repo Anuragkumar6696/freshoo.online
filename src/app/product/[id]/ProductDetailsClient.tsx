@@ -34,12 +34,34 @@ export const ProductDetailsClient: React.FC<ProductDetailsClientProps> = ({ id }
   const [activeTab, setActiveTab] = useState<"details" | "hygiene" | "recipes">("details");
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
+  const fallbackImg = (() => {
+    switch (product?.category?.toLowerCase()) {
+      case "mutton":
+        return "/mutton-fresh.png";
+      case "eggs":
+      case "egg":
+        return "/egg.jpeg";
+      case "fish":
+        return "/fish.png";
+      default:
+        return "/chicken1.png";
+    }
+  })();
+
+  const [currentImg, setCurrentImg] = useState(product?.image || fallbackImg);
+  const [hasImgError, setHasImgError] = useState(false);
+
   // Set default selected weight once product is found
   React.useEffect(() => {
-    if (product && !selectedWeight) {
+    if (product && !selectedWeight && product.weights?.[0]) {
       setSelectedWeight(product.weights[0].weight);
     }
   }, [product, selectedWeight]);
+
+  React.useEffect(() => {
+    setCurrentImg(product?.image || fallbackImg);
+    setHasImgError(false);
+  }, [product?.image, fallbackImg]);
 
   if (!product) {
     return (
@@ -85,32 +107,13 @@ export const ProductDetailsClient: React.FC<ProductDetailsClientProps> = ({ id }
     router.push("/checkout");
   };
 
-  const fallbackImg = (() => {
-    switch (product.category?.toLowerCase()) {
-      case "mutton":
-        return "/1000098711.jpg";
-      case "eggs":
-      case "egg":
-        return "/egg.jpeg";
-      case "fish":
-        return "/fish.png";
-      default:
-        return "/chicken1.png";
-    }
-  })();
-
-  const [currentImg, setCurrentImg] = useState(product.image || fallbackImg);
-  const [hasImgError, setHasImgError] = useState(false);
-
-  React.useEffect(() => {
-    setCurrentImg(product.image || fallbackImg);
-    setHasImgError(false);
-  }, [product.image, fallbackImg]);
+  // Product image gallery
 
   // Mock product image gallery: Using raw stock, vacuum pack, and finished dish angles
-  const galleryImages = [
-    currentImg 
-  ];
+  const galleryImages =
+    product.images && product.images.length > 0
+      ? product.images
+      : [currentImg || fallbackImg];
 
   const hasDiscount = activeWeightOption.originalPrice && activeWeightOption.originalPrice > activeWeightOption.price;
   const discountPercent = hasDiscount
@@ -181,22 +184,29 @@ export const ProductDetailsClient: React.FC<ProductDetailsClientProps> = ({ id }
               )}
             </div>
 
-            {/* Thumbnails */}
-            <div className="grid grid-cols-3 gap-3">
-              {galleryImages.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setActiveImageIndex(idx)}
-                  className={`aspect-square border rounded-xl overflow-hidden bg-gray-50 transition-all cursor-pointer ${
-                    activeImageIndex === idx
-                      ? "border-brand-primary ring-2 ring-red-100"
-                      : "border-gray-100 hover:border-gray-300"
-                  }`}
-                >
-                  <img src={img} alt="Thumbnail" className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
+            {/* Thumbnails (Supports up to 5 photos) */}
+            {galleryImages.length > 1 && (
+              <div className="grid grid-cols-5 gap-2 pt-1">
+                {galleryImages.map((img, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setActiveImageIndex(idx)}
+                    className={`aspect-square border-2 rounded-xl overflow-hidden bg-gray-50 transition-all cursor-pointer ${
+                      activeImageIndex === idx
+                        ? "border-brand-primary ring-2 ring-red-200 scale-102 shadow-xs"
+                        : "border-stone-200 hover:border-stone-400 opacity-75 hover:opacity-100"
+                    }`}
+                  >
+                    <img
+                      src={img}
+                      alt={`Thumbnail ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Details Column */}
@@ -304,7 +314,7 @@ export const ProductDetailsClient: React.FC<ProductDetailsClientProps> = ({ id }
                 ) : (
                   <button
                     onClick={handleAdd}
-                    className="px-6 py-3 border border-brand-primary text-brand-primary font-bold rounded-xl text-xs hover:bg-brand-primary hover:text-white transition-all shadow-sm cursor-pointer"
+                    className="px-6 py-3 bg-brand-primary text-white font-extrabold rounded-xl text-xs hover:bg-red-700 shadow-md hover:shadow-lg transition-all cursor-pointer"
                   >
                     Add to Cart
                   </button>

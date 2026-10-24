@@ -54,6 +54,19 @@ export const Header: React.FC = () => {
   const totalCartItems = cart.reduce((acc, item) => acc + item.quantity, 0);
   const storeStatus = getStoreStatusLabel();
 
+  const isFreshooAdmin = Boolean(
+    user && (
+      user.isAdmin === true ||
+      (user as any).role?.toUpperCase() === 'ADMIN' ||
+      [
+        'admin@freshoo.in',
+        'freshoo.online@gmail.com',
+        'officialanurag6696@gmail.com',
+        'anuragkumarmait@gmail.com',
+      ].includes(user.email?.toLowerCase().trim() || '')
+    )
+  );
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchVal.trim()) {
@@ -114,7 +127,7 @@ export const Header: React.FC = () => {
             {/* Mobile / Tablet Location Display */}
             <button
               onClick={() => setIsLocationOpen(true)}
-              className="flex lg:hidden items-center gap-1 px-2 py-1 rounded-lg bg-red-50 hover:bg-red-100/80 text-brand-primary border border-red-100/80 text-[11px] font-bold max-w-[105px] xs:max-w-[130px] sm:max-w-[200px] truncate transition-all cursor-pointer"
+              className="flex lg:hidden items-center gap-1 px-2.5 py-1 rounded-lg bg-red-50 hover:bg-red-100/80 text-brand-primary border border-red-200 text-[11px] font-bold max-w-[120px] xs:max-w-[140px] sm:max-w-[200px] truncate transition-all cursor-pointer"
               title="Select Delivery Area"
             >
               <MapPin size={12} className="shrink-0 text-brand-primary" />
@@ -128,16 +141,16 @@ export const Header: React.FC = () => {
           {/* Desktop Location Display */}
           <button
             onClick={() => setIsLocationOpen(true)}
-            className="hidden lg:flex items-center gap-3 px-4 py-2 rounded-xl hover:bg-gray-50 border border-gray-200 text-left transition-all cursor-pointer w-48 shadow-sm shrink-0"
+            className="hidden lg:flex items-center gap-3 px-4 py-2 rounded-xl hover:bg-stone-50 border border-stone-200 text-left transition-all cursor-pointer w-48 shadow-xs shrink-0"
           >
             <div className="p-1.5 rounded-lg bg-red-50 text-brand-primary shrink-0">
               <MapPin size={18} />
             </div>
             <div className="overflow-hidden">
-              <div className="flex items-center gap-1 text-[10px] font-black text-brand-primary uppercase tracking-widest">
+              <div className="flex items-center gap-1 text-[10px] font-bold text-brand-primary uppercase tracking-wider">
                 Deliver To <ChevronDown size={10} strokeWidth={3} />
               </div>
-              <div className="text-sm font-bold text-slate-900 truncate">
+              <div className="text-xs font-bold text-stone-900 truncate">
                 {selectedLocation ? selectedLocation.split(",")[0] : "Select Location"}
               </div>
             </div>
@@ -150,10 +163,10 @@ export const Header: React.FC = () => {
           >
             <input
               type="text"
-              placeholder="Search chicken, mutton, fish..."
+              placeholder="Search chicken, mutton, fish, eggs..."
               value={searchVal}
               onChange={(e) => setSearchVal(e.target.value)}
-              className="w-full pl-5 pr-12 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-brand-primary focus:bg-white focus:ring-4 focus:ring-red-50 outline-none transition-all text-sm font-bold text-slate-800 placeholder:text-slate-400 shadow-sm"
+              className="w-full pl-5 pr-12 py-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:border-brand-primary focus:bg-white focus:ring-4 focus:ring-red-50 outline-none transition-all text-xs font-semibold text-stone-800 placeholder:text-stone-400 shadow-xs"
             />
             <button
               type="submit"
@@ -227,7 +240,7 @@ export const Header: React.FC = () => {
                           Customer Dashboard
                         </Link>
                         {/* Conditionally render for Admins only */}
-                        {(user?.role === 'admin' || user?.isAdmin) && (
+                        {isFreshooAdmin && (
                           <Link
                             href="/admin"
                             onClick={() => setIsUserDropdownOpen(false)}
@@ -260,13 +273,16 @@ export const Header: React.FC = () => {
             {/* Cart Button */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="flex items-center gap-1.5 sm:gap-3 px-2.5 sm:px-5 py-2 sm:py-2.5 bg-brand-primary text-white font-black rounded-xl transition-all hover:bg-red-700 shadow-md hover:shadow-lg active:scale-95 cursor-pointer text-xs uppercase tracking-widest shrink-0"
+              className="flex items-center gap-1.5 sm:gap-2.5 px-3 sm:px-4 py-2 sm:py-2.5 bg-brand-primary hover:bg-red-700 text-white font-bold rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer text-xs uppercase tracking-wider shrink-0"
               title="View Shopping Cart"
             >
-              <ShoppingBag size={17} />
+              <ShoppingBag size={16} />
               <span className="hidden sm:inline">Cart</span>
               {totalCartItems > 0 && (
-                <span className="bg-white text-brand-primary min-w-[17px] sm:min-w-[20px] h-4 sm:h-5 rounded-md flex items-center justify-center text-[10px] font-black px-1 leading-none">
+                <span
+                  className="bg-white text-red-600 min-w-[18px] sm:min-w-[20px] h-4 sm:h-5 rounded-md flex items-center justify-center text-[10px] sm:text-[11px] font-black px-1 leading-none shadow-xs"
+                  style={{ color: "#c81e25", backgroundColor: "#ffffff" }}
+                >
                   {totalCartItems}
                 </span>
               )}
@@ -576,6 +592,15 @@ export const Header: React.FC = () => {
                     >
                       ⚙️ Admin Dashboard
                     </Link>
+                    {isFreshooAdmin && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="py-2 text-brand-primary font-extrabold border-b border-gray-50 transition-colors"
+                      >
+                        ⚙️ Admin Dashboard
+                      </Link>
+                    )}
                   </>
                 )}
               </nav>

@@ -25,6 +25,8 @@ import {
   Map as MapIcon,
   LogIn,
   X,
+  AlertCircle,
+  Truck,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -52,6 +54,8 @@ export default function CheckoutPage() {
     checkoutGeoLocation,
     setCheckoutGeoLocation,
     captureGeoLocation,
+    serviceability,
+    selectedFranchise,
   } = useApp();
 
   // Customer details (editable whether user is registered or guest)
@@ -68,7 +72,7 @@ export default function CheckoutPage() {
   // New address form
   const [newAddressTag, setNewAddressTag] = useState<AddressTag>("Home");
   const [newAddressLine, setNewAddressLine] = useState("");
-  const [newAddressCity] = useState("Delhi");
+  const [newAddressCity, setNewAddressCity] = useState("Delhi");
   const [newAddressPincode, setNewAddressPincode] = useState("");
 
   // Delivery instructions
@@ -103,33 +107,12 @@ export default function CheckoutPage() {
     }
   }, [user, addressMode, selectedAddressId]);
 
-  // Auto-trigger geolocation capture on checkout page load
+  // Protect route: empty cart -> redirect to shop ONLY when no order has been placed & not submitting
   useEffect(() => {
-    if (
-      typeof window !== "undefined" &&
-      !checkoutGeoLocation &&
-      "geolocation" in navigator
-    ) {
-      const t = setTimeout(async () => {
-        setGeoCapturing(true);
-        const geo = await captureGeoLocation();
-        setGeoCapturing(false);
-        if (!geo) {
-          setGeoError(
-            "Location access was denied. You can still checkout; however, sharing your location helps ensure faster and accurate delivery."
-          );
-        }
-      }, 600);
-      return () => clearTimeout(t);
-    }
-  }, []);
-
-  // Protect route: empty cart -> redirect to shop
-  useEffect(() => {
-    if (cart.length === 0 && !placedOrder) {
+    if (cart.length === 0 && !placedOrder && !isSubmitting) {
       router.push("/shop");
     }
-  }, [cart, placedOrder, router]);
+  }, [cart.length, placedOrder, isSubmitting, router]);
 
   const activeSavedAddress = useMemo(
     () => user?.addresses.find((a) => a.id === selectedAddressId) ?? null,
@@ -145,8 +128,11 @@ export default function CheckoutPage() {
     setGeoCapturing(false);
     if (!geo) {
       setGeoError(
-        "Unable to capture location. Please ensure browser permissions are granted and try again."
+        "Unable to access device location. You can still enter your address manually."
       );
+    } else if (geo.addressLabel && !newAddressLine) {
+      // Auto-populate address field from reverse geocoded components
+      setNewAddressLine(geo.addressLabel);
     }
   };
 
@@ -160,7 +146,7 @@ export default function CheckoutPage() {
     const e: Record<string, string> = {};
 
     if (!isNameValid(customerName))
-      e.customerName = "Please enter your full name (min 2 characters).";
+      e.customerName = "Please enter your full name (minimum 2 characters).";
     if (!isPhoneValid(customerPhone))
       e.customerPhone = "Please enter a valid 10-digit mobile number.";
     if (!isEmailValid(customerEmail))
@@ -168,12 +154,12 @@ export default function CheckoutPage() {
 
     if (addressMode === "saved") {
       if (!selectedAddressId || !activeSavedAddress) {
-        e.address = "Please select a saved delivery address.";
+        e.address = "Please select a delivery address.";
       }
     } else {
       if (!isAddressValid(newAddressLine)) {
         e.address =
-          "Please enter your full street address (house/building, street, sector, locality).";
+          "Please enter your street address (flat/house no., street, sector, locality).";
       }
       if (!isPincodeValid(newAddressPincode)) {
         e.pincode = "Please enter a valid 6-digit delivery pincode.";
@@ -198,7 +184,7 @@ export default function CheckoutPage() {
     return {
       tag: newAddressTag,
       addressLine: newAddressLine.trim(),
-      city: newAddressCity,
+      city: newAddressCity.trim(),
       pincode: newAddressPincode.replace(/\D/g, ""),
       geoLocation: currentGeo ?? null,
     };
@@ -208,7 +194,7 @@ export default function CheckoutPage() {
     e.preventDefault();
     if (!validate()) {
       if (typeof window !== "undefined") {
-        window.scrollTo({ top: 150, behavior: "smooth" });
+        window.scrollTo({ top: 100, behavior: "smooth" });
       }
       return;
     }
@@ -217,10 +203,8 @@ export default function CheckoutPage() {
     if (!addressPayload) return;
 
     setIsSubmitting(true);
-
     const isGuest = !user;
 
-    // Ensure address has geotag where possible
     const addressWithGeo = {
       ...addressPayload,
       geoLocation: addressPayload.geoLocation ?? currentGeo ?? null,
@@ -239,15 +223,12 @@ export default function CheckoutPage() {
       });
 
       if (order) {
+        // KEEP popup visible permanently until customer explicit action
+        // No automatic dismissal timers!
         setPlacedOrder(order);
         setSelectedAddressId("");
         setNewAddressLine("");
         setNewAddressPincode("");
-        // Auto redirect home after 2 seconds, close popup
-        setTimeout(() => {
-          setPlacedOrder(null);
-          router.push("/");
-        }, 2000);
       }
     } finally {
       setIsSubmitting(false);
@@ -257,686 +238,610 @@ export default function CheckoutPage() {
   const canSubmit = !isSubmitting && cart.length > 0;
 
   return (
-    <div className="min-h-screen flex flex-col bg-white w-full max-w-full overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-stone-50 w-full max-w-full overflow-x-hidden text-stone-800">
       <Header />
 
-      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 flex-1 w-full">
-        <div className="flex items-center gap-2 mb-8 font-semibold text-xs text-gray-400">
-          <Link href="/" className="hover:text-brand-primary">
-            Home
-          </Link>
-          <ChevronRight size={12} />
-          <Link href="/cart" className="hover:text-brand-primary">
-            Cart
-          </Link>
-          <ChevronRight size={12} />
-          <span className="text-gray-600">Checkout</span>
-        </div>
-
-        <div className="flex flex-wrap items-start justify-between gap-4 mb-8">
+      <main className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        {/* Progress Bar / Breadcrumbs */}
+        <div className="flex items-center justify-between mb-8 pb-4 border-b border-stone-200">
           <div>
-            <h1 className="font-display font-black text-2xl sm:text-3xl text-gray-900">
-              Secure Checkout
-            </h1>
-            <p className="text-xs text-gray-500 mt-1.5 font-semibold">
-              {user
-                ? `Signed in as ${user.name}. You may also edit your details below.`
-                : "Checking out as a Guest — no account required. Your details are used only for delivery."}
+            <h1 className="text-2xl font-bold text-stone-900 tracking-tight">Checkout</h1>
+            <p className="text-xs text-stone-500 mt-0.5">
+              Cash on Delivery • Free 20-min express delivery in Rohini Sector 22 & 10 km hub radius
             </p>
           </div>
-          {!user && (
-            <button
-              onClick={() => setAuthOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 hover:border-brand-primary hover:bg-red-50/40 text-xs font-extrabold text-gray-700 hover:text-brand-primary transition-colors whitespace-nowrap"
-            >
-              <LogIn size={14} />
-              Sign In Instead
-            </button>
-          )}
+          <div className="hidden sm:flex items-center gap-2 text-xs font-semibold text-stone-500">
+            <Link href="/cart" className="hover:text-brand-primary">Cart</Link>
+            <ChevronRight size={14} className="text-stone-300" />
+            <span className="text-brand-primary font-bold">Delivery & Confirmation</span>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <form onSubmit={handleSubmit} className="lg:col-span-8 space-y-6">
-            {/* Guest / Customer Identity Details */}
-            <div className="border border-gray-100 rounded-2xl p-4 sm:p-6 bg-white shadow-sm space-y-4 font-semibold text-xs text-gray-700">
-              <h3 className="font-display font-extrabold text-sm text-gray-900 pb-2 border-b border-gray-100 flex items-center gap-1.5">
-                <User size={18} className="text-brand-primary" /> Contact &
-                Customer Details
-                {user && (
-                  <span className="ml-auto text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
-                    Logged In
-                  </span>
-                )}
-              </h3>
+        {/* Guest vs Registered Banner */}
+        {!user && (
+          <div className="mb-6 p-4 bg-red-50/60 border border-red-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-brand-primary text-white shrink-0">
+                <LogIn size={18} />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-stone-900">
+                  Guest Checkout Enabled
+                </p>
+                <p className="text-[11px] text-brand-primary">
+                  No account needed. Or sign in to load your saved delivery addresses.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setAuthOpen(true)}
+              className="text-xs font-bold px-4 py-2 bg-white text-brand-primary border border-red-300 rounded-xl hover:bg-red-50 transition-colors shrink-0 shadow-xs cursor-pointer"
+            >
+              Sign In to Account
+            </button>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* LEFT COLUMN: Customer & Address Information */}
+          <div className="lg:col-span-7 space-y-6">
+            {/* Step 1: Customer Contact */}
+            <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 shadow-xs">
+              <div className="flex items-center gap-2.5 pb-4 border-b border-stone-100 mb-5">
+                <div className="w-6 h-6 rounded-full bg-brand-primary text-white text-xs font-bold flex items-center justify-center">
+                  1
+                </div>
+                <h2 className="text-sm font-bold text-stone-900 uppercase tracking-wider">
+                  Contact Information
+                </h2>
+              </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-gray-400 mb-1.5 font-bold uppercase tracking-wider text-[10px]">
-                    Full Name *
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-semibold text-stone-700 mb-1.5">
+                    Full Name <span className="text-rose-600">*</span>
                   </label>
                   <div className="relative">
-                    <User
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
-                      size={15}
-                    />
+                    <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
                     <input
                       type="text"
-                      placeholder="E.g. Rahul Sharma"
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
-                      className={`w-full pl-10 pr-3.5 py-2.5 bg-gray-50 border rounded-xl outline-none font-bold text-gray-800 transition-all ${
-                        errors.customerName
-                          ? "border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-100 focus:bg-white"
-                          : "border-gray-200 focus:border-brand-primary focus:ring-2 focus:ring-red-50 focus:bg-white"
+                      placeholder="Enter your full name"
+                      className={`w-full pl-10 pr-4 py-2.5 bg-stone-50 border rounded-xl text-xs font-medium focus:bg-white focus:outline-none transition-all ${
+                        errors.customerName ? "border-rose-400 focus:border-rose-500" : "border-stone-200 focus:border-brand-primary"
                       }`}
                     />
                   </div>
                   {errors.customerName && (
-                    <p className="mt-1.5 text-[10px] font-bold text-red-500">
-                      {errors.customerName}
-                    </p>
+                    <p className="text-[11px] font-medium text-rose-600 mt-1">{errors.customerName}</p>
                   )}
                 </div>
+
                 <div>
-                  <label className="block text-gray-400 mb-1.5 font-bold uppercase tracking-wider text-[10px]">
-                    Mobile Number *
+                  <label className="block text-xs font-semibold text-stone-700 mb-1.5">
+                    Mobile Number <span className="text-rose-600">*</span>
                   </label>
                   <div className="relative">
-                    <Phone
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
-                      size={15}
-                    />
-                    <span className="absolute left-9 top-1/2 -translate-y-1/2 text-xs font-black text-gray-400 select-none">
-                      +91
-                    </span>
+                    <Phone size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
                     <input
                       type="tel"
-                      placeholder="10-digit mobile number"
-                      value={customerPhone.replace(/^\+91\s?/, "")}
-                      onChange={(e) =>
-                        setCustomerPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
-                      }
+                      value={customerPhone}
+                      onChange={(e) => setCustomerPhone(e.target.value)}
+                      placeholder="Enter 10-digit mobile number"
                       maxLength={10}
-                      className={`w-full pl-[72px] pr-3.5 py-2.5 bg-gray-50 border rounded-xl outline-none font-bold text-gray-800 transition-all ${
-                        errors.customerPhone
-                          ? "border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-100 focus:bg-white"
-                          : "border-gray-200 focus:border-brand-primary focus:ring-2 focus:ring-red-50 focus:bg-white"
+                      className={`w-full pl-10 pr-4 py-2.5 bg-stone-50 border rounded-xl text-xs font-medium focus:bg-white focus:outline-none transition-all ${
+                        errors.customerPhone ? "border-rose-400 focus:border-rose-500" : "border-stone-200 focus:border-brand-primary"
                       }`}
                     />
                   </div>
                   {errors.customerPhone && (
-                    <p className="mt-1.5 text-[10px] font-bold text-red-500">
-                      {errors.customerPhone}
-                    </p>
+                    <p className="text-[11px] font-medium text-rose-600 mt-1">{errors.customerPhone}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-stone-700 mb-1.5">
+                    Email Address <span className="text-rose-600">*</span>
+                  </label>
+                  <div className="relative">
+                    <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
+                    <input
+                      type="email"
+                      value={customerEmail}
+                      onChange={(e) => setCustomerEmail(e.target.value)}
+                      placeholder="Enter your email address"
+                      className={`w-full pl-10 pr-4 py-2.5 bg-stone-50 border rounded-xl text-xs font-medium focus:bg-white focus:outline-none transition-all ${
+                        errors.customerEmail ? "border-rose-400 focus:border-rose-500" : "border-stone-200 focus:border-brand-primary"
+                      }`}
+                    />
+                  </div>
+                  {errors.customerEmail && (
+                    <p className="text-[11px] font-medium text-rose-600 mt-1">{errors.customerEmail}</p>
                   )}
                 </div>
               </div>
-              <div>
-                <label className="block text-gray-400 mb-1.5 font-bold uppercase tracking-wider text-[10px]">
-                  Email Address *
-                </label>
-                <div className="relative">
-                  <Mail
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
-                    size={15}
-                  />
-                  <input
-                    type="email"
-                    placeholder="you@example.com — for order updates"
-                    value={customerEmail}
-                    onChange={(e) => setCustomerEmail(e.target.value)}
-                    className={`w-full pl-10 pr-3.5 py-2.5 bg-gray-50 border rounded-xl outline-none font-bold text-gray-800 transition-all ${
-                      errors.customerEmail
-                        ? "border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-100 focus:bg-white"
-                        : "border-gray-200 focus:border-brand-primary focus:ring-2 focus:ring-red-50 focus:bg-white"
-                    }`}
-                  />
-                </div>
-                {errors.customerEmail && (
-                  <p className="mt-1.5 text-[10px] font-bold text-red-500">
-                    {errors.customerEmail}
-                  </p>
-                )}
-              </div>
             </div>
 
-            {/* Exact Geolocation Capture */}
-            <div className="border border-gray-100 rounded-2xl p-4 sm:p-6 bg-white shadow-sm space-y-4 font-semibold text-xs text-gray-700">
-              <h3 className="font-display font-extrabold text-sm text-gray-900 pb-2 border-b border-gray-100 flex items-center gap-1.5">
-                <Navigation size={18} className="text-brand-primary" /> Exact
-                Delivery Location (GPS)
-              </h3>
-
-              {geoCapturing ? (
-                <div className="flex items-center gap-3 p-4 bg-sky-50 border border-sky-100 rounded-xl text-sky-700">
-                  <Loader2 size={18} className="animate-spin shrink-0" />
-                  <div>
-                    <p className="font-extrabold">Capturing your GPS location…</p>
-                    <p className="text-[11px] font-medium text-sky-600 mt-0.5">
-                      This helps our delivery partner reach your doorstep precisely.
-                    </p>
+            {/* Step 2: Delivery Location & GPS */}
+            <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 shadow-xs">
+              <div className="flex items-center justify-between pb-4 border-b border-stone-100 mb-5">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-6 h-6 rounded-full bg-brand-primary text-white text-xs font-bold flex items-center justify-center">
+                    2
                   </div>
+                  <h2 className="text-sm font-bold text-stone-900 uppercase tracking-wider">
+                    Delivery Address
+                  </h2>
                 </div>
-              ) : currentGeo && currentGeo.latitude != null && currentGeo.longitude != null ? (
-                <div className="flex items-start justify-between gap-4 p-4 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-800">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-white rounded-lg shadow-sm border border-emerald-100 shrink-0 mt-0.5">
-                      <CheckCircle2 size={16} className="text-emerald-600" />
-                    </div>
-                    <div>
-                      <p className="font-extrabold">GPS Location Locked</p>
-                      <p className="text-[11px] font-medium text-emerald-700 mt-0.5 font-mono">
-                        {currentGeo.latitude.toFixed(5)},{" "}
-                        {currentGeo.longitude.toFixed(5)}
-                      </p>
-                      <p className="text-[10px] text-emerald-600 mt-0.5">
-                        Accuracy: ~{Math.round(currentGeo.accuracy ?? 999)}m •
-                        Captured{" "}
-                        {currentGeo.capturedAt
-                          ? new Date(currentGeo.capturedAt).toLocaleTimeString(
-                              "en-IN"
-                            )
-                          : "just now"}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-2 shrink-0">
+
+                {user && user.addresses.length > 0 && (
+                  <div className="flex gap-2">
                     <button
                       type="button"
-                      onClick={triggerGeoCapture}
-                      className="px-3 py-1.5 text-[10px] font-black uppercase tracking-wider bg-white border border-emerald-200 text-emerald-700 rounded-lg hover:bg-emerald-50 transition-colors"
+                      onClick={() => setAddressMode("saved")}
+                      className={`text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors ${
+                        addressMode === "saved"
+                          ? "bg-brand-primary text-white"
+                          : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+                      }`}
                     >
-                      Refresh
+                      Saved Addresses
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => setAddressMode("new")}
+                      className={`text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors ${
+                        addressMode === "new"
+                          ? "bg-brand-primary text-white"
+                          : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+                      }`}
+                    >
+                      Add New Address
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* GPS Location Pin helper */}
+              <div className="mb-5 p-4 bg-stone-50 border border-stone-200 rounded-xl">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-2.5">
+                    <MapPin size={18} className="text-brand-primary shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-xs font-bold text-stone-900">
+                        Attach Exact GPS Coordinates
+                      </p>
+                      <p className="text-[11px] text-stone-500 mt-0.5 leading-relaxed">
+                        Helps delivery riders reach your doorstep without phone calls.
+                      </p>
+                      {currentGeo?.latitude && (
+                        <p className="text-[11px] font-mono font-medium text-brand-primary mt-1">
+                          📍 Pin: {currentGeo.latitude.toFixed(4)}, {currentGeo.longitude?.toFixed(4)}
+                          {currentGeo.accuracy && ` (±${Math.round(currentGeo.accuracy)}m)`}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {currentGeo?.latitude ? (
                     <button
                       type="button"
                       onClick={clearGeo}
-                      className="px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-emerald-600 hover:text-emerald-800 transition-colors opacity-80"
+                      className="text-[11px] font-bold text-stone-500 hover:text-stone-800 underline shrink-0 cursor-pointer"
                     >
-                      Clear
+                      Remove Pin
                     </button>
-                  </div>
-                </div>
-              ) : (
-                <div
-                  className={`p-4 border rounded-xl ${
-                    geoError
-                      ? "bg-amber-50 border-amber-100 text-amber-800"
-                      : "bg-gray-50 border-gray-100 text-gray-600"
-                  }`}
-                >
-                  {geoError ? (
-                    <p className="text-[11px] font-semibold leading-relaxed">
-                      {geoError}
-                    </p>
                   ) : (
-                    <p className="text-[11px] font-semibold leading-relaxed">
-                      Share your live location so we can pinpoint your exact
-                      building/house for a quicker and contactless drop.
-                    </p>
+                    <button
+                      type="button"
+                      onClick={triggerGeoCapture}
+                      disabled={geoCapturing}
+                      className="px-3 py-1.5 bg-brand-primary hover:bg-red-700 text-white font-bold text-xs rounded-lg transition-colors flex items-center gap-1.5 shrink-0 shadow-xs cursor-pointer"
+                    >
+                      {geoCapturing ? (
+                        <>
+                          <Loader2 size={13} className="animate-spin" />
+                          Pinning…
+                        </>
+                      ) : (
+                        <>
+                          <Navigation size={13} />
+                          Use GPS
+                        </>
+                      )}
+                    </button>
                   )}
-                  <button
-                    type="button"
-                    onClick={triggerGeoCapture}
-                    className="mt-3 flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-primary hover:bg-red-700 text-white text-[10px] font-black uppercase tracking-wider shadow-sm transition-colors"
-                  >
-                    <Navigation size={13} />{" "}
-                    {geoError ? "Grant Access & Retry" : "Capture Exact GPS Now"}
-                  </button>
                 </div>
-              )}
-            </div>
 
-            {/* Delivery Address */}
-            <div className="border border-gray-100 rounded-2xl p-4 sm:p-6 bg-white shadow-sm space-y-4 font-semibold text-xs text-gray-700">
-              <h3 className="font-display font-extrabold text-sm text-gray-900 pb-2 border-b border-gray-100 flex items-center gap-1.5">
-                <MapPin size={18} className="text-brand-primary" /> Delivery
-                Address
-              </h3>
+                {geoError && (
+                  <p className="text-[11px] text-amber-700 mt-2 font-medium flex items-center gap-1">
+                    <AlertCircle size={13} /> {geoError}
+                  </p>
+                )}
+              </div>
 
-              {user && user.addresses.length > 0 && (
-                <div className="flex bg-gray-100 p-1 rounded-xl text-[11px] font-black uppercase tracking-wider">
-                  <button
-                    type="button"
-                    onClick={() => setAddressMode("saved")}
-                    className={`flex-1 py-2 rounded-lg transition-all ${
-                      addressMode === "saved"
-                        ? "bg-white text-brand-primary shadow-sm"
-                        : "text-gray-500 hover:text-gray-700"
-                    }`}
-                  >
-                    Saved Addresses
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setAddressMode("new")}
-                    className={`flex-1 py-2 rounded-lg transition-all ${
-                      addressMode === "new"
-                        ? "bg-white text-brand-primary shadow-sm"
-                        : "text-gray-500 hover:text-gray-700"
-                    }`}
-                  >
-                    New Address
-                  </button>
-                </div>
-              )}
-
-              {addressMode === "saved" && user?.addresses && (
-                <>
-                  <div className="space-y-3">
-                    {user.addresses.map((addr) => {
-                      const isSelected = selectedAddressId === addr.id;
-                      return (
-                        <button
-                          key={addr.id}
-                          type="button"
-                          onClick={() => setSelectedAddressId(addr.id)}
-                          className={`w-full text-left p-4 rounded-xl border flex items-start justify-between transition-all ${
-                            isSelected
-                              ? "border-brand-primary bg-red-50/20 ring-2 ring-red-100"
-                              : "border-gray-100 hover:border-gray-300 hover:bg-gray-50"
-                          }`}
-                        >
-                          <div className="flex items-start gap-3 min-w-0">
-                            <div
-                              className={`p-2 rounded-lg shrink-0 mt-0.5 ${
-                                isSelected
-                                  ? "bg-brand-primary text-white"
-                                  : "bg-gray-100 text-gray-500"
-                              }`}
-                            >
-                              {addr.tag === "Work" ? (
-                                <Building2 size={14} />
-                              ) : addr.tag === "Other" ? (
-                                <MapIcon size={14} />
-                              ) : (
-                                <Home size={14} />
-                              )}
-                            </div>
-                            <div className="min-w-0">
-                              <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                <span className="font-black text-[9px] uppercase px-2 py-0.5 rounded bg-red-50 text-brand-primary">
-                                  {addr.tag}
-                                </span>
-                              </div>
-                              <p className="font-medium text-xs text-gray-800 leading-relaxed break-words">
-                                {addr.addressLine}, {addr.city} - {addr.pincode}
-                              </p>
-                            </div>
-                          </div>
-                          {isSelected && (
-                            <CheckCircle2
-                              size={16}
-                              className="text-brand-primary shrink-0 mt-1"
-                            />
-                          )}
-                        </button>
-                      );
-                    })}
+              {/* Saved Address Selector */}
+              {addressMode === "saved" && user && user.addresses.length > 0 && (
+                <div className="space-y-3 mb-5">
+                  <label className="block text-xs font-semibold text-stone-700">
+                    Select Address <span className="text-rose-600">*</span>
+                  </label>
+                  <div className="grid grid-cols-1 gap-2.5">
+                    {user.addresses.map((a, aIdx) => (
+                      <label
+                        key={a.id || `addr-${aIdx}`}
+                        className={`flex items-start gap-3 p-3.5 border rounded-xl cursor-pointer transition-all ${
+                          selectedAddressId === a.id
+                            ? "border-brand-primary bg-red-50/40 text-stone-900"
+                            : "border-stone-200 hover:border-stone-300 bg-white text-stone-700"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="selectedAddress"
+                          checked={selectedAddressId === a.id}
+                          onChange={() => setSelectedAddressId(a.id)}
+                          className="mt-1 accent-red-600"
+                        />
+                        <div className="flex-1">
+                          <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-stone-100 text-stone-700 mb-1">
+                            {a.tag}
+                          </span>
+                          <p className="text-xs font-semibold leading-relaxed">
+                            {a.addressLine}, {a.city} - {a.pincode}
+                          </p>
+                        </div>
+                      </label>
+                    ))}
                   </div>
                   {errors.address && (
-                    <p className="text-[10px] font-bold text-red-500">
-                      {errors.address}
-                    </p>
+                    <p className="text-[11px] font-medium text-rose-600 mt-1">{errors.address}</p>
                   )}
-                </>
+                </div>
               )}
 
+              {/* New Address Fields */}
               {addressMode === "new" && (
                 <div className="space-y-4">
+                  {/* Address Tag */}
                   <div>
-                    <label className="block text-gray-400 mb-2 font-bold uppercase tracking-wider text-[10px]">
-                      Address Label
+                    <label className="block text-xs font-semibold text-stone-700 mb-2">
+                      Address Type
                     </label>
                     <div className="flex gap-2">
-                      {(["Home", "Work", "Other"] as AddressTag[]).map((t) => {
-                        const Icon =
-                          t === "Work"
-                            ? Building2
-                            : t === "Other"
-                            ? MapIcon
-                            : Home;
-                        const active = newAddressTag === t;
-                        return (
-                          <button
-                            key={t}
-                            type="button"
-                            onClick={() => setNewAddressTag(t)}
-                            className={`flex-1 flex items-center justify-center gap-2 py-2 border rounded-lg text-[11px] font-black uppercase transition-all ${
-                              active
-                                ? "border-brand-primary bg-red-50 text-brand-primary"
-                                : "border-gray-200 hover:bg-gray-50 text-gray-600"
-                            }`}
-                          >
-                            <Icon size={13} />
-                            {t}
-                          </button>
-                        );
-                      })}
+                      {(["Home", "Work", "Other"] as AddressTag[]).map((t) => (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => setNewAddressTag(t)}
+                          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer ${
+                            newAddressTag === t
+                              ? "bg-brand-primary text-white border-brand-primary"
+                              : "bg-stone-50 border-stone-200 text-stone-700 hover:bg-stone-100"
+                          }`}
+                        >
+                          {t === "Home" && <Home size={13} />}
+                          {t === "Work" && <Building2 size={13} />}
+                          {t === "Other" && <MapIcon size={13} />}
+                          {t}
+                        </button>
+                      ))}
                     </div>
                   </div>
+
+                  {/* Street Address */}
                   <div>
-                    <label className="block text-gray-400 mb-1.5 font-bold uppercase tracking-wider text-[10px]">
-                      Street / Building / House Address *
+                    <label className="block text-xs font-semibold text-stone-700 mb-1.5">
+                      Delivery Address (House/Flat No., Street, Sector, Locality) <span className="text-rose-600">*</span>
                     </label>
                     <textarea
-                      rows={3}
-                      placeholder="Flat / House No., Building Name, Street, Sector / Locality (e.g., H-16/22, Pocket 22, Sector 22, Rohini)"
+                      rows={2}
                       value={newAddressLine}
                       onChange={(e) => setNewAddressLine(e.target.value)}
-                      className={`w-full p-3 bg-gray-50 border rounded-xl outline-none font-medium transition-all resize-none ${
-                        errors.address
-                          ? "border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-100 focus:bg-white"
-                          : "border-gray-200 focus:border-brand-primary focus:ring-2 focus:ring-red-50 focus:bg-white"
+                      placeholder="E.g. Flat 302, Pocket 4, Sector 22, Rohini"
+                      className={`w-full p-3 bg-stone-50 border rounded-xl text-xs font-medium focus:bg-white focus:outline-none transition-all ${
+                        errors.address ? "border-rose-400 focus:border-rose-500" : "border-stone-200 focus:border-brand-primary"
                       }`}
                     />
                     {errors.address && (
-                      <p className="mt-1.5 text-[10px] font-bold text-red-500">
-                        {errors.address}
-                      </p>
+                      <p className="text-[11px] font-medium text-rose-600 mt-1">{errors.address}</p>
                     )}
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-gray-400 mb-1.5 font-bold uppercase tracking-wider text-[10px]">
-                        City
+                      <label className="block text-xs font-semibold text-stone-700 mb-1.5">
+                        City / Region
                       </label>
                       <input
                         type="text"
-                        disabled
                         value={newAddressCity}
-                        className="w-full px-3 py-2.5 bg-gray-100 border border-gray-200 rounded-xl outline-none font-bold text-gray-500"
+                        onChange={(e) => setNewAddressCity(e.target.value)}
+                        placeholder="Enter delivery city"
+                        className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-xs font-medium focus:bg-white focus:border-brand-primary focus:outline-none"
                       />
                     </div>
+
                     <div>
-                      <label className="block text-gray-400 mb-1.5 font-bold uppercase tracking-wider text-[10px]">
-                        Pincode *
+                      <label className="block text-xs font-semibold text-stone-700 mb-1.5">
+                        Pincode <span className="text-rose-600">*</span>
                       </label>
                       <input
                         type="text"
-                        placeholder="110086"
-                        maxLength={6}
                         value={newAddressPincode}
-                        onChange={(e) =>
-                          setNewAddressPincode(
-                            e.target.value.replace(/\D/g, "").slice(0, 6)
-                          )
-                        }
-                        className={`w-full px-3 py-2.5 bg-gray-50 border rounded-xl outline-none font-bold transition-all ${
-                          errors.pincode
-                            ? "border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-100 focus:bg-white"
-                            : "border-gray-200 focus:border-brand-primary focus:ring-2 focus:ring-red-50 focus:bg-white"
+                        onChange={(e) => setNewAddressPincode(e.target.value)}
+                        placeholder="6-digit pincode (e.g. 110086)"
+                        maxLength={6}
+                        className={`w-full px-3.5 py-2.5 bg-stone-50 border rounded-xl text-xs font-medium focus:bg-white focus:outline-none transition-all ${
+                          errors.pincode ? "border-rose-400 focus:border-rose-500" : "border-stone-200 focus:border-brand-primary"
                         }`}
                       />
                       {errors.pincode && (
-                        <p className="mt-1.5 text-[10px] font-bold text-red-500">
-                          {errors.pincode}
-                        </p>
+                        <p className="text-[11px] font-medium text-rose-600 mt-1">{errors.pincode}</p>
                       )}
                     </div>
                   </div>
                 </div>
               )}
-            </div>
 
-            {/* Instructions */}
-            <div className="border border-gray-100 rounded-2xl p-4 sm:p-6 bg-white shadow-sm space-y-4 font-semibold text-xs text-gray-700">
-              <h3 className="font-display font-extrabold text-sm text-gray-900 pb-2 border-b border-gray-100 flex items-center gap-1.5">
-                <MessageSquare size={18} className="text-brand-primary" />{" "}
-                Special Delivery Instructions
-              </h3>
-              <div>
-                <textarea
-                  placeholder="E.g. Ring bell only, call after reaching gate, hand to security guard, avoid calling post 11 PM…"
-                  value={instructions}
-                  onChange={(e) => setInstructions(e.target.value)}
-                  rows={2}
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-brand-primary focus:bg-white focus:ring-2 focus:ring-red-50 outline-none transition-all text-xs"
-                />
-              </div>
-            </div>
-
-            {/* Payment Method - COD ONLY */}
-            <div className="border border-gray-100 rounded-2xl p-4 sm:p-6 bg-white shadow-sm space-y-4 font-semibold text-xs text-gray-700">
-              <h3 className="font-display font-extrabold text-sm text-gray-900 pb-2 border-b border-gray-100 flex items-center gap-1.5">
-                <CreditCard size={18} className="text-brand-primary" /> Payment
-                Method
-              </h3>
-
-              <div className="space-y-3">
-                <div className="w-full p-4 rounded-xl border-2 border-brand-primary bg-red-50/30 ring-2 ring-red-100 text-brand-primary flex items-start justify-between">
-                  <div className="flex items-start gap-3 min-w-0">
-                    <div className="p-2.5 rounded-xl bg-brand-primary text-white shrink-0">
-                      <ShieldCheck size={18} />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-extrabold text-gray-900 text-xs flex items-center gap-2 flex-wrap">
-                        Cash on Delivery (COD)
-                        <span className="px-2 py-0.5 rounded-full bg-brand-primary text-white text-[9px] font-black uppercase tracking-wider">
-                          Recommended
-                        </span>
-                      </p>
-                      <p className="text-[11px] font-medium text-gray-500 mt-1 leading-relaxed">
-                        Pay with cash or UPI when your order arrives at your
-                        doorstep. No prepayment required — 100% secure.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="p-1 rounded-full bg-white border border-brand-primary shrink-0 mt-1">
-                    <div className="w-3 h-3 rounded-full bg-brand-primary" />
-                  </div>
-                </div>
-
-                <div className="p-3 rounded-xl bg-gray-50 border border-dashed border-gray-200 text-[10px] font-bold text-gray-400 text-center">
-                  Prepaid methods (UPI, Cards, Wallets) will be enabled soon.
+              {/* Delivery Instructions */}
+              <div className="mt-5 pt-4 border-t border-stone-100">
+                <label className="block text-xs font-semibold text-stone-700 mb-1.5">
+                  Delivery Instructions (Optional)
+                </label>
+                <div className="relative">
+                  <MessageSquare size={16} className="absolute left-3.5 top-3 text-stone-400" />
+                  <input
+                    type="text"
+                    value={instructions}
+                    onChange={(e) => setInstructions(e.target.value)}
+                    placeholder="Add delivery instructions (e.g. leave with guard, call on arrival)"
+                    className="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-xs font-medium focus:bg-white focus:border-brand-primary focus:outline-none"
+                  />
                 </div>
               </div>
             </div>
-          </form>
 
-          {/* Right Side Summary */}
-          <div className="lg:col-span-4 space-y-6">
-            <div className="border border-gray-100 rounded-2xl p-4 sm:p-6 bg-white shadow-sm space-y-4 font-semibold text-xs text-gray-700 lg:sticky lg:top-28">
-              <h3 className="font-display font-extrabold text-sm text-gray-900 pb-2 border-b border-gray-100">
-                Order Summary
-              </h3>
-              <div className="divide-y divide-gray-100 max-h-56 overflow-y-auto pr-1">
-                {cart.map((item) => (
+            {/* Step 3: Payment Method */}
+            <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 shadow-xs">
+              <div className="flex items-center gap-2.5 pb-4 border-b border-stone-100 mb-4">
+                <div className="w-6 h-6 rounded-full bg-brand-primary text-white text-xs font-bold flex items-center justify-center">
+                  3
+                </div>
+                <h2 className="text-sm font-bold text-stone-900 uppercase tracking-wider">
+                  Payment Method
+                </h2>
+              </div>
+
+              <div className="p-4 border border-brand-primary bg-red-50/30 rounded-xl flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-brand-primary text-white">
+                    <CreditCard size={18} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-stone-900">
+                      Cash on Delivery (COD) / UPI at Doorstep
+                    </p>
+                    <p className="text-[11px] text-stone-500">
+                      Inspect your fresh meat sealed packaging before paying.
+                    </p>
+                  </div>
+                </div>
+                <span className="text-[11px] font-extrabold uppercase px-2.5 py-1 bg-red-100 text-brand-primary rounded-md">
+                  Active
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN: Order Summary & Place Order */}
+          <div className="lg:col-span-5 space-y-5">
+            <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 shadow-xs sticky top-24">
+              <h2 className="text-sm font-bold text-stone-900 uppercase tracking-wider pb-3 border-b border-stone-100 mb-4">
+                Order Summary ({cart.reduce((s, it) => s + it.quantity, 0)} Items)
+              </h2>
+
+              {/* Items List */}
+              <div className="space-y-3 max-h-60 overflow-y-auto pr-1 mb-5 divide-y divide-stone-100">
+                {cart.map((item, index) => (
                   <div
-                    key={item.id}
-                    className="flex justify-between py-2 text-xs"
+                    key={item.id ? `${item.id}-${index}` : `checkout-item-${item.product?.id || 'prod'}-${item.selectedWeight || ''}-${index}`}
+                    className="pt-2.5 first:pt-0 flex items-center justify-between text-xs"
                   >
-                    <div className="min-w-0 flex-1 pr-4">
-                      <p className="font-bold text-gray-900 truncate">
-                        {item.product.name}
-                      </p>
-                      <p className="text-[10px] text-gray-400 font-bold mt-0.5">
-                        {item.selectedWeight} × {item.quantity}
-                      </p>
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-10 h-10 rounded-lg bg-stone-100 overflow-hidden shrink-0 border border-stone-200/60">
+                        <img
+                          src={item.product?.image || "/chicken1.png"}
+                          alt={item.product?.name || "Product"}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div>
+                        <p className="font-bold text-stone-900 line-clamp-1">{item.product?.name}</p>
+                        <p className="text-[11px] text-stone-500">
+                          {item.selectedWeight} × {item.quantity}
+                        </p>
+                      </div>
                     </div>
-                    <span className="font-extrabold text-gray-900 shrink-0">
+                    <span className="font-bold text-stone-900 shrink-0">
                       ₹{item.price * item.quantity}
                     </span>
                   </div>
                 ))}
               </div>
 
-              <hr className="border-gray-100" />
-
-              <div className="space-y-2.5">
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-500">Cart Subtotal</span>
-                  <span className="text-gray-900 font-bold">
-                    ₹{getCartSubtotal()}
-                  </span>
+              {/* Bill Details */}
+              <div className="space-y-2 py-4 border-t border-b border-stone-100 text-xs text-stone-600">
+                <div className="flex justify-between">
+                  <span>Item Subtotal</span>
+                  <span className="font-semibold text-stone-900">₹{getCartSubtotal()}</span>
                 </div>
-                {appliedCoupon && (
-                  <div className="flex justify-between text-xs text-emerald-600 font-bold">
-                    <span>Coupon Applied</span>
+                {getCartDiscount() > 0 && (
+                  <div className="flex justify-between text-brand-primary font-semibold">
+                    <span>Discount</span>
                     <span>-₹{getCartDiscount()}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-500">Delivery Charges</span>
-                  <span className="text-emerald-600 font-bold">FREE</span>
-                </div>
-                <div className="flex justify-between text-sm font-black text-gray-900 pt-2 border-t border-gray-100">
-                  <span>Grand Total</span>
-                  <span className="text-brand-primary text-md">
-                    ₹{getCartTotal()}
+                <div className="flex justify-between items-center text-brand-primary">
+                  <span className="flex items-center gap-1 font-semibold">
+                    <Truck size={13} /> Express Delivery (20 Mins)
+                  </span>
+                  <span className="font-extrabold uppercase text-[11px] bg-red-50 px-2 py-0.5 rounded">
+                    FREE
                   </span>
                 </div>
               </div>
 
+              {/* Grand Total */}
+              <div className="flex justify-between items-baseline pt-4 pb-5">
+                <div>
+                  <span className="text-sm font-bold text-stone-900">Grand Total</span>
+                  <p className="text-[10px] text-stone-400">Inclusive of all local taxes</p>
+                </div>
+                <span className="text-xl font-extrabold text-brand-primary">
+                  ₹{getCartTotal()}
+                </span>
+              </div>
+
+              {/* Submit Button */}
               <button
-                type="button"
-                disabled={!canSubmit || isSubmitting}
-                onClick={handleSubmit}
-                className={`w-full py-3.5 font-extrabold rounded-xl text-xs text-white shadow-md flex items-center justify-center gap-2 transition-all uppercase tracking-wider ${
-                  !canSubmit || isSubmitting
-                    ? "bg-gray-300 shadow-none cursor-not-allowed"
-                    : "bg-brand-primary hover:bg-red-700 hover:shadow-lg cursor-pointer active:scale-[0.99]"
+                type="submit"
+                disabled={!canSubmit}
+                className={`w-full py-3.5 px-4 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer ${
+                  canSubmit
+                    ? "bg-brand-primary hover:bg-red-700 text-white shadow-red-700/20"
+                    : "bg-stone-200 text-stone-400 cursor-not-allowed"
                 }`}
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 size={14} className="animate-spin" />
-                    Confirming Order…
+                    <Loader2 size={16} className="animate-spin" />
+                    Placing Order & Logging to Freshoo…
                   </>
                 ) : (
                   <>
-                    <Sparkles size={14} />
-                    Place Order • ₹{getCartTotal()}
+                    <ShieldCheck size={16} />
+                    Place Order (₹{getCartTotal()})
                   </>
                 )}
               </button>
 
-              <p className="text-[10px] text-center text-gray-500 font-bold leading-relaxed">
-                By placing this order you agree to Freshoo&apos;s hygiene
-                promise and hyperlocal delivery terms.
-              </p>
-            </div>
-
-            <div className="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-4 flex gap-2.5 text-emerald-800 text-[10px] leading-relaxed">
-              <ShieldCheck
-                size={18}
-                className="text-emerald-600 shrink-0"
-              />
-              <div>
-                <p className="font-bold">Hygiene Sealed Delivery</p>
-                <p className="text-gray-500 font-semibold mt-0.5">
-                  Double bagged & sanitized container. Delivery boy undergoes
-                  temperature screening daily.
+              <div className="mt-4 text-center">
+                <p className="text-[10px] text-stone-400 flex items-center justify-center gap-1">
+                  <ShieldCheck size={12} className="text-brand-primary" />
+                  Hygienic cold chain packaging • 100% money back guarantee
                 </p>
               </div>
             </div>
           </div>
-        </div>
+        </form>
       </main>
 
-      {/* Confirmation Modal */}
+      {/* CONFIRMATION POPUP MODAL (FIXED: Visible until explicit user action, no auto-redirects) */}
       <AnimatePresence>
         {placedOrder && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
+          <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4">
             <motion.div
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.55 }}
+              animate={{ opacity: 0.6 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black"
+              className="absolute inset-0 bg-stone-950/70 backdrop-blur-xs"
+              onClick={() => {
+                // Clicking backdrop keeps user on page or lets them close explicitly
+              }}
             />
 
             <motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              initial={{ scale: 0.94, opacity: 0, y: 16 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="relative z-10 w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 overflow-hidden mx-4 my-6 text-center font-semibold text-xs text-gray-700"
+              exit={{ scale: 0.94, opacity: 0, y: 16 }}
+              transition={{ type: "spring", duration: 0.35 }}
+              className="relative z-10 w-full max-w-lg bg-white rounded-3xl shadow-2xl p-6 sm:p-8 text-center text-xs text-stone-700 border border-stone-100"
             >
               <button
-                onClick={() => router.push("/")}
-                className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+                onClick={() => {
+                  setPlacedOrder(null);
+                  router.push("/");
+                }}
+                className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-stone-100 text-stone-400 hover:text-stone-700 transition-colors"
                 aria-label="Close"
               >
                 <X size={18} />
               </button>
 
-              <div className="inline-flex p-3 rounded-full bg-emerald-50 text-emerald-600 mb-4">
-                <CheckCircle2 size={36} className="animate-pulse" />
+              <div className="inline-flex p-3 rounded-full bg-red-50 text-brand-primary mb-3">
+                <CheckCircle2 size={36} />
               </div>
 
-              <h3 className="font-display font-black text-2xl text-gray-900">
-                Order Placed Successfully!
+              <h3 className="text-xl font-bold text-stone-900">
+                Order Received Successfully!
               </h3>
-              <p className="text-xs text-emerald-600 font-bold mt-1 uppercase tracking-wide flex items-center justify-center gap-1">
-                <Sparkles size={12} /> Fresh Cut Initiated
+              <p className="text-xs text-brand-primary font-semibold mt-1 flex items-center justify-center gap-1">
+                <Sparkles size={13} /> Status: Order Received • Fresh Cut Initiated
               </p>
 
-              <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4 my-6 text-left space-y-2.5 font-bold">
-                <div className="flex justify-between border-b border-gray-200/50 pb-2">
-                  <span className="text-gray-400">Order ID:</span>
-                  <span className="text-gray-900">{placedOrder.id}</span>
+              {/* Order Details Card */}
+              <div className="bg-stone-50 border border-stone-200/80 rounded-2xl p-4 my-5 text-left space-y-2 text-xs">
+                <div className="flex justify-between border-b border-stone-200 pb-2">
+                  <span className="text-stone-500">Order ID:</span>
+                  <span className="font-bold text-stone-900 font-mono">{placedOrder.id}</span>
                 </div>
-                <div className="flex justify-between border-b border-gray-200/50 pb-2">
-                  <span className="text-gray-400">Date & Time:</span>
-                  <span className="text-gray-900">{placedOrder.date}</span>
+                <div className="flex justify-between border-b border-stone-200 pb-2">
+                  <span className="text-stone-500">Date & Time:</span>
+                  <span className="font-semibold text-stone-900">{placedOrder.date}</span>
                 </div>
-                <div className="flex justify-between border-b border-gray-200/50 pb-2">
-                  <span className="text-gray-400">Customer:</span>
-                  <span className="text-gray-900">
-                    {placedOrder.customerName ?? "Guest"}
+                <div className="flex justify-between border-b border-stone-200 pb-2">
+                  <span className="text-stone-500">Customer:</span>
+                  <span className="font-semibold text-stone-900">
+                    {placedOrder.customerName ?? "Customer"}
                   </span>
                 </div>
-                <div className="flex justify-between border-b border-gray-200/50 pb-2">
-                  <span className="text-gray-400">Payment:</span>
-                  <span className="text-brand-primary uppercase font-extrabold">
-                    {placedOrder.paymentMethod.toUpperCase()}
+                <div className="flex justify-between border-b border-stone-200 pb-2">
+                  <span className="text-stone-500">Payment:</span>
+                  <span className="font-bold text-brand-primary uppercase">
+                    {placedOrder.paymentMethod.toUpperCase()} (Collect ₹{placedOrder.total})
                   </span>
                 </div>
-                <div className="flex justify-between border-b border-gray-200/50 pb-2">
-                  <span className="text-gray-400">Paid Amount:</span>
-                  <span className="text-brand-primary">
+                <div className="flex justify-between border-b border-stone-200 pb-2">
+                  <span className="text-stone-500">Total Amount:</span>
+                  <span className="font-bold text-brand-primary">
                     ₹{placedOrder.total}
                   </span>
                 </div>
-                <div className="flex justify-between items-start gap-2">
-                  <span className="text-gray-400 shrink-0">
-                    Delivery Point:
-                  </span>
-                  <span className="text-gray-900 text-right leading-relaxed break-all max-w-[180px]">
-                    {placedOrder.address.addressLine}, {placedOrder.address.city}
-                    {" - "}{placedOrder.address.pincode}
+                <div className="flex justify-between items-start gap-2 pt-0.5">
+                  <span className="text-stone-500 shrink-0">Delivery Point:</span>
+                  <span className="font-medium text-stone-900 text-right leading-relaxed max-w-[220px]">
+                    {placedOrder.address.addressLine}, {placedOrder.address.city} - {placedOrder.address.pincode}
                   </span>
                 </div>
-                {placedOrder.geoLocation?.latitude !== null &&
-                  placedOrder.geoLocation?.latitude !== undefined && (
-                    <div className="flex justify-between items-center pt-2 border-t border-gray-100 mt-1">
-                      <span className="text-gray-400">GPS Attached:</span>
-                      <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
-                        YES
-                      </span>
-                    </div>
-                  )}
+                {placedOrder.geoLocation?.latitude != null && (
+                  <div className="flex justify-between items-center pt-2 border-t border-stone-200 mt-1">
+                    <span className="text-stone-500">GPS Pin Attached:</span>
+                    <span className="text-[10px] font-mono font-bold text-brand-primary bg-red-100 px-2 py-0.5 rounded">
+                      YES ({placedOrder.geoLocation.latitude.toFixed(4)}, {placedOrder.geoLocation.longitude?.toFixed(4)})
+                    </span>
+                  </div>
+                )}
               </div>
 
-              <p className="text-xs text-gray-500 max-w-xs mx-auto leading-relaxed">
-                Thank you for choosing Freshoo. Our butchers will now custom
-                chop your cuts and dispatch under cold containment. Order
-                receipt has been prepared for the store admin.
+              <p className="text-xs text-stone-500 max-w-sm mx-auto leading-relaxed">
+                Thank you for ordering with Freshoo! Both your customer receipt and our internal hub dispatch alert have been prepared.
               </p>
 
-              <div className="flex gap-3 mt-8">
+              {/* Action Buttons: Explicit customer choice */}
+              <div className="flex flex-col sm:flex-row gap-3 mt-6">
                 <Link
-                  href="/"
-                  className="flex-1 py-3 text-center border border-gray-200 hover:bg-gray-50 font-extrabold rounded-xl text-xs text-gray-700 transition-colors"
+                  href={`/order/${placedOrder.id}`}
+                  className="flex-1 py-3 text-center bg-brand-primary hover:bg-red-700 text-white font-bold rounded-xl text-xs transition-colors shadow-sm"
                 >
-                  Go to Home
+                  Track Order Online
                 </Link>
                 <Link
-                  href={placedOrder.isGuestOrder ? "/shop" : "/account"}
-                  className="flex-1 py-3 text-center bg-brand-primary hover:bg-red-700 text-white font-extrabold rounded-xl text-xs shadow-md transition-colors"
+                  href="/shop"
+                  className="flex-1 py-3 text-center border border-stone-200 hover:bg-stone-50 text-stone-800 font-bold rounded-xl text-xs transition-colors"
                 >
-                  {placedOrder.isGuestOrder
-                    ? "Order More"
-                    : "View Order Status"}
+                  Continue Shopping
                 </Link>
               </div>
             </motion.div>

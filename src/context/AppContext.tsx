@@ -9,6 +9,7 @@ export interface Product {
   category: "Chicken" | "Mutton" | "Fish" | "Eggs";
   description: string;
   image: string;
+  images?: string[];
   rating: number;
   reviewsCount: number;
   freshnessBadge: string;
@@ -49,6 +50,16 @@ export interface Address {
   geoLocation?: GeoLocation | null;
 }
 
+export type PermittedOrderStatus = "Order Received" | "Order Confirmed";
+export type OrderStatus =
+  | "Order Received"
+  | "Order Confirmed"
+  | "Order Placed"
+  | "Preparing"
+  | "Out for Delivery"
+  | "Delivered"
+  | "Cancelled";
+
 export interface Order {
   id: string;
   _id?: string;
@@ -66,7 +77,10 @@ export interface Order {
   total: number;
   address: Address;
   paymentMethod: string;
-  status: "Order Placed" | "Preparing" | "Out for Delivery" | "Delivered" | "Cancelled";
+  paymentStatus?: string;
+  status: OrderStatus;
+  statusHistory?: Array<{ status: string; timestamp: string | Date; updatedBy?: string; note?: string }>;
+  franchise?: { id?: string; name?: string; code?: string; distanceKm?: number | null } | null;
   geoLocation?: GeoLocation | null;
   customerEmail?: string | null;
   customerPhone?: string | null;
@@ -157,6 +171,12 @@ interface AppContextType {
   setCheckoutGeoLocation: React.Dispatch<React.SetStateAction<GeoLocation | null>>;
   captureGeoLocation: () => Promise<GeoLocation | null>;
 
+  franchises: any[];
+  selectedFranchise: any | null;
+  setSelectedFranchise: (f: any) => void;
+  serviceability: any | null;
+  refreshFranchises: () => Promise<void>;
+
   orders: Order[];
   placeOrder: (
     addressOrId: string | Omit<Address, "id">,
@@ -168,7 +188,7 @@ interface AppContextType {
       guestDetails?: { name: string; email: string; phone: string };
     }
   ) => Promise<Order | null>;
-  refreshOrders: () => Promise<void>;
+  refreshOrders: (forceAll?: boolean) => Promise<void>;
   updateOrderStatus: (orderId: string, status: Order["status"]) => Promise<boolean>;
   reorderItems: (items: CartItem[]) => void;
 
@@ -181,35 +201,47 @@ const apiFetch = async <T = any,>(
   path: string,
   init: RequestInit = {}
 ): Promise<ApiResult<T>> => {
-  const isBrowser = typeof window !== "undefined";
-  const isVercelOrRemote = isBrowser && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1";
-  const backendEnv = process.env.NEXT_PUBLIC_BACKEND_URL?.trim();
-
   let base: string;
   if (path.startsWith("http")) {
     base = path;
-  } else if (isVercelOrRemote && (!backendEnv || backendEnv.includes("localhost"))) {
-    // In production on Vercel/domain, fallback to internal Next.js /api to avoid dead localhost calls
-    base = `/api${path.startsWith("/") ? path : `/${path}`}`;
   } else {
-    const rawBase = backendEnv || "http://localhost:4000/api/v1";
-    base = `${rawBase.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
+    // Route directly to Next.js native /api
+    base = `/api${path.startsWith("/") ? path : `/${path}`}`;
   }
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 15000);
+
+  let token: string | null = null;
+  if (typeof window !== "undefined") {
+    try {
+      token = localStorage.getItem("freshoo_token");
+    } catch { /* noop */ }
+  }
 
   const opts: RequestInit = {
     credentials: "include",
     signal: controller.signal,
     headers: {
       "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(init.headers || {}),
     },
     ...init,
   };
   try {
-    const r = await fetch(base, opts);
+    let r = await fetch(base, opts);
+    if (r.status === 404 && !path.startsWith("http") && !base.startsWith("/api")) {
+      const fallbackUrl = `/api${path.startsWith("/") ? path : `/${path}`}`;
+      try {
+        const r2 = await fetch(fallbackUrl, opts);
+        if (r2.ok) {
+          r = r2;
+        }
+      } catch {
+        /* ignore fallback error */
+      }
+    }
     clearTimeout(timer);
     const text = await r.text();
     let json: any = {};
@@ -235,7 +267,7 @@ const apiFetch = async <T = any,>(
 const getCategoryFallbackImage = (category?: string): string => {
   switch (category?.toLowerCase()) {
     case "mutton":
-      return "/1000098711.jpg";
+      return "/mutton-fresh.png";
     case "eggs":
     case "egg":
       return "/egg.jpeg";
@@ -267,26 +299,36 @@ const sanitizeImageUrl = (image: any, category?: string): string => {
   return cleaned;
 };
 
-const productFromAny = (p: any): Product => ({
-  id: String(p.id || p._id),
-  name: p.name,
-  category: p.category,
-  description: p.description,
-  image: sanitizeImageUrl(p.image, p.category),
-  rating: Number(p.rating ?? 4.5),
-  reviewsCount: Number(p.reviewsCount ?? 0),
-  freshnessBadge: p.freshnessBadge || "Cut After Order",
-  isBestSeller: !!p.isBestSeller,
-  weights: Array.isArray(p.weights)
-    ? p.weights.map((w: any) => ({
-        weight: w.weight,
-        price: Number(w.price),
-        originalPrice: w.originalPrice != null ? Number(w.originalPrice) : undefined,
-      }))
-    : [],
-  stock: Number(p.stock ?? 0),
-  available: p.available !== false,
-});
+const productFromAny = (p: any): Product => {
+  const primaryImg = sanitizeImageUrl(p.image, p.category);
+  const rawImages = Array.isArray(p.images) && p.images.length > 0 ? p.images : [p.image || primaryImg];
+  const images = rawImages
+    .filter(Boolean)
+    .map((img: string) => sanitizeImageUrl(img, p.category))
+    .slice(0, 5);
+
+  return {
+    id: String(p.id || p._id),
+    name: p.name,
+    category: p.category,
+    description: p.description,
+    image: images[0] || primaryImg,
+    images: images.length > 0 ? images : [primaryImg],
+    rating: Number(p.rating ?? 4.5),
+    reviewsCount: Number(p.reviewsCount ?? 0),
+    freshnessBadge: p.freshnessBadge || "Cut After Order",
+    isBestSeller: !!p.isBestSeller,
+    weights: Array.isArray(p.weights)
+      ? p.weights.map((w: any) => ({
+          weight: w.weight,
+          price: Number(w.price),
+          originalPrice: w.originalPrice != null ? Number(w.originalPrice) : undefined,
+        }))
+      : [],
+    stock: Number(p.stock ?? 0),
+    available: p.available !== false,
+  };
+};
 
 const DEFAULT_SETTINGS: StoreSettings = {
   openingTime: "14:00",
@@ -319,6 +361,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [user, setUser] = useState<PublicUser | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [checkoutGeoLocation, setCheckoutGeoLocation] = useState<GeoLocation | null>(null);
+  const [franchises, setFranchises] = useState<any[]>([]);
+  const [selectedFranchise, setSelectedFranchise] = useState<any | null>(null);
+  const [serviceability, setServiceability] = useState<any | null>(null);
 
   // Hydrate from localStorage immediately (for SSR/client split)
   useEffect(() => {
@@ -412,8 +457,47 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, []);
 
-  const refreshOrders = useCallback(async () => {
-    const r = await apiFetch("/user/orders", { method: "GET" });
+  const refreshOrders = useCallback(async (forceAll?: boolean) => {
+    let isAdmin = false;
+    try {
+      const stored = localStorage.getItem("freshoo_user");
+      if (stored) {
+        const u = JSON.parse(stored);
+        const email = (u.email || "").toLowerCase().trim();
+        if (
+          u.isAdmin ||
+          u.role === "admin" ||
+          u.role === "ADMIN" ||
+          email === "admin@freshoo.in" ||
+          email === "freshoo.online@gmail.com" ||
+          email === "officialanurag6696@gmail.com" ||
+          email === "anuragkumarmait@gmail.com" ||
+          email.endsWith("@freshoo.online") ||
+          email.endsWith("@freshoo.in")
+        ) {
+          isAdmin = true;
+        }
+      }
+    } catch { /* noop */ }
+    if (user) {
+      const email = (user.email || "").toLowerCase().trim();
+      if (
+        user.isAdmin ||
+        (user as any).role === "admin" ||
+        (user as any).role === "ADMIN" ||
+        email === "admin@freshoo.in" ||
+        email === "freshoo.online@gmail.com" ||
+        email === "officialanurag6696@gmail.com" ||
+        email === "anuragkumarmait@gmail.com" ||
+        email.endsWith("@freshoo.online") ||
+        email.endsWith("@freshoo.in")
+      ) {
+        isAdmin = true;
+      }
+    }
+
+    const endpoint = (forceAll || isAdmin) ? "/orders?limit=2000" : "/user/orders";
+    const r = await apiFetch(endpoint, { method: "GET" });
     if (r.success && Array.isArray(r.data?.orders)) {
       setOrders(r.data.orders as Order[]);
       try { localStorage.setItem("freshoo_orders", JSON.stringify(r.data.orders)); } catch { /* noop */ }
@@ -423,7 +507,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (cached) setOrders(JSON.parse(cached));
       } catch { /* noop */ }
     }
-  }, []);
+  }, [user]);
 
   const refreshAddresses = useCallback(async () => {
     const r = await apiFetch("/user/addresses", { method: "GET" });
@@ -442,6 +526,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         refreshProducts(),
         refreshLocations(),
         refreshSettings(),
+        refreshFranchises(),
       ]);
       if (user) {
         await Promise.all([refreshOrders(), refreshAddresses()]);
@@ -477,7 +562,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [user?.id, isInitialized, refreshOrders, refreshAddresses]);
 
-  // ----- Geo Capture
+  const refreshFranchises = useCallback(async () => {
+    const r = await apiFetch("/franchises", { method: "GET" });
+    if (r.success && Array.isArray(r.data?.franchises)) {
+      setFranchises(r.data.franchises);
+      if (!selectedFranchise && r.data.franchises.length > 0) {
+        setSelectedFranchise(r.data.franchises[0]);
+      }
+    }
+  }, [selectedFranchise]);
+
+  // ----- Geo Capture with Accurate Reverse Geocoding & Serviceability
   const captureGeoLocation = (): Promise<GeoLocation | null> => {
     return new Promise((resolve) => {
       if (typeof window === "undefined" || !("geolocation" in navigator)) {
@@ -485,12 +580,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return;
       }
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
+        async (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          let label: string | null = null;
+
+          try {
+            const res = await fetch(`/api/geocode/reverse?lat=${lat}&lng=${lng}`);
+            if (res.ok) {
+              const data = await res.json();
+              if (data?.address?.addressLine) {
+                label = data.address.addressLine;
+                if (label && data.address.locality && !label.includes(data.address.locality)) {
+                  label += `, ${data.address.locality}`;
+                }
+              }
+              if (data?.serviceability) {
+                setServiceability(data.serviceability);
+                if (data.serviceability.franchise) {
+                  setSelectedFranchise(data.serviceability.franchise);
+                }
+              }
+            }
+          } catch {
+            // ignore network failure
+          }
+
           const geo: GeoLocation = {
-            latitude: pos.coords.latitude,
-            longitude: pos.coords.longitude,
+            latitude: lat,
+            longitude: lng,
             accuracy: pos.coords.accuracy,
-            addressLabel: null,
+            addressLabel: label,
             capturedAt: new Date().toISOString(),
           };
           setCheckoutGeoLocation(geo);
@@ -694,6 +814,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
     if (r.success && r.data?.user) {
       const u = r.data.user;
+      if (r.data?.token) {
+        try { localStorage.setItem("freshoo_token", r.data.token); } catch { /* noop */ }
+      }
       setUser({
         id: u.id,
         name: u.name,
@@ -720,6 +843,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
     if (r.success && r.data?.user) {
       const u = r.data.user;
+      if (r.data?.token) {
+        try { localStorage.setItem("freshoo_token", r.data.token); } catch { /* noop */ }
+      }
       setUser({
         id: u.id,
         name: u.name,
@@ -735,6 +861,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const logout = async (): Promise<boolean> => {
     await apiFetch("/auth/logout", { method: "POST" });
+    try { localStorage.removeItem("freshoo_token"); } catch { /* noop */ }
+    try { localStorage.removeItem("freshoo_user"); } catch { /* noop */ }
     setUser(null);
     setOrders([]);
     return true;
@@ -914,6 +1042,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         checkoutGeoLocation,
         setCheckoutGeoLocation,
         captureGeoLocation,
+        franchises,
+        selectedFranchise,
+        setSelectedFranchise,
+        serviceability,
+        refreshFranchises,
         orders,
         placeOrder,
         refreshOrders,

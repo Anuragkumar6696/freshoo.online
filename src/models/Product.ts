@@ -33,6 +33,7 @@ const ProductSchema = new Schema<IProduct>(
     },
     description: { type: String, required: true, trim: true },
     image: { type: String, required: true, trim: true },
+    images: { type: [String], default: [] },
     rating: { type: Number, default: 4.5, min: 0, max: 5 },
     reviewsCount: { type: Number, default: 0, min: 0 },
     freshnessBadge: { type: String, default: "Cut After Order", trim: true },

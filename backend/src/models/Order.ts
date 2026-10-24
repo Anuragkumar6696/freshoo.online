@@ -98,7 +98,7 @@ const OrderSchema = new Schema<IOrder>(
         "DELIVERED",
         "CANCELLED",
       ],
-      default: "PENDING",
+      default: "CONFIRMED",
       index: true,
     },
 

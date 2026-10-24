@@ -36,8 +36,8 @@ export const Logo: React.FC<LogoProps> = ({
       style={{
         width: width,
         height: height,
-        background: invert ? "#ffffff" : "linear-gradient(135deg, hsl(354, 84%, 45%) 0%, hsl(354, 84%, 38%) 100%)",
-        boxShadow: invert ? "none" : "0 4px 14px -2px rgba(211, 47, 47, 0.35)",
+        background: invert ? "#ffffff" : "linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)",
+        boxShadow: invert ? "none" : "0 4px 14px -2px rgba(220, 38, 38, 0.4)",
       }}
     >
       <Image

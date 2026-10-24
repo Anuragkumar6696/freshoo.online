@@ -12,7 +12,7 @@ interface ProductCardProps {
 const getCategoryFallback = (cat?: string) => {
   switch (cat?.toLowerCase()) {
     case "mutton":
-      return "/1000098711.jpg";
+      return "/mutton-fresh.png";
     case "eggs":
     case "egg":
       return "/egg.jpeg";
@@ -71,7 +71,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     <div className="group relative flex flex-col bg-white border border-slate-200/60 rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-premium shadow-hover transition-all duration-500 card-gradient">
       {/* Discount Badge */}
       {hasDiscount && (
-        <div className="absolute top-2.5 sm:top-4 left-2.5 sm:left-4 z-20 pointer-events-none bg-brand-primary text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg shadow-lg shadow-red-500/20">
+        <div className="absolute top-2.5 sm:top-4 left-2.5 sm:left-4 z-20 pointer-events-none bg-brand-primary text-white text-[9px] sm:text-[10px] font-bold uppercase tracking-wider px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg shadow-sm">
           {discountPercent}% OFF
         </div>
       )}
@@ -90,6 +90,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           loading="lazy"
           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"
         />
+        {Array.isArray(product.images) && product.images.length > 1 && (
+          <div className="absolute bottom-2.5 right-2.5 z-20 pointer-events-none bg-stone-900/80 backdrop-blur-xs text-white text-[9px] font-bold px-2 py-0.5 rounded-md shadow-xs">
+            📷 {product.images.length}
+          </div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
       </Link>
 
@@ -97,8 +102,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <div className="p-3 sm:p-5 flex flex-col flex-1">
         {/* Rating and Freshness Badge */}
         <div className="flex items-center justify-between gap-1.5 sm:gap-2 mb-2 sm:mb-3 flex-wrap">
-          <span className="inline-flex items-center gap-1 sm:gap-1.5 text-[9px] sm:text-[10px] font-black bg-emerald-50 text-emerald-700 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-emerald-200/50 uppercase tracking-wider">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="inline-flex items-center gap-1 sm:gap-1.5 text-[9px] sm:text-[10px] font-black bg-red-50 text-brand-primary px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-red-200/50 uppercase tracking-wider">
+            <span className="w-1.5 h-1.5 rounded-full bg-brand-primary animate-pulse" />
             {product.freshnessBadge}
           </span>
           <div className="flex items-center gap-1 text-amber-500 text-[10px] sm:text-xs font-black bg-amber-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg border border-amber-100 shrink-0">
@@ -154,18 +159,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </div>
 
           {quantityInCart > 0 ? (
-            <div className="flex items-center bg-brand-primary text-white rounded-xl shadow-lg shadow-red-500/20 overflow-hidden ring-2 ring-red-100">
+            <div className="flex items-center bg-brand-primary text-white rounded-xl shadow-xs overflow-hidden">
               <button
                 onClick={handleDecrement}
-                className="p-1.5 sm:p-2.5 hover:bg-white/10 transition-colors cursor-pointer"
+                className="p-1.5 sm:p-2.5 hover:bg-red-700 transition-colors cursor-pointer"
                 aria-label="Decrease quantity"
               >
                 <Minus size={13} strokeWidth={3} />
               </button>
-              <span className="w-5 sm:w-8 text-center font-black text-xs sm:text-sm">{quantityInCart}</span>
+              <span className="w-5 sm:w-7 text-center font-bold text-xs sm:text-sm">{quantityInCart}</span>
               <button
                 onClick={handleIncrement}
-                className="p-1.5 sm:p-2.5 hover:bg-white/10 transition-colors cursor-pointer"
+                className="p-1.5 sm:p-2.5 hover:bg-red-700 transition-colors cursor-pointer"
                 aria-label="Increase quantity"
               >
                 <Plus size={13} strokeWidth={3} />
@@ -174,9 +179,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           ) : (
             <button
               onClick={handleAdd}
-              className="flex items-center gap-1 sm:gap-2 bg-slate-900 hover:bg-brand-primary text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl font-black text-[11px] sm:text-xs uppercase tracking-wider transition-all duration-300 shadow-md hover:shadow-red-500/20 active:scale-95 cursor-pointer group/btn"
+              className="flex items-center gap-1 sm:gap-1.5 bg-brand-primary hover:bg-red-700 text-white px-3 sm:px-4 py-2 rounded-xl font-bold text-xs transition-colors shadow-xs active:scale-95 cursor-pointer"
             >
-              Add <Plus size={12} strokeWidth={3} className="group-hover/btn:rotate-90 transition-transform" />
+              Add <Plus size={12} strokeWidth={3} />
             </button>
           )}
         </div>

@@ -144,11 +144,21 @@ export const getUserOrders = async (req: AuthRequest, res: Response): Promise<Re
     const userId = req.user?.userId || (req.user as any)?.id || (req.user as any)?._id;
     const userEmail = (req.user as any)?.email ? (req.user as any).email.toLowerCase() : null;
     const userPhone = (req.user as any)?.phone || null;
-    const isAdmin = (req.user as any)?.isAdmin || (req.user as any)?.role === "ADMIN" || userEmail === "admin@freshoo.in";
+    const MASTER_ADMINS = [
+      "admin@freshoo.in",
+      "freshoo.online@gmail.com",
+      "officialanurag6696@gmail.com",
+      "anuragkumarmait@gmail.com",
+    ];
+    const isAdmin =
+      (req.user as any)?.isAdmin ||
+      (req.user as any)?.role === "ADMIN" ||
+      (req.user as any)?.role === "admin" ||
+      (userEmail && (MASTER_ADMINS.includes(userEmail) || userEmail.endsWith("@freshoo.online") || userEmail.endsWith("@freshoo.in")));
 
-    // 🚀 FIX: Agar Admin request kar raha hai, toh saare orders do (No user filter!)
+    // 🚀 FIX: If Admin is requesting, return all past and live orders without user filtering
     if (isAdmin) {
-      const allOrders = await Order.find({}).sort({ createdAt: -1 }).limit(100).lean();
+      const allOrders = await Order.find({}).sort({ createdAt: -1 }).limit(2000).lean();
       const formattedOrders = allOrders.map((order) => formatOrder(order));
       return successResponse(res, { orders: formattedOrders });
     }

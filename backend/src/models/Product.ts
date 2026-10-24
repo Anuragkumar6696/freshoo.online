@@ -13,6 +13,7 @@ export interface IProduct extends Document {
   category: "Chicken" | "Mutton" | "Fish" | "Eggs";
   description: string;
   image: string;
+  images?: string[];
   rating: number;
   reviewsCount: number;
   freshnessBadge: string;
@@ -46,6 +47,7 @@ const ProductSchema = new Schema<IProduct>(
     },
     description: { type: String, required: true, trim: true },
     image: { type: String, default: "/images/default-product.jpg", trim: true },
+    images: { type: [String], default: [] },
     rating: { type: Number, default: 4.5, min: 0, max: 5 },
     reviewsCount: { type: Number, default: 0, min: 0 },
     freshnessBadge: { type: String, default: "Cut After Order", trim: true },

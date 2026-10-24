@@ -12,7 +12,6 @@ import {
   SlidersHorizontal,
   ChevronDown,
   X,
-  MapPin,
   Sparkles,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -114,24 +113,6 @@ function ShopContent() {
             <h1 className="font-display font-black text-2xl sm:text-3xl text-gray-900">
               {selectedCategory === "All" ? "Fresh Cuts Inventory" : `${selectedCategory} Products`}
             </h1>
-          </div>
-
-          {/* Location details */}
-          <div className="bg-red-50/40 border border-red-100/50 rounded-2xl p-3.5 flex items-center gap-3 max-w-sm">
-            <MapPin size={18} className="text-brand-primary shrink-0 animate-pulse" />
-            <div className="text-xs font-semibold text-gray-700">
-              {selectedLocation ? (
-                <>
-                  <p className="font-bold text-brand-primary">Delivering to: {selectedLocation.split(",")[0]}</p>
-                  <p className="text-[10px] text-gray-400 font-medium">Standard hyperlocal express delivery (30-45 mins)</p>
-                </>
-              ) : (
-                <>
-                  <p className="font-bold text-red-600">No Delivery Location Selected</p>
-                  <p className="text-[10px] text-gray-500 font-medium">Set area in header to check product delivery slots</p>
-                </>
-              )}
-            </div>
           </div>
         </div>
 

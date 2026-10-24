@@ -28,6 +28,7 @@ export async function GET(
     if (!p) return notFound("Product not found");
     const json = p.toJSON();
     json.image = sanitizeProductImage(json.image);
+    json.images = Array.isArray(json.images) && json.images.length > 0 ? json.images.map(sanitizeProductImage) : [json.image];
     return jsonOk({ product: json });
   } catch (e: any) {
     return jsonErr(e?.message || "Failed to load product", 500);
@@ -46,8 +47,14 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await req.json();
-    if (body.image) {
+    if (Array.isArray(body.images)) {
+      body.images = body.images.slice(0, 5).map(sanitizeProductImage);
+      if (!body.image && body.images.length > 0) {
+        body.image = body.images[0];
+      }
+    } else if (body.image) {
       body.image = sanitizeProductImage(body.image);
+      body.images = [body.image];
     }
     await connectDB();
     const updated = await Product.findByIdAndUpdate(id, body, {
@@ -57,7 +64,12 @@ export async function PATCH(
     if (!updated) return notFound("Product not found");
     const json = updated.toJSON();
     json.image = sanitizeProductImage(json.image);
-
+    json.images =
+      Array.isArray(json.images) && json.images.length > 0
+        ? json.images.map(sanitizeProductImage)
+        : Array.isArray(body.images) && body.images.length > 0
+        ? body.images.map(sanitizeProductImage)
+        : [json.image];
     // Non-blocking admin alert for product update
     void (async () => {
       try {
@@ -79,7 +91,7 @@ export async function PATCH(
       }
     })();
 
-    return jsonOk({ product: updated.toJSON() });
+    return jsonOk({ product: json });
   } catch (e: any) {
     return jsonErr(e?.message || "Failed to update product", 500);
   }

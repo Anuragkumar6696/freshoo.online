@@ -180,9 +180,9 @@ export default function FranchisePage() {
             <div className="bg-red-50/40 border border-red-100/50 rounded-2xl p-4 flex gap-3 text-brand-primary font-semibold text-[10px] leading-relaxed">
               <MapPin size={18} className="shrink-0" />
               <div>
-                <p className="font-bold">Delhi expansion priorities</p>
+                <p className="font-bold">Delhi NCR Active Hubs & Expansion Priorities</p>
                 <p className="text-gray-500 mt-0.5">
-                  Currently prioritizing candidate inquiries for Rohini Sector 16/18/24, Saket, Vasant Kunj, Dwarka Sector 10/12, and Karol Bagh.
+                  Currently operating live hubs in <strong>Ghaziabad (Siddharth Vihar)</strong> and <strong>Delhi (Rohini Sector 22)</strong>. Prioritizing candidate inquiries for Indirapuram, Crossings Republik, Noida, Pitampura, and Dwarka.
                 </p>
               </div>
             </div>

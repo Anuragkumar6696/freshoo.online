@@ -69,6 +69,7 @@ export const createProduct = async (req: AuthRequest, res: Response): Promise<Re
       category,
       description,
       image,
+      images,
       rating,
       reviewsCount,
       freshnessBadge,
@@ -93,12 +94,15 @@ export const createProduct = async (req: AuthRequest, res: Response): Promise<Re
       return errorResponse(res, "Product with similar name already exists", 409);
     }
 
+    const finalImages = Array.isArray(images) && images.length > 0 ? images.slice(0, 5) : [image || "/chicken1.png"];
+
     const product = await Product.create({
       name,
       slug,
       category,
       description,
-      image,
+      image: finalImages[0],
+      images: finalImages,
       rating: rating ?? 4.5,
       reviewsCount: reviewsCount ?? 0,
       freshnessBadge: freshnessBadge || "Cut After Order",

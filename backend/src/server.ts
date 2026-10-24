@@ -107,6 +107,85 @@ app.use("/api/v1/user", userRoutes);
 
 // Correctly mount user orders (handles GET /api/v1/user/orders)
 app.use("/api/v1/user/orders", ordersRoutes);
+
+// Locations, settings, and franchises compatibility routes
+app.get("/api/v1/locations", (_req: Request, res: Response) => {
+  res.status(200).json({
+    success: true,
+    locations: [
+      "Rohini Sector 22",
+      "Rohini Sector 21",
+      "Rohini Sector 23",
+      "Rohini Sector 24",
+      "Rohini Sector 25",
+      "Pitampura",
+      "Prashant Vihar",
+      "Paschim Vihar",
+      "Janakpuri",
+      "Dwarka",
+    ],
+  });
+});
+
+app.get("/api/v1/settings", async (_req: Request, res: Response) => {
+  try {
+    const mongoose = require("mongoose");
+    const s = await mongoose.connection.collection("storesettings").findOne({ singleton: "main" });
+    if (s) {
+      return res.status(200).json({ success: true, settings: s });
+    }
+  } catch {}
+  res.status(200).json({
+    success: true,
+    settings: {
+      storeName: "Freshoo",
+      openingTime: "07:00",
+      closingTime: "23:00",
+      isTemporarilyClosed: false,
+      holidayMode: false,
+      holidays: [],
+    },
+  });
+});
+
+app.patch("/api/v1/settings", async (req: Request, res: Response) => {
+  try {
+    const mongoose = require("mongoose");
+    const body = req.body;
+    await mongoose.connection.collection("storesettings").updateOne(
+      { singleton: "main" },
+      { $set: { ...body, updatedAt: new Date() } },
+      { upsert: true }
+    );
+    const updated = await mongoose.connection.collection("storesettings").findOne({ singleton: "main" });
+    return res.status(200).json({ success: true, settings: updated });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err?.message || "Failed to update settings" });
+  }
+});
+
+app.get("/api/v1/franchises", (_req: Request, res: Response) => {
+  res.status(200).json({
+    success: true,
+    data: [
+      {
+        id: "rohini-22",
+        name: "Rohini Sector 22 Hub (Main)",
+        code: "ROHINI-22",
+        address: "Pocket 4, Sector 22, Rohini, New Delhi",
+        city: "Delhi",
+        coordinates: { latitude: 28.7188, longitude: 77.0673 },
+        phone: "+919310593167",
+        email: "freshoo.online@gmail.com",
+        deliveryRadiusKm: 15,
+        isActive: true,
+        openingTime: "07:00",
+        closingTime: "23:00",
+        isTemporarilyClosed: false,
+      },
+    ],
+  });
+});
 // 404 Handler
 app.use((_req: Request, res: Response) => {
   res.status(404).json({ success: false, error: "Route not found" });

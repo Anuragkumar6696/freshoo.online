@@ -1,14 +1,24 @@
 import mongoose, { Schema, Document } from "mongoose";
 import type {
   Order as OrderT,
-  CartItem,
   GeoLocation,
   Address,
 } from "@/context/AppContext";
 
-export type OrderStatus = OrderT["status"];
+export type PermittedOrderStatus = "Order Received" | "Order Confirmed";
+export type OrderStatus =
+  | "Order Received"
+  | "Order Confirmed"
+  | "Order Placed"
+  | "Preparing"
+  | "Out for Delivery"
+  | "Delivered"
+  | "Cancelled";
 
-const ORDER_STATUSES: OrderStatus[] = [
+export const ORDER_STATUSES: OrderStatus[] = [
+  "Order Received",
+  "Order Confirmed",
+  // Legacy backward-compat:
   "Order Placed",
   "Preparing",
   "Out for Delivery",
@@ -16,22 +26,34 @@ const ORDER_STATUSES: OrderStatus[] = [
   "Cancelled",
 ];
 
-export interface IOrder extends Document, Omit<OrderT, "id" | "_id"> {
+export interface IStatusHistory {
+  status: string;
+  timestamp: Date;
+  updatedBy?: string;
+  note?: string;
+}
+
+export interface IOrderFranchise {
+  id?: mongoose.Types.ObjectId | null;
+  name?: string | null;
+  code?: string | null;
+  distanceKm?: number | null;
+}
+
+export interface IOrder extends Document, Omit<OrderT, "id" | "_id" | "franchise"> {
   _id: mongoose.Types.ObjectId;
-  // Friendly public order id (FRSH-XXXXXX)
   friendlyId: string;
-  // Linkage fields
   userId?: mongoose.Types.ObjectId | null;
-  // Guest order lookup
   guestEmail?: string | null;
   guestPhone?: string | null;
-  // Admin notes
   adminNotes?: string;
   createdAt: Date;
   updatedAt: Date;
-  // Soft geo duplicate of the address subdoc, also stored inside address.geoLocation for frontend compat
   geoLocation: GeoLocation | null;
   idempotencyKey?: string;
+  statusHistory: IStatusHistory[];
+  franchise?: IOrderFranchise | null;
+  paymentStatus: string;
 }
 
 const GeoSchema = new Schema<GeoLocation>(
@@ -68,9 +90,28 @@ const CartItemSchema = new Schema(
   { _id: true, strict: false }
 );
 
+const StatusHistorySchema = new Schema<IStatusHistory>(
+  {
+    status: { type: String, required: true },
+    timestamp: { type: Date, default: Date.now },
+    updatedBy: { type: String, default: "system" },
+    note: { type: String, default: "" },
+  },
+  { _id: false }
+);
+
+const FranchiseSnapshotSchema = new Schema<IOrderFranchise>(
+  {
+    id: { type: Schema.Types.ObjectId, ref: "Franchise", default: null },
+    name: { type: String, default: null },
+    code: { type: String, default: null },
+    distanceKm: { type: Number, default: null },
+  },
+  { _id: false }
+);
+
 const OrderSchema = new Schema<IOrder>(
   {
-    // Friendly order id (FRSH-XXXXXX)
     friendlyId: { type: String, required: true, unique: true, index: true },
     date: { type: String, required: true, trim: true },
     items: { type: [CartItemSchema], required: true, default: [] },
@@ -85,14 +126,30 @@ const OrderSchema = new Schema<IOrder>(
       trim: true,
       index: true,
     },
+    paymentStatus: {
+      type: String,
+      default: "Pending",
+      index: true,
+    },
     status: {
       type: String,
       enum: ORDER_STATUSES,
-      default: "Order Placed",
+      default: "Order Confirmed",
       index: true,
     },
+    statusHistory: {
+      type: [StatusHistorySchema],
+      default: () => [
+        {
+          status: "Order Confirmed",
+          timestamp: new Date(),
+          updatedBy: "system",
+          note: "Order placed and automatically confirmed",
+        },
+      ],
+    },
+    franchise: { type: FranchiseSnapshotSchema, default: null },
     geoLocation: { type: GeoSchema, default: null },
-    // Redundant customer fields for easier search / guest lookup + frontend compat
     customerEmail: { type: String, default: null, lowercase: true, trim: true, index: true },
     customerPhone: { type: String, default: null, trim: true, index: true },
     customerName: { type: String, default: null, trim: true },
@@ -105,7 +162,6 @@ const OrderSchema = new Schema<IOrder>(
       sparse: true,
       default: () => `idemp-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
     },
-    // Database linkage (null for guests)
     userId: { type: Schema.Types.ObjectId, ref: "User", default: null, index: true },
     guestEmail: { type: String, default: null, lowercase: true, trim: true, index: true },
     guestPhone: { type: String, default: null, trim: true, index: true },
@@ -140,6 +196,7 @@ OrderSchema.index({ customerEmail: 1, createdAt: -1 });
 OrderSchema.index({ customerPhone: 1, createdAt: -1 });
 OrderSchema.index({ status: 1, createdAt: -1 });
 OrderSchema.index({ isGuestOrder: 1, createdAt: -1 });
+OrderSchema.index({ "franchise.code": 1, createdAt: -1 });
 
 export const Order =
   (mongoose.models.Order as mongoose.Model<IOrder>) ||

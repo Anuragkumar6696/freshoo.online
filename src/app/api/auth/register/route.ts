@@ -13,6 +13,8 @@ import { User } from "@/models/User";
 import { jsonErr, jsonOk, methodNotAllowed } from "@/lib/response";
 import { sendWelcomeEmail } from "@/lib/brevo";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -75,10 +77,17 @@ export async function POST(req: NextRequest) {
     }).catch((e) => console.warn("[Brevo] welcome email send failed:", e));
 
     const res = NextResponse.json(
-      { success: true, data: { user: publicUser, message: "Welcome to Freshoo!" } },
+      { success: true, data: { user: publicUser, token, message: "Welcome to Freshoo!" } },
       { status: 201 }
     );
     res.headers.set("Set-Cookie", cookie);
+    res.cookies.set(process.env.AUTH_COOKIE_NAME || "freshoo_auth", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 30 * 24 * 60 * 60,
+    });
     return res;
   } catch (e: any) {
     console.error("auth/register error:", e);
