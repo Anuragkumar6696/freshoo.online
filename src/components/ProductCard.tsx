@@ -129,8 +129,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 onChange={(e) => setSelectedWeight(e.target.value)}
                 className="w-full text-[11px] sm:text-xs font-black text-slate-600 bg-slate-50 hover:bg-white border border-slate-200 rounded-xl px-2 sm:px-3 py-1.5 sm:py-2 outline-none appearance-none cursor-pointer pr-8 sm:pr-10 transition-all hover:border-brand-primary/30 hover:ring-2 hover:ring-red-50"
               >
-                {product.weights.map((w) => (
-                  <option key={w.weight} value={w.weight}>
+                {product.weights.map((w, idx) => (
+                  <option key={`${w.weight}-${w.price}-${idx}`} value={w.weight}>
                     {w.weight} - ₹{w.price}
                   </option>
                 ))}

@@ -342,11 +342,11 @@ export const ProductDetailsClient: React.FC<ProductDetailsClientProps> = ({ id }
                 Select Portion Weight
               </h4>
               <div className="flex flex-wrap gap-2.5">
-                {product.weights.map((w) => {
+                {product.weights.map((w, idx) => {
                   const isSelected = selectedWeight === w.weight;
                   return (
                     <button
-                      key={w.weight}
+                      key={`${w.weight}-${w.price}-${idx}`}
                       onClick={() => setSelectedWeight(w.weight)}
                       className={`px-4 py-2.5 rounded-xl border font-bold text-xs transition-all cursor-pointer ${
                         isSelected

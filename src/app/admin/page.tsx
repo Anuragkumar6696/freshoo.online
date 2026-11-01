@@ -1137,7 +1137,7 @@ function AdminPageContent() {
                                 {addr.tag ? `[${addr.tag}] ` : ""}{addr.addressLine || "—"}
                               </div>
                               <div className="text-stone-500 text-[10px]">
-                                {addr.city || "Delhi"} - {addr.pincode || "—"}
+                                {addr.city || "Delhi"}{addr.state ? `, ${addr.state}` : ""} - {addr.pincode || "—"}
                               </div>
                             </td>
                             <td className="py-3 px-4 whitespace-nowrap">
@@ -1650,10 +1650,10 @@ function AdminPageContent() {
                         {p.category}
                       </span>
                     </div>
-                    <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed">{p.description ? p.description.replace(/\*\*/g, "") : ""}</p>
+                    <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed">{p.description}</p>
                     <div className="mt-2 flex gap-2">
-                      {p.weights.map((w) => (
-                        <span key={w.weight} className="text-[11px] font-bold bg-red-50 text-brand-primary px-2 py-0.5 rounded border border-red-100">
+                      {p.weights.map((w, idx) => (
+                        <span key={`${w.weight}-${idx}`} className="text-[11px] font-bold bg-red-50 text-brand-primary px-2 py-0.5 rounded border border-red-100">
                           {w.weight}: ₹{w.price}
                         </span>
                       ))}
@@ -1731,7 +1731,11 @@ function AdminPageContent() {
                 <div className="p-3 bg-stone-50 rounded-xl border border-stone-100">
                   <span className="text-[10px] font-bold text-stone-400 uppercase block mb-1">Delivery Address</span>
                   <p className="font-semibold text-stone-800 leading-relaxed">
-                    {selectedOrderDetails.address?.addressLine}, {selectedOrderDetails.address?.city} - {selectedOrderDetails.address?.pincode}
+                    {selectedOrderDetails.address?.flatSociety && !selectedOrderDetails.address.addressLine.includes(selectedOrderDetails.address.flatSociety)
+                      ? `${selectedOrderDetails.address.flatSociety}, `
+                      : ""}
+                    {selectedOrderDetails.address?.addressLine}, {selectedOrderDetails.address?.city}
+                    {selectedOrderDetails.address?.state ? `, ${selectedOrderDetails.address.state}` : ""} - {selectedOrderDetails.address?.pincode}
                   </p>
                   {selectedOrderDetails.geoLocation?.latitude && (
                     <a

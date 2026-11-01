@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useApp, Order, GeoLocation, Address } from "@/context/AppContext";
@@ -71,9 +71,12 @@ export default function CheckoutPage() {
 
   // New address form
   const [newAddressTag, setNewAddressTag] = useState<AddressTag>("Home");
-  const [newAddressLine, setNewAddressLine] = useState("");
+  const [newFlatSociety, setNewFlatSociety] = useState("");
+  const [newLocality, setNewLocality] = useState("");
   const [newAddressCity, setNewAddressCity] = useState("Delhi");
+  const [newAddressState, setNewAddressState] = useState("Delhi");
   const [newAddressPincode, setNewAddressPincode] = useState("");
+  const [gpsAutoFilled, setGpsAutoFilled] = useState(false);
 
   // Delivery instructions
   const [instructions, setInstructions] = useState("");
@@ -92,20 +95,20 @@ export default function CheckoutPage() {
   // Form errors
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Sync initial fields if user changes
+  // Sync initial fields ONCE when user loads (does NOT overwrite user keystrokes)
+  const userLoadedRef = useRef(false);
   useEffect(() => {
-    if (user) {
-      setCustomerName((prev) => prev || user.name);
-      setCustomerPhone((prev) => prev || user.phone);
-      setCustomerEmail((prev) => prev || user.email);
-      if (
-        (addressMode === "saved" || !selectedAddressId) &&
-        user.addresses.length > 0
-      ) {
+    if (user && !userLoadedRef.current) {
+      userLoadedRef.current = true;
+      if (user.name) setCustomerName(user.name);
+      if (user.phone) setCustomerPhone(user.phone);
+      if (user.email) setCustomerEmail(user.email);
+      if (user.addresses && user.addresses.length > 0) {
         setSelectedAddressId(user.addresses[0].id);
+        setAddressMode("saved");
       }
     }
-  }, [user, addressMode, selectedAddressId]);
+  }, [user]);
 
   // Protect route: empty cart -> redirect to shop ONLY when no order has been placed & not submitting
   useEffect(() => {
@@ -121,6 +124,45 @@ export default function CheckoutPage() {
 
   const currentGeo: GeoLocation | null = checkoutGeoLocation;
 
+  // Auto-fill address fields from currentGeo (both on mount & whenever currentGeo updates)
+  useEffect(() => {
+    if (currentGeo?.latitude && currentGeo?.longitude) {
+      if (currentGeo.pincode) {
+        setNewAddressPincode(currentGeo.pincode);
+      }
+      if (currentGeo.locality) {
+        setNewLocality(currentGeo.locality);
+      } else if (currentGeo.addressLabel) {
+        setNewLocality(currentGeo.addressLabel);
+      }
+      if (currentGeo.city && currentGeo.city !== "Delhi") {
+        setNewAddressCity(currentGeo.city);
+      }
+      if (currentGeo.state && currentGeo.state !== "Delhi") {
+        setNewAddressState(currentGeo.state);
+      }
+
+      // If currentGeo lacks pincode or locality or state, fetch reverse geocode immediately to auto-fill!
+      if (!currentGeo.pincode || !currentGeo.locality || !currentGeo.state || currentGeo.city === "Delhi") {
+        fetch(`/api/geocode/reverse?lat=${currentGeo.latitude}&lng=${currentGeo.longitude}`)
+          .then((r) => r.json())
+          .then((res) => {
+            const addr = res?.data?.address || res?.address;
+            if (addr) {
+              if (addr.pincode) setNewAddressPincode(addr.pincode);
+              if (addr.locality) setNewLocality(addr.locality);
+              if (addr.city) setNewAddressCity(addr.city);
+              if (addr.state) setNewAddressState(addr.state);
+              setGpsAutoFilled(true);
+            }
+          })
+          .catch(() => { /* ignore */ });
+      } else {
+        setGpsAutoFilled(true);
+      }
+    }
+  }, [currentGeo?.latitude, currentGeo?.longitude]);
+
   const triggerGeoCapture = async () => {
     setGeoCapturing(true);
     setGeoError(null);
@@ -128,11 +170,33 @@ export default function CheckoutPage() {
     setGeoCapturing(false);
     if (!geo) {
       setGeoError(
-        "Unable to access device location. You can still enter your address manually."
+        "Unable to access device location. You can enter your address details manually."
       );
-    } else if (geo.addressLabel && !newAddressLine) {
-      // Auto-populate address field from reverse geocoded components
-      setNewAddressLine(geo.addressLabel);
+    } else {
+      let filled = false;
+      if (geo.pincode) {
+        setNewAddressPincode(geo.pincode);
+        filled = true;
+      }
+      if (geo.locality) {
+        setNewLocality(geo.locality);
+        filled = true;
+      } else if (geo.addressLabel) {
+        setNewLocality(geo.addressLabel);
+        filled = true;
+      }
+      if (geo.city) {
+        setNewAddressCity(geo.city);
+        filled = true;
+      }
+      if (geo.state) {
+        setNewAddressState(geo.state);
+        filled = true;
+      }
+      if (filled) {
+        setGpsAutoFilled(true);
+        setAddressMode("new");
+      }
     }
   };
 
@@ -140,6 +204,7 @@ export default function CheckoutPage() {
     setCheckoutGeoLocation(null);
     localStorage.removeItem("freshoo_checkout_geo");
     setGeoError(null);
+    setGpsAutoFilled(false);
   };
 
   const validate = (): boolean => {
@@ -157,12 +222,21 @@ export default function CheckoutPage() {
         e.address = "Please select a delivery address.";
       }
     } else {
-      if (!isAddressValid(newAddressLine)) {
-        e.address =
-          "Please enter your street address (flat/house no., street, sector, locality).";
+      if (!newFlatSociety.trim() || newFlatSociety.trim().length < 2) {
+        e.flatSociety =
+          "Please enter your Flat / House No. and Society / Building name.";
+      }
+      if (!newLocality.trim() || newLocality.trim().length < 2) {
+        e.locality = "Please enter or confirm your Area / Locality / Sector.";
       }
       if (!isPincodeValid(newAddressPincode)) {
         e.pincode = "Please enter a valid 6-digit delivery pincode.";
+      }
+      if (!newAddressCity.trim()) {
+        e.city = "Please enter delivery city.";
+      }
+      if (!newAddressState.trim()) {
+        e.state = "Please enter delivery state.";
       }
     }
 
@@ -175,16 +249,25 @@ export default function CheckoutPage() {
       if (!activeSavedAddress) return null;
       return {
         tag: activeSavedAddress.tag,
+        flatSociety: activeSavedAddress.flatSociety || "",
+        locality: activeSavedAddress.locality || "",
         addressLine: activeSavedAddress.addressLine,
         city: activeSavedAddress.city,
+        state: activeSavedAddress.state || "",
         pincode: activeSavedAddress.pincode,
         geoLocation: activeSavedAddress.geoLocation ?? null,
       };
     }
+    const combinedAddressLine = [newFlatSociety.trim(), newLocality.trim()]
+      .filter(Boolean)
+      .join(", ");
     return {
       tag: newAddressTag,
-      addressLine: newAddressLine.trim(),
+      flatSociety: newFlatSociety.trim(),
+      locality: newLocality.trim(),
+      addressLine: combinedAddressLine,
       city: newAddressCity.trim(),
+      state: newAddressState.trim(),
       pincode: newAddressPincode.replace(/\D/g, ""),
       geoLocation: currentGeo ?? null,
     };
@@ -223,12 +306,13 @@ export default function CheckoutPage() {
       });
 
       if (order) {
-        // KEEP popup visible permanently until customer explicit action
-        // No automatic dismissal timers!
         setPlacedOrder(order);
         setSelectedAddressId("");
-        setNewAddressLine("");
+        setNewFlatSociety("");
+        setNewLocality("");
         setNewAddressPincode("");
+        // Navigate cleanly to order details page with success confirmation popup
+        router.push(`/order/${order.id}?success=1`);
       }
     } finally {
       setIsSubmitting(false);
@@ -247,7 +331,7 @@ export default function CheckoutPage() {
           <div>
             <h1 className="text-2xl font-bold text-stone-900 tracking-tight">Checkout</h1>
             <p className="text-xs text-stone-500 mt-0.5">
-              Cash on Delivery • Free 20-min express delivery in Rohini Sector 22 & 10 km hub radius
+              Cash on Delivery • Free 20-min express delivery from local hub • No delivery charges
             </p>
           </div>
           <div className="hidden sm:flex items-center gap-2 text-xs font-semibold text-stone-500">
@@ -287,13 +371,20 @@ export default function CheckoutPage() {
           <div className="lg:col-span-7 space-y-6">
             {/* Step 1: Customer Contact */}
             <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 shadow-xs">
-              <div className="flex items-center gap-2.5 pb-4 border-b border-stone-100 mb-5">
-                <div className="w-6 h-6 rounded-full bg-brand-primary text-white text-xs font-bold flex items-center justify-center">
-                  1
+              <div className="flex items-center justify-between pb-4 border-b border-stone-100 mb-5">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-6 h-6 rounded-full bg-brand-primary text-white text-xs font-bold flex items-center justify-center">
+                    1
+                  </div>
+                  <h2 className="text-sm font-bold text-stone-900 uppercase tracking-wider">
+                    Contact Information
+                  </h2>
                 </div>
-                <h2 className="text-sm font-bold text-stone-900 uppercase tracking-wider">
-                  Contact Information
-                </h2>
+                {user && (
+                  <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                    ✓ Editable for this delivery
+                  </span>
+                )}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -413,7 +504,7 @@ export default function CheckoutPage() {
                         Attach Exact GPS Coordinates
                       </p>
                       <p className="text-[11px] text-stone-500 mt-0.5 leading-relaxed">
-                        Helps delivery riders reach your doorstep without phone calls.
+                        Enabling GPS auto-fills your Pincode, State, City & Locality instantly.
                       </p>
                       {currentGeo?.latitude && (
                         <p className="text-[11px] font-mono font-medium text-brand-primary mt-1">
@@ -425,13 +516,34 @@ export default function CheckoutPage() {
                   </div>
 
                   {currentGeo?.latitude ? (
-                    <button
-                      type="button"
-                      onClick={clearGeo}
-                      className="text-[11px] font-bold text-stone-500 hover:text-stone-800 underline shrink-0 cursor-pointer"
-                    >
-                      Remove Pin
-                    </button>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={triggerGeoCapture}
+                        disabled={geoCapturing}
+                        className="px-2.5 py-1.5 bg-brand-primary hover:bg-red-700 text-white font-bold text-[11px] rounded-lg transition-colors flex items-center gap-1 shadow-xs cursor-pointer"
+                        title="Re-detect GPS and refresh address"
+                      >
+                        {geoCapturing ? (
+                          <>
+                            <Loader2 size={12} className="animate-spin" />
+                            Detecting…
+                          </>
+                        ) : (
+                          <>
+                            <Navigation size={12} />
+                            Re-Detect GPS
+                          </>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={clearGeo}
+                        className="text-[11px] font-bold text-stone-500 hover:text-stone-800 underline cursor-pointer"
+                      >
+                        Remove
+                      </button>
+                    </div>
                   ) : (
                     <button
                       type="button"
@@ -453,6 +565,21 @@ export default function CheckoutPage() {
                     </button>
                   )}
                 </div>
+
+                {gpsAutoFilled && currentGeo && (
+                  <div className="mt-3 p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-900 text-[11px]">
+                    <div className="flex items-center gap-1.5 font-bold text-emerald-800">
+                      <CheckCircle2 size={13} className="text-emerald-700" />
+                      <span>GPS Detected & Auto-Filled Details:</span>
+                    </div>
+                    <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-emerald-700 font-medium">
+                      {newLocality && <span><strong>Locality:</strong> {newLocality}</span>}
+                      {newAddressCity && <span><strong>City:</strong> {newAddressCity}</span>}
+                      {newAddressState && <span><strong>State:</strong> {newAddressState}</span>}
+                      {newAddressPincode && <span><strong>Pincode:</strong> {newAddressPincode}</span>}
+                    </div>
+                  </div>
+                )}
 
                 {geoError && (
                   <p className="text-[11px] text-amber-700 mt-2 font-medium flex items-center gap-1">
@@ -489,7 +616,9 @@ export default function CheckoutPage() {
                             {a.tag}
                           </span>
                           <p className="text-xs font-semibold leading-relaxed">
-                            {a.addressLine}, {a.city} - {a.pincode}
+                            {a.flatSociety ? `${a.flatSociety}, ` : ""}
+                            {a.addressLine}, {a.city}
+                            {a.state ? `, ${a.state}` : ""} - {a.pincode}
                           </p>
                         </div>
                       </label>
@@ -530,48 +659,78 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  {/* Street Address */}
+                  {/* Field 1: Flat Number and Society */}
                   <div>
-                    <label className="block text-xs font-semibold text-stone-700 mb-1.5">
-                      Delivery Address (House/Flat No., Street, Sector, Locality) <span className="text-rose-600">*</span>
+                    <label className="block text-xs font-semibold text-stone-700 mb-1.5 flex items-center justify-between">
+                      <span>
+                        Flat / House No. & Society / Apartment Name <span className="text-rose-600">*</span>
+                      </span>
+                      <span className="text-[10px] text-stone-400 font-normal">
+                        e.g. Flat 402, Tower B, Prateek Grand City
+                      </span>
                     </label>
-                    <textarea
-                      rows={2}
-                      value={newAddressLine}
-                      onChange={(e) => setNewAddressLine(e.target.value)}
-                      placeholder="E.g. Flat 302, Pocket 4, Sector 22, Rohini"
-                      className={`w-full p-3 bg-stone-50 border rounded-xl text-xs font-medium focus:bg-white focus:outline-none transition-all ${
-                        errors.address ? "border-rose-400 focus:border-rose-500" : "border-stone-200 focus:border-brand-primary"
-                      }`}
-                    />
-                    {errors.address && (
-                      <p className="text-[11px] font-medium text-rose-600 mt-1">{errors.address}</p>
+                    <div className="relative">
+                      <Home size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
+                      <input
+                        type="text"
+                        value={newFlatSociety}
+                        onChange={(e) => setNewFlatSociety(e.target.value)}
+                        placeholder="Flat No., House No., Floor, Society or Building name"
+                        className={`w-full pl-10 pr-4 py-2.5 bg-stone-50 border rounded-xl text-xs font-medium focus:bg-white focus:outline-none transition-all ${
+                          errors.flatSociety
+                            ? "border-rose-400 focus:border-rose-500"
+                            : "border-stone-200 focus:border-brand-primary"
+                        }`}
+                      />
+                    </div>
+                    {errors.flatSociety && (
+                      <p className="text-[11px] font-medium text-rose-600 mt-1">{errors.flatSociety}</p>
                     )}
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-stone-700 mb-1.5">
-                        City / Region
-                      </label>
+                  {/* Field 2: Area / Locality / Sector */}
+                  <div>
+                    <label className="block text-xs font-semibold text-stone-700 mb-1.5 flex items-center justify-between">
+                      <span>
+                        Area / Locality / Sector <span className="text-rose-600">*</span>
+                      </span>
+                      {gpsAutoFilled && (
+                        <span className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
+                          <CheckCircle2 size={11} /> Auto-filled by GPS
+                        </span>
+                      )}
+                    </label>
+                    <div className="relative">
+                      <MapPin size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
                       <input
                         type="text"
-                        value={newAddressCity}
-                        onChange={(e) => setNewAddressCity(e.target.value)}
-                        placeholder="Enter delivery city"
-                        className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-xs font-medium focus:bg-white focus:border-brand-primary focus:outline-none"
+                        value={newLocality}
+                        onChange={(e) => setNewLocality(e.target.value)}
+                        placeholder="Locality, Sector, or Landmark (e.g. Siddharth Vihar / Sector 22)"
+                        className={`w-full pl-10 pr-4 py-2.5 bg-stone-50 border rounded-xl text-xs font-medium focus:bg-white focus:outline-none transition-all ${
+                          errors.locality
+                            ? "border-rose-400 focus:border-rose-500"
+                            : "border-stone-200 focus:border-brand-primary"
+                        }`}
                       />
                     </div>
+                    {errors.locality && (
+                      <p className="text-[11px] font-medium text-rose-600 mt-1">{errors.locality}</p>
+                    )}
+                  </div>
 
+                  {/* Field 3, 4, 5: Pincode, City, State Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-xs font-semibold text-stone-700 mb-1.5">
-                        Pincode <span className="text-rose-600">*</span>
+                      <label className="block text-xs font-semibold text-stone-700 mb-1.5 flex items-center justify-between">
+                        <span>Pincode <span className="text-rose-600">*</span></span>
+                        {gpsAutoFilled && <span className="text-[9px] text-emerald-600 font-bold">GPS</span>}
                       </label>
                       <input
                         type="text"
                         value={newAddressPincode}
                         onChange={(e) => setNewAddressPincode(e.target.value)}
-                        placeholder="6-digit pincode (e.g. 110086)"
+                        placeholder="6-digit Pincode"
                         maxLength={6}
                         className={`w-full px-3.5 py-2.5 bg-stone-50 border rounded-xl text-xs font-medium focus:bg-white focus:outline-none transition-all ${
                           errors.pincode ? "border-rose-400 focus:border-rose-500" : "border-stone-200 focus:border-brand-primary"
@@ -579,6 +738,44 @@ export default function CheckoutPage() {
                       />
                       {errors.pincode && (
                         <p className="text-[11px] font-medium text-rose-600 mt-1">{errors.pincode}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-stone-700 mb-1.5 flex items-center justify-between">
+                        <span>City <span className="text-rose-600">*</span></span>
+                        {gpsAutoFilled && <span className="text-[9px] text-emerald-600 font-bold">GPS</span>}
+                      </label>
+                      <input
+                        type="text"
+                        value={newAddressCity}
+                        onChange={(e) => setNewAddressCity(e.target.value)}
+                        placeholder="City (e.g. Ghaziabad / Delhi)"
+                        className={`w-full px-3.5 py-2.5 bg-stone-50 border rounded-xl text-xs font-medium focus:bg-white focus:outline-none transition-all ${
+                          errors.city ? "border-rose-400 focus:border-rose-500" : "border-stone-200 focus:border-brand-primary"
+                        }`}
+                      />
+                      {errors.city && (
+                        <p className="text-[11px] font-medium text-rose-600 mt-1">{errors.city}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-stone-700 mb-1.5 flex items-center justify-between">
+                        <span>State <span className="text-rose-600">*</span></span>
+                        {gpsAutoFilled && <span className="text-[9px] text-emerald-600 font-bold">GPS</span>}
+                      </label>
+                      <input
+                        type="text"
+                        value={newAddressState}
+                        onChange={(e) => setNewAddressState(e.target.value)}
+                        placeholder="State (e.g. UP / Delhi)"
+                        className={`w-full px-3.5 py-2.5 bg-stone-50 border rounded-xl text-xs font-medium focus:bg-white focus:outline-none transition-all ${
+                          errors.state ? "border-rose-400 focus:border-rose-500" : "border-stone-200 focus:border-brand-primary"
+                        }`}
+                      />
+                      {errors.state && (
+                        <p className="text-[11px] font-medium text-rose-600 mt-1">{errors.state}</p>
                       )}
                     </div>
                   </div>
@@ -738,6 +935,32 @@ export default function CheckoutPage() {
         </form>
       </main>
 
+      {/* FULL-SCREEN SECURE SUBMISSION OVERLAY (Prevents duplicate clicks & shows active progress) */}
+      <AnimatePresence>
+        {isSubmitting && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-stone-950/80 backdrop-blur-sm flex flex-col items-center justify-center p-4 text-center text-white"
+          >
+            <div className="bg-stone-900 border border-stone-800 p-8 rounded-3xl shadow-2xl max-w-sm w-full flex flex-col items-center">
+              <div className="w-16 h-16 rounded-2xl bg-brand-primary/20 border border-brand-primary/40 flex items-center justify-center mb-4">
+                <Loader2 size={32} className="animate-spin text-brand-primary" />
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2">Placing Your Order…</h3>
+              <p className="text-xs text-stone-400 leading-relaxed mb-4">
+                Securing fresh stock and preparing order confirmation. Please do not refresh or press back.
+              </p>
+              <div className="flex items-center gap-2 text-[11px] text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20 font-medium">
+                <ShieldCheck size={14} />
+                <span>Auto-confirmed & cut strictly after order</span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* CONFIRMATION POPUP MODAL (FIXED: Visible until explicit user action, no auto-redirects) */}
       <AnimatePresence>
         {placedOrder && (
@@ -811,8 +1034,12 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex justify-between items-start gap-2 pt-0.5">
                   <span className="text-stone-500 shrink-0">Delivery Point:</span>
-                  <span className="font-medium text-stone-900 text-right leading-relaxed max-w-[220px]">
-                    {placedOrder.address.addressLine}, {placedOrder.address.city} - {placedOrder.address.pincode}
+                  <span className="font-medium text-stone-900 text-right leading-relaxed max-w-[240px]">
+                    {placedOrder.address.flatSociety && !placedOrder.address.addressLine.includes(placedOrder.address.flatSociety)
+                      ? `${placedOrder.address.flatSociety}, `
+                      : ""}
+                    {placedOrder.address.addressLine}, {placedOrder.address.city}
+                    {placedOrder.address.state ? `, ${placedOrder.address.state}` : ""} - {placedOrder.address.pincode}
                   </span>
                 </div>
                 {placedOrder.geoLocation?.latitude != null && (

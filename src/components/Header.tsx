@@ -585,13 +585,6 @@ export const Header: React.FC = () => {
                     >
                       My Dashboard
                     </Link>
-                    <Link
-                      href="/admin"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="py-2 text-brand-primary font-extrabold border-b border-gray-50 transition-colors"
-                    >
-                      ⚙️ Admin Dashboard
-                    </Link>
                     {isFreshooAdmin && (
                       <Link
                         href="/admin"

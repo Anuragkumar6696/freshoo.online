@@ -33,8 +33,11 @@ export interface IUser extends Document {
 const AddressSchema = new Schema<IAddress>(
   {
     tag: { type: String, enum: ["Home", "Work", "Other"], default: "Home" },
+    flatSociety: { type: String, default: "", trim: true },
+    locality: { type: String, default: "", trim: true },
     addressLine: { type: String, required: true, trim: true },
     city: { type: String, required: true, default: "Delhi", trim: true },
+    state: { type: String, default: "Delhi", trim: true },
     pincode: { type: String, required: true, trim: true },
     geoLocation: {
       latitude: { type: Number, default: null },
@@ -42,6 +45,10 @@ const AddressSchema = new Schema<IAddress>(
       accuracy: { type: Number, default: null },
       addressLabel: { type: String, default: null, trim: true },
       capturedAt: { type: String, default: null, trim: true },
+      pincode: { type: String, default: null, trim: true },
+      locality: { type: String, default: null, trim: true },
+      city: { type: String, default: null, trim: true },
+      state: { type: String, default: null, trim: true },
     },
   },
   { _id: true, timestamps: false }

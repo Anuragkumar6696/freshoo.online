@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import {
@@ -27,6 +28,16 @@ export default function OrderTrackingPage() {
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      if (sp.get("success") === "1" || sp.get("new") === "1") {
+        setShowSuccessModal(true);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (!id) return;
@@ -233,7 +244,11 @@ export default function OrderTrackingPage() {
                   </h3>
                 </div>
                 <p className="text-xs font-medium text-stone-800 leading-relaxed">
-                  {order.address?.addressLine}, {order.address?.city} - {order.address?.pincode}
+                  {order.address?.flatSociety && !order.address.addressLine.includes(order.address.flatSociety)
+                    ? `${order.address.flatSociety}, `
+                    : ""}
+                  {order.address?.addressLine}, {order.address?.city}
+                  {order.address?.state ? `, ${order.address.state}` : ""} - {order.address?.pincode}
                 </p>
                 {order.geoLocation?.latitude && (
                   <div className="mt-3 pt-3 border-t border-stone-100">
@@ -257,7 +272,7 @@ export default function OrderTrackingPage() {
                   </h3>
                 </div>
                 <p className="text-xs font-bold text-stone-900">
-                  {order.franchise?.name || "Rohini Sector 22 Hub (Main)"}
+                  {order.franchise?.name || "Local Express Fulfillment Hub"}
                 </p>
                 <p className="text-[11px] text-stone-500 mt-1">
                   Target Delivery: ~20 mins within freshness service area.
@@ -273,6 +288,90 @@ export default function OrderTrackingPage() {
           </div>
         )}
       </main>
+
+      {/* REFRESHED ORDER CONFIRMATION MODAL */}
+      <AnimatePresence>
+        {showSuccessModal && order && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.6 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-stone-950/70 backdrop-blur-xs"
+              onClick={() => setShowSuccessModal(false)}
+            />
+
+            <motion.div
+              initial={{ scale: 0.94, opacity: 0, y: 16 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.94, opacity: 0, y: 16 }}
+              transition={{ type: "spring", duration: 0.35 }}
+              className="relative z-10 w-full max-w-lg bg-white rounded-3xl shadow-2xl p-6 sm:p-8 text-center text-xs text-stone-700 border border-stone-100"
+            >
+              <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4 ring-8 ring-emerald-50">
+                <CheckCircle2 size={36} strokeWidth={2.5} />
+              </div>
+
+              <span className="inline-block px-3 py-1 bg-emerald-50 text-emerald-700 font-extrabold text-[11px] rounded-full border border-emerald-200 uppercase tracking-wider mb-2">
+                Order Confirmed
+              </span>
+
+              <h2 className="text-xl sm:text-2xl font-bold text-stone-900 tracking-tight">
+                Order Placed Successfully!
+              </h2>
+
+              <p className="text-xs text-stone-500 mt-1.5 mb-5 max-w-sm mx-auto">
+                Thank you, <strong className="text-stone-800">{order.customerName}</strong>. Your order has been placed and is automatically confirmed for preparation.
+              </p>
+
+              <div className="bg-stone-50 rounded-2xl p-4 border border-stone-200/70 text-left space-y-2 mb-6">
+                <div className="flex justify-between items-center text-xs pb-2 border-b border-stone-200/50">
+                  <span className="text-stone-500 font-medium">Order Reference:</span>
+                  <span className="font-mono font-bold text-stone-900">
+                    #{order.friendlyId || order.id}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-xs pb-2 border-b border-stone-200/50">
+                  <span className="text-stone-500 font-medium">Payment Mode:</span>
+                  <span className="font-bold text-stone-900 uppercase">
+                    {order.paymentMethod || "COD"} (Cash on Delivery)
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-xs pb-2 border-b border-stone-200/50">
+                  <span className="text-stone-500 font-medium">Total Amount:</span>
+                  <span className="font-extrabold text-brand-primary text-sm">
+                    ₹{order.total}
+                  </span>
+                </div>
+                {order.customerPhone && (
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-stone-500 font-medium">Contact Phone:</span>
+                    <span className="font-semibold text-stone-800">
+                      {order.customerPhone}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowSuccessModal(false)}
+                  className="flex-1 py-3 px-4 bg-brand-primary hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
+                >
+                  View Live Tracking Receipt
+                </button>
+                <Link
+                  href="/shop"
+                  className="py-3 px-4 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl text-xs font-bold transition-colors text-center cursor-pointer"
+                >
+                  Continue Shopping
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       <Footer />
     </div>

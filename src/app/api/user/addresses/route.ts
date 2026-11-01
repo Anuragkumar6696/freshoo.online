@@ -13,8 +13,11 @@ export async function GET(_req: NextRequest) {
     return jsonOk({ addresses: ctx.user.addresses.map((a: any) => ({
       id: (a._id || a.id).toString(),
       tag: a.tag,
+      flatSociety: a.flatSociety || "",
+      locality: a.locality || "",
       addressLine: a.addressLine,
       city: a.city,
+      state: a.state || "Delhi",
       pincode: a.pincode,
       geoLocation: a.geoLocation || null,
     })) });
@@ -29,18 +32,21 @@ export async function POST(req: NextRequest) {
     if (!ctx) return unauthorized();
     const body = await req.json();
     const tag = body?.tag || "Home";
+    const flatSociety = (body?.flatSociety || "").trim();
+    const locality = (body?.locality || "").trim();
     const addressLine = (body?.addressLine || "").trim();
     const city = (body?.city || "Delhi").trim();
+    const state = (body?.state || "Delhi").trim();
     const pincode = String(body?.pincode || "").replace(/\D/g, "").slice(0, 6);
     const geoLocation = body?.geoLocation || null;
 
-    if (addressLine.length < 5)
+    if (addressLine.length < 3)
       return jsonErr("Street address is too short");
     if (pincode.length !== 6)
       return jsonErr("Please enter a valid 6-digit pincode");
 
     await connectDB();
-    const newAddr: any = { tag, addressLine, city, pincode };
+    const newAddr: any = { tag, flatSociety, locality, addressLine, city, state, pincode };
     if (geoLocation) newAddr.geoLocation = geoLocation;
 
     const user = await User.findById(ctx.user._id);
@@ -54,8 +60,11 @@ export async function POST(req: NextRequest) {
           ? {
               id: (last._id || last.id || "").toString(),
               tag: last.tag,
+              flatSociety: last.flatSociety || "",
+              locality: last.locality || "",
               addressLine: last.addressLine,
               city: last.city,
+              state: last.state || "Delhi",
               pincode: last.pincode,
               geoLocation: last.geoLocation || null,
             }
@@ -63,8 +72,11 @@ export async function POST(req: NextRequest) {
         addresses: user.addresses.map((a: any) => ({
           id: (a._id || a.id).toString(),
           tag: a.tag,
+          flatSociety: a.flatSociety || "",
+          locality: a.locality || "",
           addressLine: a.addressLine,
           city: a.city,
+          state: a.state || "Delhi",
           pincode: a.pincode,
           geoLocation: a.geoLocation || null,
         })),

@@ -46,6 +46,8 @@ export default function AccountPage() {
   // Address Form State
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [tag, setTag] = useState<"Home" | "Work" | "Other">("Home");
+  const [flatSociety, setFlatSociety] = useState("");
+  const [locality, setLocality] = useState("");
   const [addressLine, setAddressLine] = useState("");
   const [city] = useState("Delhi");
   const [pincode, setPincode] = useState("");
@@ -203,15 +205,27 @@ export default function AccountPage() {
   const handleAddAddressSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormError("");
-    if (!addressLine || !pincode) {
-      setFormError("Please fill out all address fields.");
+    if ((!flatSociety && !addressLine) || !pincode) {
+      setFormError("Please fill out Flat/Society and pincode.");
       return;
     }
     if (pincode.length !== 6 || isNaN(Number(pincode))) {
-      setFormError("Please enter a valid 6-digit Delhi pincode.");
+      setFormError("Please enter a valid 6-digit delivery pincode.");
       return;
     }
-    addAddress({ tag, addressLine, city, pincode });
+    const combinedLine = [flatSociety.trim(), locality.trim(), addressLine.trim()]
+      .filter(Boolean)
+      .join(", ");
+    addAddress({
+      tag,
+      flatSociety: flatSociety.trim(),
+      locality: locality.trim(),
+      addressLine: combinedLine,
+      city,
+      pincode,
+    });
+    setFlatSociety("");
+    setLocality("");
     setAddressLine("");
     setPincode("");
     setShowAddressForm(false);
@@ -714,9 +728,16 @@ export default function AccountPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <input
                         type="text"
-                        placeholder="House / Flat No, Street, Society, Landmark *"
-                        value={addressLine}
-                        onChange={(e) => setAddressLine(e.target.value)}
+                        placeholder="Flat / House No. & Society / Apartment Name *"
+                        value={flatSociety}
+                        onChange={(e) => setFlatSociety(e.target.value)}
+                        className="w-full sm:col-span-2 px-3.5 py-2.5 bg-white border border-stone-200 rounded-xl focus:border-brand-primary outline-none text-xs font-medium"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Area / Locality / Sector"
+                        value={locality}
+                        onChange={(e) => setLocality(e.target.value)}
                         className="w-full sm:col-span-2 px-3.5 py-2.5 bg-white border border-stone-200 rounded-xl focus:border-brand-primary outline-none text-xs font-medium"
                       />
                       <input
@@ -727,7 +748,7 @@ export default function AccountPage() {
                       />
                       <input
                         type="text"
-                        placeholder="6-digit Pincode (e.g. 110085) *"
+                        placeholder="6-digit Pincode (e.g. 201009) *"
                         value={pincode}
                         maxLength={6}
                         onChange={(e) => setPincode(e.target.value.replace(/\D/g, ""))}

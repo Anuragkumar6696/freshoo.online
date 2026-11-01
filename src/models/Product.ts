@@ -56,6 +56,7 @@ const ProductSchema = new Schema<IProduct>(
 );
 
 ProductSchema.index({ name: "text", description: "text", category: "text" });
+ProductSchema.index({ category: 1, isBestSeller: -1, createdAt: -1 });
 
 export const Product =
   (mongoose.models.Product as mongoose.Model<IProduct>) ||

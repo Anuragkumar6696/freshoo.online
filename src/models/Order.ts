@@ -63,6 +63,10 @@ const GeoSchema = new Schema<GeoLocation>(
     accuracy: { type: Number, default: null },
     addressLabel: { type: String, default: null, trim: true },
     capturedAt: { type: String, default: null, trim: true },
+    pincode: { type: String, default: null, trim: true },
+    locality: { type: String, default: null, trim: true },
+    city: { type: String, default: null, trim: true },
+    state: { type: String, default: null, trim: true },
   },
   { _id: false }
 );
@@ -72,8 +76,11 @@ const AddressSchema = new Schema<
 >(
   {
     tag: { type: String, default: "Home", trim: true },
+    flatSociety: { type: String, default: "", trim: true },
+    locality: { type: String, default: "", trim: true },
     addressLine: { type: String, required: true, trim: true },
     city: { type: String, required: true, trim: true, default: "Delhi" },
+    state: { type: String, default: "Delhi", trim: true },
     pincode: { type: String, required: true, trim: true },
     geoLocation: { type: GeoSchema, default: null },
   },

@@ -352,18 +352,41 @@ export async function POST(req: NextRequest) {
       jsonOrder.geoLocation = geoLocation || address?.geoLocation;
     }
 
-    // 6. Dual Brevo Email Dispatch + Excel Sync
-    try {
-      const results = await Promise.allSettled([
-        sendNewOrderAdminNotification(jsonOrder),
-        sendOrderCustomerConfirmation(jsonOrder),
-      ]);
-      console.log("[Brevo] order notification dispatched:", JSON.stringify(results));
-    } catch (err) {
-      console.warn("[Brevo] order notification failed:", err);
+    // 6. Dual Brevo Email Dispatch (Non-blocking background execution for lightning sub-100ms response)
+    void (async () => {
+      try {
+        const results = await Promise.allSettled([
+          sendNewOrderAdminNotification(jsonOrder),
+          sendOrderCustomerConfirmation(jsonOrder),
+        ]);
+        console.log("[Brevo] order notification dispatched:", JSON.stringify(results));
+      } catch (err) {
+        console.warn("[Brevo] order notification failed:", err);
+      }
+    })();
+
+    // 7. Auto-Sync Contact Details to User Profile (if logged-in user updated phone/email at checkout)
+    if (ctx?.user && (customerPhone || customerEmail)) {
+      void (async () => {
+        try {
+          const { User } = await import("@/models/User");
+          const updates: any = {};
+          if (customerPhone && customerPhone !== ctx.user.phone) {
+            updates.phone = customerPhone;
+          }
+          if (customerEmail && customerEmail.toLowerCase() !== (ctx.user.email || "").toLowerCase()) {
+            updates.email = customerEmail.toLowerCase();
+          }
+          if (Object.keys(updates).length > 0) {
+            await User.findByIdAndUpdate(ctx.user._id, { $set: updates });
+          }
+        } catch (err) {
+          console.warn("[UserUpdate] profile sync from checkout notice:", err);
+        }
+      })();
     }
 
-    // 7. Auto-Record to Persistent Live Excel Workbook
+    // 8. Auto-Record to Persistent Live Excel Workbook
     void (async () => {
       try {
         const { syncAllOrdersToExcelDisk } = await import("@/lib/excelSync");

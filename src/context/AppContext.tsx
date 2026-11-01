@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import { Toast, ToastData } from "@/components/Toast";
 
 // Types
 export interface Product {
@@ -39,13 +40,20 @@ export interface GeoLocation {
   accuracy: number | null;
   addressLabel: string | null;
   capturedAt: string | null;
+  pincode?: string | null;
+  locality?: string | null;
+  city?: string | null;
+  state?: string | null;
 }
 
 export interface Address {
   id: string;
   tag: "Home" | "Work" | "Other";
+  flatSociety?: string;
+  locality?: string;
   addressLine: string;
   city: string;
+  state?: string;
   pincode: string;
   geoLocation?: GeoLocation | null;
 }
@@ -191,6 +199,10 @@ interface AppContextType {
   refreshOrders: (forceAll?: boolean) => Promise<void>;
   updateOrderStatus: (orderId: string, status: Order["status"]) => Promise<boolean>;
   reorderItems: (items: CartItem[]) => void;
+
+  toast: ToastData | null;
+  showToast: (message: string, subtext?: string) => void;
+  hideToast: () => void;
 
   isAdmin: boolean;
 }
@@ -365,6 +377,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [selectedFranchise, setSelectedFranchise] = useState<any | null>(null);
   const [serviceability, setServiceability] = useState<any | null>(null);
 
+  // Toast state
+  const [toast, setToast] = useState<ToastData | null>(null);
+  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const showToast = useCallback((message: string, subtext?: string) => {
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    setToast({ message, subtext, id: Date.now() });
+    toastTimeoutRef.current = setTimeout(() => {
+      setToast(null);
+    }, 2800);
+  }, []);
+
+  const hideToast = useCallback(() => {
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    setToast(null);
+  }, []);
+
+  const isPlacingOrderRef = useRef(false);
+
   // Hydrate from localStorage immediately (for SSR/client split)
   useEffect(() => {
     try {
@@ -372,7 +403,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (loc) {
         setSelectedLocation(loc);
       } else {
-        setSelectedLocation("Sector 22, Rohini, Delhi");
+        setSelectedLocation("Siddharth Vihar, Ghaziabad");
       }
       const savedCart = localStorage.getItem("freshoo_cart");
       if (savedCart) setCart(JSON.parse(savedCart));
@@ -585,16 +616,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           const lng = pos.coords.longitude;
           let label: string | null = null;
 
+          let geoPincode: string | null = null;
+          let geoLocality: string | null = null;
+          let geoCity: string | null = null;
+          let geoState: string | null = null;
+
           try {
             const res = await fetch(`/api/geocode/reverse?lat=${lat}&lng=${lng}`);
             if (res.ok) {
               const data = await res.json();
-              if (data?.address?.addressLine) {
-                label = data.address.addressLine;
-                if (label && data.address.locality && !label.includes(data.address.locality)) {
-                  label += `, ${data.address.locality}`;
+              const addr = data?.address || {};
+              if (addr.addressLine) {
+                label = addr.addressLine;
+                if (label && addr.locality && !label.includes(addr.locality)) {
+                  label += `, ${addr.locality}`;
                 }
               }
+              if (addr.pincode) geoPincode = addr.pincode;
+              if (addr.locality) geoLocality = addr.locality;
+              if (addr.city) geoCity = addr.city;
+              if (addr.state) geoState = addr.state;
+
               if (data?.serviceability) {
                 setServiceability(data.serviceability);
                 if (data.serviceability.franchise) {
@@ -612,6 +654,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             accuracy: pos.coords.accuracy,
             addressLabel: label,
             capturedAt: new Date().toISOString(),
+            pincode: geoPincode,
+            locality: geoLocality,
+            city: geoCity,
+            state: geoState,
           };
           setCheckoutGeoLocation(geo);
           try { localStorage.setItem("freshoo_checkout_geo", JSON.stringify(geo)); } catch { /* noop */ }
@@ -760,6 +806,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         { id: cartItemId, product, selectedWeight, price: option.price, quantity: 1 },
       ]);
     }
+    showToast("Added to cart", `${product.name} (${selectedWeight})`);
   };
   const removeFromCart = (cartItemId: string) => saveCart(cart.filter((it) => it.id !== cartItemId));
   const updateCartQuantity = (cartItemId: string, qty: number) => {
@@ -906,70 +953,93 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     opts = {}
   ) => {
     if (cart.length === 0) return null;
-    const { instructions, geoLocation, isGuest = false, guestDetails } = opts;
-
-    let resolvedAddress: Omit<Address, "id"> | Address;
-    if (typeof addressOrId === "string") {
-      if (!user) return null;
-      const found = user.addresses.find((a) => a.id === addressOrId);
-      if (!found) return null;
-      resolvedAddress = found;
-    } else {
-      resolvedAddress = addressOrId;
-    }
-
-    const finalGeo = geoLocation ?? checkoutGeoLocation ?? null;
-
-    const r = await apiFetch("/orders", {
-      method: "POST",
-      body: JSON.stringify({
-        items: cart,
-        address: resolvedAddress,
-        paymentMethod,
-        instructions: instructions || "",
-        geoLocation: finalGeo,
-        isGuest: !user || isGuest,
-        guestDetails,
-        customerName: guestDetails?.name || user?.name || "Customer",
-        customerEmail: guestDetails?.email || user?.email || null,
-        customerPhone: guestDetails?.phone || user?.phone || null,
-        couponCode: appliedCoupon?.code,
-      }),
-    });
-
-    if (!r.success || !r.data?.order) {
-      alert(r.error || "Something went wrong while placing your order. Please try again.");
+    if (isPlacingOrderRef.current) {
+      console.warn("[AppContext] Order placement already in progress, blocking duplicate submission");
       return null;
     }
-    const order = r.data.order as Order;
-    // Fix id mismatch: backend uses friendlyId, frontend expects id
-    if (!order.id && (order as any).friendlyId) {
-      (order as any).id = (order as any).friendlyId;
+    isPlacingOrderRef.current = true;
+
+    try {
+      const { instructions, geoLocation, isGuest = false, guestDetails } = opts;
+
+      let resolvedAddress: Omit<Address, "id"> | Address;
+      if (typeof addressOrId === "string") {
+        if (!user) return null;
+        const found = user.addresses.find((a) => a.id === addressOrId);
+        if (!found) return null;
+        resolvedAddress = found;
+      } else {
+        resolvedAddress = addressOrId;
+      }
+
+      const finalGeo = geoLocation ?? checkoutGeoLocation ?? null;
+
+      const r = await apiFetch("/orders", {
+        method: "POST",
+        body: JSON.stringify({
+          items: cart,
+          address: resolvedAddress,
+          paymentMethod,
+          instructions: instructions || "",
+          geoLocation: finalGeo,
+          isGuest: !user || isGuest,
+          guestDetails,
+          customerName: guestDetails?.name || user?.name || "Customer",
+          customerEmail: guestDetails?.email || user?.email || null,
+          customerPhone: guestDetails?.phone || user?.phone || null,
+          couponCode: appliedCoupon?.code,
+        }),
+      });
+
+      if (!r.success || !r.data?.order) {
+        alert(r.error || "Something went wrong while placing your order. Please try again.");
+        return null;
+      }
+      const order = r.data.order as Order;
+      // Fix id mismatch: backend uses friendlyId, frontend expects id
+      if (!order.id && (order as any).friendlyId) {
+        (order as any).id = (order as any).friendlyId;
+      }
+      // Map backend status (PENDING) to frontend label (Order Placed) if backend provided statusLabel
+      if ((order as any).statusLabel && !order.status) {
+        order.status = (order as any).statusLabel as Order["status"];
+      }
+
+      // Sync customer details to local user state if changed
+      if (user && guestDetails) {
+        setUser((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            name: guestDetails.name || prev.name,
+            phone: guestDetails.phone || prev.phone,
+            email: guestDetails.email || prev.email,
+          };
+        });
+      }
+
+      // Local updates — avoid duplicate if already present
+      setOrders((prev) => {
+        if (prev.find((p) => p.id === order.id)) return prev;
+        const updated = [order, ...prev];
+        try { localStorage.setItem("freshoo_orders", JSON.stringify(updated)); } catch { /* noop */ }
+        return updated;
+      });
+
+      if (typeof addressOrId !== "string" && user && !isGuest) {
+        // Try saving address
+        await addAddress(resolvedAddress as Omit<Address, "id">);
+      }
+
+      clearCart();
+      try { localStorage.removeItem("freshoo_checkout_geo"); } catch { /* noop */ }
+      setCheckoutGeoLocation(null);
+      if (user) await refreshOrders();
+
+      return order;
+    } finally {
+      isPlacingOrderRef.current = false;
     }
-    // Map backend status (PENDING) to frontend label (Order Placed) if backend provided statusLabel
-    if ((order as any).statusLabel && !order.status) {
-      order.status = (order as any).statusLabel as Order["status"];
-    }
-
-    // Local updates — avoid duplicate if already present
-    setOrders((prev) => {
-      if (prev.find((p) => p.id === order.id)) return prev;
-      const updated = [order, ...prev];
-      try { localStorage.setItem("freshoo_orders", JSON.stringify(updated)); } catch { /* noop */ }
-      return updated;
-    });
-
-    if (typeof addressOrId !== "string" && user && !isGuest) {
-      // Try saving address
-      await addAddress(resolvedAddress as Omit<Address, "id">);
-    }
-
-    clearCart();
-    try { localStorage.removeItem("freshoo_checkout_geo"); } catch { /* noop */ }
-    setCheckoutGeoLocation(null);
-    if (user) await refreshOrders();
-
-    return order;
   };
 
   const updateOrderStatus = async (orderId: string, status: Order["status"]): Promise<boolean> => {
@@ -1052,10 +1122,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         refreshOrders,
         updateOrderStatus,
         reorderItems,
+        toast,
+        showToast,
+        hideToast,
         isAdmin,
       }}
     >
       {children}
+      <Toast toast={toast} onClose={hideToast} />
     </AppContext.Provider>
   );
 };

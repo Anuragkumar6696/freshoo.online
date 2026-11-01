@@ -56,7 +56,10 @@ export async function GET(req: NextRequest) {
       _id: undefined,
       __v: undefined,
     }));
-    return jsonOk({ products, count: products.length });
+    return jsonOk(
+      { products, count: products.length },
+      { headers: { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=120" } }
+    );
   } catch (e: any) {
     console.error("products GET error:", e);
     return jsonErr(e?.message || "Failed to load products", 500);

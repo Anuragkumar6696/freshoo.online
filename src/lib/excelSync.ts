@@ -21,8 +21,11 @@ export interface ExcelOrderRow {
   "Items Count": number;
   "Items Ordered (Catalogue Breakdown)": string;
   "Address Tag": string;
+  "Flat & Society"?: string;
+  "Locality"?: string;
   "Delivery Address": string;
   "City": string;
+  "State"?: string;
   "Pincode": string;
   "GPS Latitude": number | string;
   "GPS Longitude": number | string;
@@ -97,8 +100,11 @@ export function formatOrderForExcel(o: any): ExcelOrderRow {
     "Items Count": itemsList.length,
     "Items Ordered (Catalogue Breakdown)": itemsBreakdown || "No items",
     "Address Tag": addr.tag || "Home",
+    "Flat & Society": addr.flatSociety || "—",
+    "Locality": addr.locality || "—",
     "Delivery Address": addr.addressLine || "—",
     "City": addr.city || "Delhi",
+    "State": addr.state || "Delhi",
     "Pincode": addr.pincode || "—",
     "GPS Latitude": lat,
     "GPS Longitude": lng,
